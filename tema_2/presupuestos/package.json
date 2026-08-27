@@ -1,0 +1,36 @@
+{
+  "name": "presupuestos-pro",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.6.2",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0",
+    "vitest": "^3.2.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "jsdom": "^26.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "core-js@3.50.0": true
+  }
+}

@@ -1,0 +1,25 @@
+# Especificación: [NOMBRE DEL PROYECTO] v[N]
+
+## 1. Objetivo y contexto de negocio
+[¿Qué problema resuelve y por qué importa? ¿Cómo se usa en la vida real?]
+
+## 2. Usuarios
+[¿Quién lo usa? ¿Qué sabe y qué no? ¿Hay alguien que recibe el resultado sin usar la app?]
+
+## 3. Escenarios de usuario (historias)
+- HU1 — Como [usuario], quiero [acción], para [beneficio].
+
+## 4. Requisitos funcionales
+- RF1. El sistema debe [comportamiento observable].   [QUÉ hace, no CÓMO. Sin tecnología.]
+
+## 5. Reglas de negocio (con ejemplos)
+[Las reglas que no se pueden saltar, cada una con un ejemplo concreto que se pueda comprobar.]
+
+## 6. Criterios de aceptación (verificables sin código)
+- CA1. [Algo que se mira en la app y se sabe si está bien con un sí/no.]
+
+## 7. Casos límite
+- CL1. ¿Qué pasa si [situación rara o vacía]?
+
+## 8. Fuera de alcance
+[Lo que esta versión NO hace, dicho explícitamente. La sección que impide que la IA se vaya por las ramas.]

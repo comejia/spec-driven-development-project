@@ -1,0 +1,6 @@
+/speckit.specify
+
+[pegar aquí la spec manual]
+
+Antes de redactar la especificación formal, hazme las preguntas que necesites para
+resolver cualquier ambigüedad. No implementes nada todavía.

@@ -1,0 +1,100 @@
+# Especificación: PresupuestosPro v0
+
+## 1. Objetivo y contexto de negocio
+
+PresupuestosPro es una herramienta para que un freelancer español cree presupuestos profesionales con su marca y los descargue en PDF para enviárselos a sus clientes, sin pelearse con Excel ni con plantillas.
+
+Hoy, la escena real es esta: son las once de la noche, un cliente ha pedido precio y hay que mandárselo mañana. El freelancer abre una hoja de cálculo vieja, copia un presupuesto anterior, cambia los conceptos a mano, calcula el IVA con la calculadora del móvil y cruza los dedos para que los números cuadren. El resultado tarda demasiado y se ve poco profesional.
+
+Éxito de negocio: poder emitir un presupuesto correcto y con buena imagen en menos de 5 minutos.
+
+## 2. Usuarios
+
+- **El freelancer (usa la aplicación).** Autónomo en España (diseñador, programador, fotógrafo, consultor…). Trabaja solo, no es técnico y hace varios presupuestos al mes. Sabe manejarse con una web normal; no sabe (ni quiere saber) de impuestos más allá de lo justo.
+- **El cliente (no usa la aplicación).** Recibe el PDF por email. Puede ser una **empresa o autónomo**, o un **particular**. La distinción importa: cambia si se aplica o no la retención de IRPF.
+
+## 3. Escenarios de usuario
+
+- HU1 — Como freelancer, quiero configurar mi nombre, NIF, datos de contacto y logo, para que mis presupuestos salgan con mi marca sin tener que ponerla cada vez.
+- HU2 — Como freelancer, quiero mantener un catálogo de mis servicios con un precio por defecto cada uno, para no reescribir lo mismo en cada presupuesto.
+- HU3 — Como freelancer, quiero crear un presupuesto eligiendo el cliente y añadiendo líneas (de mi catálogo o escritas a mano), para adaptarlo a cada encargo.
+- HU4 — Como freelancer, quiero que la base imponible, el IVA, la retención de IRPF (cuando toque) y el total se calculen solos, para no equivocarme con los impuestos.
+- HU5 — Como freelancer, quiero descargar el presupuesto como PDF con mi logo, número y validez, para enviárselo al cliente con buena imagen.
+
+## 4. Requisitos funcionales
+
+- RF1. El sistema debe permitir guardar y editar el perfil del freelancer: nombre, NIF, datos de contacto y logo.
+- RF2. El sistema debe permitir crear, editar y eliminar servicios del catálogo, cada uno con nombre y precio por defecto.
+- RF3. El sistema debe permitir crear un presupuesto indicando los datos del cliente y su tipo: **empresa/autónomo** o **particular**.
+- RF4. Cada línea del presupuesto debe poder venir del catálogo o escribirse a mano, con descripción, cantidad y precio unitario.
+- RF5. El sistema debe calcular automáticamente, en cada presupuesto:
+  - Base imponible = suma de (cantidad × precio unitario) de todas las líneas.
+  - IVA = base imponible × 21 % (tipo por defecto).
+  - Retención de IRPF (si el freelancer la activa) = base imponible × 15 % o × 7 %, según elija.
+  - Total = base imponible + IVA − retención de IRPF.
+- RF6. Si el cliente es "particular", la retención de IRPF no se aplica en ningún caso.
+- RF7. El sistema debe numerar los presupuestos automáticamente con el formato AAAA-NNN (por ejemplo, 2026-001), reiniciando el contador cada año.
+- RF8. El presupuesto debe mostrar la fecha de emisión y una validez de 30 días desde esa fecha.
+- RF9. El sistema debe permitir editar o eliminar cualquier línea del presupuesto antes de generar el PDF.
+- RF10. El sistema debe generar un PDF con el logo, los datos del freelancer y del cliente, el número, las fechas, la tabla de líneas y el desglose de base, IVA, retención y total.
+- RF11. Cuando el freelancer vuelva a abrir la aplicación, su perfil, su catálogo y sus presupuestos deben seguir ahí.
+
+## 5. Reglas de negocio (con ejemplo)
+
+- **IVA:** 21 % por defecto (tipo general de servicios profesionales en España).
+- **Retención de IRPF:** 15 % (general) o 7 % (nuevos autónomos). Es opcional y **solo se aplica a clientes empresa/autónomo, nunca a particulares**.
+- **Fórmula del total:** Total = base imponible + IVA − retención de IRPF.
+- **Numeración:** formato AAAA-NNN (2026-001, 2026-002…), reinicia cada año.
+- **Validez:** 30 días desde la fecha de emisión.
+
+**Ejemplo de referencia (debe cuadrar al céntimo):**
+
+| Concepto | Importe |
+|---|---|
+| Diseño de página web | 1.500,00 € |
+| Sesión de fotos de producto | 500,00 € |
+| **Base imponible** | **2.000,00 €** |
+| IVA (21 %) | 420,00 € |
+| Retención de IRPF (−15 %) | −300,00 € |
+| **Total a pagar** | **2.120,00 €** |
+
+- El mismo presupuesto con retención del 7 %: total **2.280,00 €**.
+- El mismo presupuesto a un cliente particular (sin retención): total **2.420,00 €**.
+
+## 6. Criterios de aceptación (verificables sin código)
+
+- CA1. Con el ejemplo de la sección 5 y retención del 15 %, el total mostrado es exactamente 2.120,00 €.
+- CA2. Al activar o desactivar la retención de IRPF, o al cambiar entre 15 % y 7 %, el total se recalcula solo.
+- CA3. Al marcar el cliente como "particular", la retención de IRPF no se aplica y el total sube respecto al mismo presupuesto con retención.
+- CA4. El segundo presupuesto creado en el año recibe automáticamente el número siguiente (por ejemplo, 2026-002).
+- CA5. El PDF descargado muestra el logo, el número, la fecha de emisión, la validez y el desglose completo (base, IVA, retención si la hay, total).
+- CA6. Puedo editar o borrar cualquier línea antes de generar el PDF y los totales se actualizan.
+- CA7. Cierro la aplicación, la vuelvo a abrir, y mi perfil, mi catálogo y mis presupuestos siguen ahí.
+
+## 7. Casos límite
+
+- CL1. Presupuesto sin ninguna línea: no se genera el PDF; se avisa al freelancer.
+- CL2. Línea escrita a mano, fuera del catálogo: permitida (no todo encargo está catalogado).
+- CL3. Cliente particular con la retención activada por error: la retención no se aplica (manda el tipo de cliente).
+
+## 8. Fuera de alcance (v0)
+
+- **No es una factura:** nada de facturación electrónica ni VeriFactu en esta versión.
+- Sin cuentas de usuario ni "entrar con contraseña".
+- Sin guardar nada en la nube: los datos viven en el ordenador del freelancer.
+- Sin multidivisa: solo euros.
+- Sin enviar el PDF por email desde la aplicación (el freelancer lo descarga y lo manda él).
+- Sin descuentos por línea ni globales (si algún día se añaden, se especificarán con su regla de cálculo y ejemplos).
+
+---
+
+## 9. Preguntas abiertas (para la sesión de clarificación con Spec Kit)
+
+Cosas que sé que no he decidido. No las escondo: las apunto para resolverlas en el siguiente paso.
+
+- PA1. **IVA:** ¿el 21 % debe ser editable? ¿Hacen falta los otros tipos (10 %, 4 %, 0 % exento)?
+- PA2. **Logo:** ¿qué aparece en el PDF si el freelancer todavía no ha subido logo?
+- PA3. **Numeración:** ¿se puede corregir un número a mano si hace falta, o es intocable?
+- PA4. **Redondeo:** ¿cómo se redondean exactamente los importes con decimales raros (2,345 €)?
+- PA5. **Primer uso:** ¿qué ve el freelancer la primera vez, con el catálogo vacío y sin perfil?
+- PA6. **Cambio de ordenador:** si los datos viven en este ordenador, ¿qué pasa si uso otro? ¿Lo asumimos y lo decimos claramente?

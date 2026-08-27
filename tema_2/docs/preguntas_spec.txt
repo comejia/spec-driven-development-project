@@ -1,0 +1,10 @@
+1.  ¿Se entiende el OBJETIVO sin saber de tecnología? (si tu cuñado no lo pilla, reescríbelo)
+2.  ¿Está claro QUIÉN es el usuario y qué sabe (y qué no sabe) hacer?
+3.  ¿Las reglas de negocio tienen un EJEMPLO concreto con números o casos reales?
+4.  ¿Hay CRITERIOS DE ACEPTACIÓN que se comprueben con un sí/no usando la app?
+5.  ¿Has separado el QUÉ del CÓMO? ¿Te has colado diciendo qué tecnología usar?
+6.  ¿Existe una sección de "FUERA DE ALCANCE" que diga qué NO se hace?
+7.  ¿Has pensado en los CASOS LÍMITE (vacío, cero, error, lo inesperado)?
+8.  ¿Falta alguna DECISIÓN que la IA tendría que adivinar? Decídela tú.
+9.  ¿Hay AMBIGÜEDADES tipo "que se vea profesional" sin definir? Concrétalas.
+10. ¿Podrías dársela a OTRA persona y que construyera lo mismo que tú tienes en la cabeza?
