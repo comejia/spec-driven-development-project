@@ -1,0 +1,51 @@
+# Exportar todos mis presupuestos en un .zip
+
+## Objetivo
+Que el freelancer pueda llevarse TODOS sus presupuestos de una sola vez, en un único
+archivo comprimido .zip, como copia de seguridad y para archivarlos donde quiera.
+Hoy sus datos viven solo en su navegador. Este botón es su seguro de vida.
+
+## Usuario
+El mismo freelancer de siempre: autónomo, no técnico. Sabe descargar un archivo y
+descomprimir un .zip con doble clic. No sabe (ni tiene por qué saber) qué hay dentro
+de un "archivo de datos".
+
+## Alcance
+- Un botón "Exportar todo (.zip)" en un lugar visible de la lista de presupuestos.
+- Al pulsarlo se descarga UN único archivo .zip que contiene:
+  - Un PDF por cada presupuesto existente, exactamente el mismo PDF que ya genera
+    la app para ese presupuesto.
+  - Un único archivo de datos con toda la información (presupuestos, catálogo de
+    servicios y perfil del freelancer, logo incluido), pensado para poder restaurar
+    la aplicación en el futuro.
+- Funciona con los datos que haya: 1 presupuesto o 200.
+
+## Reglas de negocio
+- Nombre del .zip: "presupuestospro-copia-AAAA-MM-DD.zip", con la fecha del día de
+  la exportación. Ejemplo: exporto el 15/03/2026 → presupuestospro-copia-2026-03-15.zip.
+- Nombre de cada PDF dentro del zip: número + cliente. Ejemplo: "2026-001 - Estudio
+  García.pdf".
+- La exportación NO modifica nada: es solo lectura. Después de exportar, la app
+  sigue exactamente igual.
+- Los PDF del zip deben cuadrar al céntimo con los que genera la app uno a uno
+  (mismo ejemplo de control del Módulo 2: total 3.604,00 €).
+
+## Criterios de éxito
+- Con 3 presupuestos creados, pulso el botón y descargo un único .zip.
+- Al descomprimirlo veo 3 PDF con nombre "número - cliente" y un archivo de datos.
+- Abro cualquiera de los PDF y es idéntico al que descargo desde la app para ese
+  mismo presupuesto.
+- Con 0 presupuestos, el botón avisa de que no hay nada que exportar (y no se
+  descarga ningún zip vacío).
+
+## Casos límite
+- Sin presupuestos: aviso claro, sin descarga.
+- Cliente con caracteres conflictivos en el nombre ("Diseño/Web S.L."): el nombre de
+  archivo se limpia para que el zip no se rompa.
+- Muchos presupuestos (50+): puede tardar; tiene que verse que está trabajando.
+
+## Fuera de alcance
+- IMPORTAR la copia (restaurar los datos): será otra spec, otro capítulo.
+- Exportar a Excel/CSV con formato contable.
+- Copias automáticas o programadas: solo bajo demanda, con su botón.
+- Enviar el zip por email o subirlo a ninguna nube.

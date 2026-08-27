@@ -1,0 +1,7 @@
+Crea el archivo CLAUDE.md en la raíz del proyecto: será tu memoria técnica en todas las
+sesiones futuras. Tiene que caber en una pantalla e incluir: (1) qué es esta app en una
+frase; (2) el stack: tecnologías activas y decisiones técnicas vigentes (revisa los
+plan.md de specs/ para extraerlas); (3) cómo se arranca y se prueba en local; (4) las
+convenciones que seguimos; (5) una última línea que diga: "Las reglas de producto viven
+en .specify/memory/constitution.md y el estado del producto en specs/README.md".
+Enséñamelo antes de guardar.
