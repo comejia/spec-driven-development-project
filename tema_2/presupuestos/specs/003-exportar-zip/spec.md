@@ -8,6 +8,14 @@
 
 **Entrada**: Descripción del usuario: "Exportar todos mis presupuestos en un .zip — un botón que descargue un único archivo comprimido con un PDF por cada presupuesto y un archivo de datos único, como copia de seguridad para el freelancer."
 
+## Clarifications
+
+### Session 2026-08-27
+
+- Q: Si al preparar la copia falla la generación de un PDF concreto (por un dato inesperado), ¿qué debe hacer la exportación? → A: Abortar toda la exportación y mostrar un aviso claro; no se descarga ningún `.zip`.
+- Q: ¿Qué debe pasar durante la barra de progreso — porcentaje o solo indicador de "trabajando"? → A: Barra con porcentaje/contador real basado en PDF generados (p. ej. "12 de 50").
+- Q: ¿`datos.json` debe cuadrar con la estructura interna actual o basta cualquier formato legible? → A: Debe reflejar exactamente la estructura interna actual para restaurar tal cual.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Descargar una copia completa en un solo clic (Prioridad: P1)
@@ -54,7 +62,7 @@ Si el freelancer tiene muchos presupuestos (50 o más), la exportación puede ta
 
 **Escenarios de aceptación**:
 
-1. **Dado** que el freelancer tiene 50 o más presupuestos numerados, **cuando** pulsa "Exportar todo (.zip)", **entonces** ve una barra de progreso que indica que la copia se está preparando hasta que la descarga comienza.
+1. **Dado** que el freelancer tiene 50 o más presupuestos numerados, **cuando** pulsa "Exportar todo (.zip)", **entonces** ve una barra de progreso con porcentaje o contador real (p. ej. "12 de 50") que avanza a medida que se generan los PDF, hasta que la descarga comienza.
 2. **Dado** que el freelancer no tiene ningún presupuesto numerado, **cuando** pulsa "Exportar todo (.zip)", **entonces** aparece un aviso (tooltip) indicando que no hay nada que exportar y no se descarga ningún archivo.
 
 ---
@@ -63,8 +71,9 @@ Si el freelancer tiene muchos presupuestos (50 o más), la exportación puede ta
 
 - **Sin presupuestos numerados**: al pulsar el botón se muestra un aviso (tooltip) claro y no se descarga ningún `.zip` vacío.
 - **Cliente con caracteres conflictivos en el nombre** (por ejemplo "Diseño/Web S.L."): el nombre del PDF dentro del `.zip` se limpia de caracteres no válidos para que el archivo comprimido no se corrompa y se pueda descomprimir con normalidad.
-- **Muchos presupuestos (50 o más)**: la preparación puede tardar; el freelancer ve una barra de progreso que confirma que la aplicación está trabajando.
+- **Muchos presupuestos (50 o más)**: la preparación puede tardar; el freelancer ve una barra de progreso con porcentaje o contador real (p. ej. "12 de 50") que confirma el avance de la exportación.
 - **Solo borradores, ningún numerado**: se trata igual que "sin presupuestos numerados" — aviso y sin descarga (los borradores no se incluyen en la exportación).
+- **Fallo al generar un PDF durante la exportación**: si cualquier PDF no se puede generar, se aborta toda la exportación y se muestra un aviso claro; no se descarga ningún `.zip` (nunca una copia parcial).
 
 ## Requisitos *(obligatorio)*
 
@@ -73,7 +82,7 @@ Si el freelancer tiene muchos presupuestos (50 o más), la exportación puede ta
 - **RF-001**: La lista de presupuestos DEBE mostrar un botón "Exportar todo (.zip)" en un lugar visible de su cabecera.
 - **RF-002**: Al pulsar el botón, el sistema DEBE generar y descargar un único archivo `.zip` que contenga todos los presupuestos numerados existentes.
 - **RF-003**: El sistema DEBE incluir en el `.zip` un archivo PDF por cada presupuesto numerado, siendo cada PDF idéntico al que la aplicación genera para ese presupuesto de forma individual (mismo contenido y mismo total; ejemplo de control: 3.604,00 €).
-- **RF-004**: El sistema DEBE incluir en el `.zip` un único archivo de datos llamado `datos.json` que contenga toda la información necesaria para una futura restauración: los presupuestos, el catálogo de servicios y el perfil del freelancer (incluido su logo).
+- **RF-004**: El sistema DEBE incluir en el `.zip` un único archivo de datos llamado `datos.json` que contenga toda la información necesaria para una futura restauración: los presupuestos, el catálogo de servicios y el perfil del freelancer (incluido su logo). Su contenido DEBE reflejar exactamente la estructura interna que la aplicación almacena hoy, de forma que una futura restauración pueda reconstruir la aplicación tal cual, sin transformaciones ni pérdida de datos.
 - **RF-005**: El sistema DEBE excluir del `.zip` los presupuestos en estado borrador; solo se incluyen los presupuestos numerados.
 - **RF-006**: El sistema DEBE nombrar el archivo comprimido como `presupuestospro-copia-AAAA-MM-DD.zip`, usando la fecha local del equipo del freelancer en el momento de la exportación.
 - **RF-007**: El sistema DEBE nombrar cada PDF dentro del `.zip` con el formato "número - cliente" (por ejemplo, `2026-001 - Estudio García.pdf`).
@@ -81,14 +90,15 @@ Si el freelancer tiene muchos presupuestos (50 o más), la exportación puede ta
 - **RF-009**: El sistema DEBE realizar la exportación como una operación de solo lectura: tras exportar, ningún presupuesto, servicio ni dato del perfil ha sido creado, modificado ni eliminado.
 - **RF-010**: El sistema DEBE funcionar con cualquier número de presupuestos numerados existentes (desde 1 hasta 200 o más).
 - **RF-011**: Cuando no exista ningún presupuesto numerado, el sistema DEBE mostrar un aviso (tooltip) al pulsar el botón y NO DEBE descargar ningún archivo.
-- **RF-012**: Durante la preparación de la copia, el sistema DEBE mostrar una barra de progreso que indique que la exportación está en curso, especialmente perceptible cuando hay muchos presupuestos (50 o más).
+- **RF-012**: Durante la preparación de la copia, el sistema DEBE mostrar una barra de progreso con porcentaje o contador real basado en los PDF ya generados (por ejemplo, "12 de 50"), que indique el avance de la exportación hasta que comienza la descarga.
 - **RF-013**: Toda la interfaz, mensajes y avisos de esta funcionalidad DEBEN estar en español de España.
+- **RF-014**: Si durante la preparación de la copia falla la generación de algún PDF, el sistema DEBE abortar toda la exportación, mostrar un aviso claro y NO descargar ningún archivo `.zip` (nunca se entrega una copia parcial).
 
 ### Entidades clave *(incluir si la funcionalidad implica datos)*
 
 - **Copia de seguridad (archivo .zip)**: el paquete descargable que agrupa toda la información exportable. Contiene un conjunto de PDF (uno por presupuesto numerado) y un único archivo de datos. Se identifica por la fecha de exportación en su nombre.
 - **Documento PDF del presupuesto**: representación imprimible de un presupuesto numerado, idéntica a la que ya genera la aplicación. Se identifica por número de presupuesto y nombre de cliente.
-- **Archivo de datos (`datos.json`)**: contenedor único de la información restaurable: presupuestos, catálogo de servicios y perfil del freelancer (con logo). No incluye la lista de clientes guardados.
+- **Archivo de datos (`datos.json`)**: contenedor único de la información restaurable: presupuestos, catálogo de servicios y perfil del freelancer (con logo). Su contenido refleja exactamente la estructura interna que la aplicación almacena hoy, para permitir una restauración tal cual. No incluye la lista de clientes guardados.
 
 ## Criterios de éxito *(obligatorio)*
 
@@ -99,7 +109,7 @@ Si el freelancer tiene muchos presupuestos (50 o más), la exportación puede ta
 - **CE-003**: Al abrir cualquier PDF del `.zip`, su contenido y total son idénticos al PDF que la aplicación descarga individualmente para ese presupuesto (verificable con el ejemplo de control de 3.604,00 €).
 - **CE-004**: Con 0 presupuestos numerados, al pulsar el botón el freelancer ve un aviso y no se descarga ningún archivo.
 - **CE-005**: Con un cliente cuyo nombre contiene caracteres conflictivos, el `.zip` se descomprime sin errores en el explorador de archivos del sistema.
-- **CE-006**: Con 50 o más presupuestos numerados, el freelancer percibe una barra de progreso durante la preparación de la copia.
+- **CE-006**: Con 50 o más presupuestos numerados, el freelancer percibe una barra de progreso con porcentaje o contador real (p. ej. "12 de 50") que avanza durante la preparación de la copia.
 - **CE-007**: Tras cualquier exportación, la lista de presupuestos y todos los datos permanecen exactamente igual que antes de exportar.
 
 ## Supuestos
