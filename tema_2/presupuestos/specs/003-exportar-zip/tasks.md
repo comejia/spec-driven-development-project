@@ -28,8 +28,8 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 **Propósito**: Preparar la nueva dependencia y andamiaje mínimo para la exportación.
 
-- [ ] T001 Instalar JSZip como dependencia de producción con versión fijada: `npm install jszip --save-exact` y verificar que aparece en `package.json` (research.md, Decisión 1)
-- [ ] T002 [P] Instalar tipos de JSZip si son necesarios (`@types/jszip`) o confirmar que JSZip trae sus propios tipos; verificar que `import JSZip from 'jszip'` compila en un archivo `.ts` de prueba temporal (luego eliminar el archivo temporal)
+- [X] T001 Instalar JSZip como dependencia de producción con versión fijada: `npm install jszip --save-exact` y verificar que aparece en `package.json` (research.md, Decisión 1)
+- [X] T002 [P] Instalar tipos de JSZip si son necesarios (`@types/jszip`) o confirmar que JSZip trae sus propios tipos; verificar que `import JSZip from 'jszip'` compila en un archivo `.ts` de prueba temporal (luego eliminar el archivo temporal)
 
 **Checkpoint**: JSZip disponible e importable en TypeScript sin errores.
 
@@ -41,9 +41,9 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 **⚠️ CRÍTICO**: Ninguna historia de usuario puede empezar hasta completar esta fase.
 
-- [ ] T003 [P] Añadir `fechaLocalISO(fecha?: Date): string` en `src/utils/dates.ts` que devuelva la fecha **local** del equipo en formato `AAAA-MM-DD` con relleno a 2 dígitos (usar `getFullYear`, `getMonth()+1`, `getDate()`); NO modificar `hoy()` existente (contracts/exportacion.md, research.md Decisión 4, RF-006)
-- [ ] T004 [P] Crear `src/utils/nombreArchivo.ts` con `sanearNombreArchivo(nombre: string): string` que sustituya caracteres no válidos `\ / : * ? " < > |` y de control, colapse espacios, recorte extremos y nunca devuelva cadena vacía (fallback a `"sin-nombre"`) (contracts/exportacion.md, RF-008, CE-005)
-- [ ] T005 Refactorizar `src/services/pdf.ts`: extraer `construirDocumentoPDF(presupuesto: Presupuesto): jsPDF` con TODA la lógica de maquetación actual, y dejar `generarDocumentoPDF(presupuesto)` como envoltorio que llama al builder y ejecuta `doc.save(...)`; el comportamiento externo de `generarDocumentoPDF` NO debe cambiar (contracts/exportacion.md, research.md Decisión 2, RF-003)
+- [X] T003 [P] Añadir `fechaLocalISO(fecha?: Date): string` en `src/utils/dates.ts` que devuelva la fecha **local** del equipo en formato `AAAA-MM-DD` con relleno a 2 dígitos (usar `getFullYear`, `getMonth()+1`, `getDate()`); NO modificar `hoy()` existente (contracts/exportacion.md, research.md Decisión 4, RF-006)
+- [X] T004 [P] Crear `src/utils/nombreArchivo.ts` con `sanearNombreArchivo(nombre: string): string` que sustituya caracteres no válidos `\ / : * ? " < > |` y de control, colapse espacios, recorte extremos y nunca devuelva cadena vacía (fallback a `"sin-nombre"`) (contracts/exportacion.md, RF-008, CE-005)
+- [X] T005 Refactorizar `src/services/pdf.ts`: extraer `construirDocumentoPDF(presupuesto: Presupuesto): jsPDF` con TODA la lógica de maquetación actual, y dejar `generarDocumentoPDF(presupuesto)` como envoltorio que llama al builder y ejecuta `doc.save(...)`; el comportamiento externo de `generarDocumentoPDF` NO debe cambiar (contracts/exportacion.md, research.md Decisión 2, RF-003)
 
 **Checkpoint**: Utilidades puras listas y `pdf.ts` refactorizado sin cambiar el PDF individual. Comienza el trabajo por historias.
 
@@ -57,17 +57,17 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 ### Tests para Historia de usuario 1 (escribir primero, deben FALLAR) ⚠️
 
-- [ ] T006 [P] [US1] Crear `tests/services/exportacion.test.ts` con casos: (a) selección incluye solo `estado === 'numerado'` (borradores fuera, RF-005); (b) `construirDatosJson()` contiene `presupuestos`, `catalogo`, `perfil`, `contador` y **no** contiene `clientes` (RF-004); (c) solo lectura: `localStorage` no cambia tras exportar (RF-009, CE-007). Deben fallar por no existir aún el servicio.
+- [X] T006 [P] [US1] Crear `tests/services/exportacion.test.ts` con casos: (a) selección incluye solo `estado === 'numerado'` (borradores fuera, RF-005); (b) `construirDatosJson()` contiene `presupuestos`, `catalogo`, `perfil`, `contador` y **no** contiene `clientes` (RF-004); (c) solo lectura: `localStorage` no cambia tras exportar (RF-009, CE-007). Deben fallar por no existir aún el servicio.
 
 ### Implementación para Historia de usuario 1
 
-- [ ] T007 [US1] Crear `src/services/exportacion.ts` con las interfaces del contrato: `ResultadoExportacion`, `OnProgreso`, y firmas de `exportarTodoZip`, `construirZip`, `construirDatosJson` (contracts/exportacion.md, data-model.md)
-- [ ] T008 [US1] Implementar `construirDatosJson(): object` en `src/services/exportacion.ts`: leer con `getItem` las claves `presupuestospro_presupuestos`, `presupuestospro_catalogo`, `presupuestospro_perfil`, `presupuestospro_contador`; envolver como `{ version: 1, exportadoEl: <ISO>, datos: { presupuestos, catalogo, perfil, contador } }`; NO incluir `clientes` (data-model.md, RF-004)
-- [ ] T009 [US1] Implementar en `src/services/exportacion.ts` la selección de numerados (`filter(p => p.estado === 'numerado')`) y la generación secuencial de PDFs reutilizando `construirDocumentoPDF` + `doc.output('blob')` para producir `EntradaPDF[]` (data-model.md, RF-003)
-- [ ] T010 [US1] Implementar `construirZip(onProgreso?)` en `src/services/exportacion.ts`: empaquetar con JSZip cada PDF (`zip.file`) y `datos.json` (`JSON.stringify(obj, null, 2)`), generar `Blob` con `zip.generateAsync({ type: 'blob' })`; devolver `{ blob, nombreZip }` usando `presupuestospro-copia-${fechaLocalISO()}.zip` (RF-002, RF-006)
-- [ ] T011 [US1] Implementar `exportarTodoZip(onProgreso?)` en `src/services/exportacion.ts`: orquestar selección → `construirZip` → disparar descarga (crear `URL.createObjectURL`, `<a download>`, clic programático, `URL.revokeObjectURL`); devolver `{ ok: true, nombreZip }` en éxito (research.md Decisión 7, RF-002)
-- [ ] T012 [US1] Añadir botón "Exportar todo (.zip)" en la cabecera de `src/components/Presupuestos/PresupuestosPage.tsx` (junto a "Nuevo presupuesto") que invoque `exportarTodoZip` y dispare la descarga (RF-001)
-- [ ] T013 [US1] Ejecutar `npm run test` y verificar que los tests de T006 pasan tras la implementación; ajustar hasta verde
+- [X] T007 [US1] Crear `src/services/exportacion.ts` con las interfaces del contrato: `ResultadoExportacion`, `OnProgreso`, y firmas de `exportarTodoZip`, `construirZip`, `construirDatosJson` (contracts/exportacion.md, data-model.md)
+- [X] T008 [US1] Implementar `construirDatosJson(): object` en `src/services/exportacion.ts`: leer con `getItem` las claves `presupuestospro_presupuestos`, `presupuestospro_catalogo`, `presupuestospro_perfil`, `presupuestospro_contador`; envolver como `{ version: 1, exportadoEl: <ISO>, datos: { presupuestos, catalogo, perfil, contador } }`; NO incluir `clientes` (data-model.md, RF-004)
+- [X] T009 [US1] Implementar en `src/services/exportacion.ts` la selección de numerados (`filter(p => p.estado === 'numerado')`) y la generación secuencial de PDFs reutilizando `construirDocumentoPDF` + `doc.output('blob')` para producir `EntradaPDF[]` (data-model.md, RF-003)
+- [X] T010 [US1] Implementar `construirZip(onProgreso?)` en `src/services/exportacion.ts`: empaquetar con JSZip cada PDF (`zip.file`) y `datos.json` (`JSON.stringify(obj, null, 2)`), generar `Blob` con `zip.generateAsync({ type: 'blob' })`; devolver `{ blob, nombreZip }` usando `presupuestospro-copia-${fechaLocalISO()}.zip` (RF-002, RF-006)
+- [X] T011 [US1] Implementar `exportarTodoZip(onProgreso?)` en `src/services/exportacion.ts`: orquestar selección → `construirZip` → disparar descarga (crear `URL.createObjectURL`, `<a download>`, clic programático, `URL.revokeObjectURL`); devolver `{ ok: true, nombreZip }` en éxito (research.md Decisión 7, RF-002)
+- [X] T012 [US1] Añadir botón "Exportar todo (.zip)" en la cabecera de `src/components/Presupuestos/PresupuestosPage.tsx` (junto a "Nuevo presupuesto") que invoque `exportarTodoZip` y dispare la descarga (RF-001)
+- [X] T013 [US1] Ejecutar `npm run test` y verificar que los tests de T006 pasan tras la implementación; ajustar hasta verde
 
 **Checkpoint**: US1 completa — el botón descarga un `.zip` correcto con PDFs idénticos y `datos.json`. MVP funcional y testeable de forma independiente.
 
@@ -81,14 +81,14 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 ### Tests para Historia de usuario 2 (escribir primero, deben FALLAR) ⚠️
 
-- [ ] T014 [P] [US2] Crear `tests/services/nombreArchivo.test.ts` con casos: "Diseño/Web S.L." produce nombre válido sin `/`; caracteres de control y `\ : * ? " < > |` eliminados/sustituidos; espacios colapsados; cadena vacía o solo inválidos → `"sin-nombre"` (RF-008, CE-005)
-- [ ] T015 [P] [US2] Añadir a `tests/services/exportacion.test.ts` casos de nombrado: PDF nombrado `"<numero> - <cliente saneado>.pdf"` (ej. `2026-001 - Estudio García.pdf`) y nombre del `.zip` `presupuestospro-copia-AAAA-MM-DD.zip` con fecha local (RF-006, RF-007)
+- [X] T014 [P] [US2] Crear `tests/services/nombreArchivo.test.ts` con casos: "Diseño/Web S.L." produce nombre válido sin `/`; caracteres de control y `\ : * ? " < > |` eliminados/sustituidos; espacios colapsados; cadena vacía o solo inválidos → `"sin-nombre"` (RF-008, CE-005)
+- [X] T015 [P] [US2] Añadir a `tests/services/exportacion.test.ts` casos de nombrado: PDF nombrado `"<numero> - <cliente saneado>.pdf"` (ej. `2026-001 - Estudio García.pdf`) y nombre del `.zip` `presupuestospro-copia-AAAA-MM-DD.zip` con fecha local (RF-006, RF-007)
 
 ### Implementación para Historia de usuario 2
 
-- [ ] T016 [US2] En `src/services/exportacion.ts`, aplicar `sanearNombreArchivo` al construir el `nombreArchivo` de cada `EntradaPDF` con el formato `"<numero> - <cliente> .pdf"` saneado (RF-007, RF-008)
-- [ ] T017 [US2] Verificar/ajustar en `construirZip` que el nombre del `.zip` usa `fechaLocalISO()` (fecha local, no UTC) tal como exige RF-006 (research.md Decisión 4)
-- [ ] T018 [US2] Ejecutar `npm run test` y verificar que T014 y T015 pasan; ajustar hasta verde
+- [X] T016 [US2] En `src/services/exportacion.ts`, aplicar `sanearNombreArchivo` al construir el `nombreArchivo` de cada `EntradaPDF` con el formato `"<numero> - <cliente> .pdf"` saneado (RF-007, RF-008)
+- [X] T017 [US2] Verificar/ajustar en `construirZip` que el nombre del `.zip` usa `fechaLocalISO()` (fecha local, no UTC) tal como exige RF-006 (research.md Decisión 4)
+- [X] T018 [US2] Ejecutar `npm run test` y verificar que T014 y T015 pasan; ajustar hasta verde
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente — nombres correctos y `.zip` robusto ante caracteres conflictivos.
 
@@ -102,16 +102,16 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 ### Tests para Historia de usuario 3 (escribir primero, deben FALLAR) ⚠️
 
-- [ ] T019 [P] [US3] Añadir a `tests/services/exportacion.test.ts` casos: (a) 0 numerados → `{ ok: false, motivo: 'sin-numerados' }` y NO se construye/descarga zip (RF-011, CE-004); (b) atomicidad: si `construirDocumentoPDF` lanza para un presupuesto → `{ ok: false, motivo: 'fallo-pdf' }` y no se produce blob (RF-014); (c) `onProgreso(generados, total)` se invoca `total` veces con valores `1..total`, verificado también con un lote grande (p. ej. 200 numerados) para cubrir RF-010 y CE-006 (RF-012)
+- [X] T019 [P] [US3] Añadir a `tests/services/exportacion.test.ts` casos: (a) 0 numerados → `{ ok: false, motivo: 'sin-numerados' }` y NO se construye/descarga zip (RF-011, CE-004); (b) atomicidad: si `construirDocumentoPDF` lanza para un presupuesto → `{ ok: false, motivo: 'fallo-pdf' }` y no se produce blob (RF-014); (c) `onProgreso(generados, total)` se invoca `total` veces con valores `1..total`, verificado también con un lote grande (p. ej. 200 numerados) para cubrir RF-010 y CE-006 (RF-012)
 
 ### Implementación para Historia de usuario 3
 
-- [ ] T020 [US3] En `src/services/exportacion.ts`, implementar el caso vacío: si no hay numerados, devolver `{ ok: false, motivo: 'sin-numerados', mensaje: 'No hay nada que exportar' }` sin construir zip (RF-011)
-- [ ] T021 [US3] En `src/services/exportacion.ts`, implementar atomicidad: envolver la generación de PDFs en try/catch; si alguno lanza, abortar y devolver `{ ok: false, motivo: 'fallo-pdf', mensaje: 'No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.' }` sin descargar (RF-014)
-- [ ] T022 [US3] En `src/services/exportacion.ts`, invocar `onProgreso(generados, total)` tras generar cada PDF (contador real `1..total`) (RF-012)
-- [ ] T023 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar barra de progreso con texto "X de N" alimentada por `onProgreso`, deshabilitar el botón durante la exportación y ocultar la barra al terminar (contracts/exportacion.md — estados de UI)
-- [ ] T024 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar tooltip "No hay nada que exportar" cuando `motivo === 'sin-numerados'` y, cuando `motivo === 'fallo-pdf'`, mostrar el mensaje devuelto por el servicio ("No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.") (RF-011, RF-014, RF-013)
-- [ ] T025 [US3] Ejecutar `npm run test` y verificar que T019 pasa; ajustar hasta verde
+- [X] T020 [US3] En `src/services/exportacion.ts`, implementar el caso vacío: si no hay numerados, devolver `{ ok: false, motivo: 'sin-numerados', mensaje: 'No hay nada que exportar' }` sin construir zip (RF-011)
+- [X] T021 [US3] En `src/services/exportacion.ts`, implementar atomicidad: envolver la generación de PDFs en try/catch; si alguno lanza, abortar y devolver `{ ok: false, motivo: 'fallo-pdf', mensaje: 'No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.' }` sin descargar (RF-014)
+- [X] T022 [US3] En `src/services/exportacion.ts`, invocar `onProgreso(generados, total)` tras generar cada PDF (contador real `1..total`) (RF-012)
+- [X] T023 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar barra de progreso con texto "X de N" alimentada por `onProgreso`, deshabilitar el botón durante la exportación y ocultar la barra al terminar (contracts/exportacion.md — estados de UI)
+- [X] T024 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar tooltip "No hay nada que exportar" cuando `motivo === 'sin-numerados'` y, cuando `motivo === 'fallo-pdf'`, mostrar el mensaje devuelto por el servicio ("No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.") (RF-011, RF-014, RF-013)
+- [X] T025 [US3] Ejecutar `npm run test` y verificar que T019 pasa; ajustar hasta verde
 
 **Checkpoint**: Las tres historias funcionan de forma independiente.
 
@@ -121,11 +121,11 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 **Propósito**: Estilos, verificación integral y actualización de contexto.
 
-- [ ] T026 [P] Añadir estilos CSS para el botón "Exportar todo (.zip)" y la barra de progreso en `src/styles/global.css` (o el CSS del dominio), usando variables CSS nativas y diseño responsive (AGENTS.md — CSS puro)
-- [ ] T027 Verificar solo lectura de extremo a extremo: revisar que `exportacion.ts` no llama a ningún `guardar*` ni `setItem` (RF-009, CE-007)
-- [ ] T028 Ejecutar `npm run build` (`tsc -b` + `vite build`) y corregir cualquier error de tipos o build (quickstart.md)
-- [ ] T029 Ejecutar la validación manual de `quickstart.md` (escenarios 1–5) y confirmar los criterios CE-001..CE-007 y RF-014; incluir una prueba de escala con 200 presupuestos numerados para verificar RF-010 (la exportación completa sin bloqueo perceptible y la barra de progreso avanza hasta la descarga)
-- [ ] T030 [P] Actualizar `AGENTS.md` con la nueva dependencia JSZip y la convención de exportación (usar el skill `update-context` si procede)
+- [X] T026 [P] Añadir estilos CSS para el botón "Exportar todo (.zip)" y la barra de progreso en `src/styles/global.css` (o el CSS del dominio), usando variables CSS nativas y diseño responsive (AGENTS.md — CSS puro)
+- [X] T027 Verificar solo lectura de extremo a extremo: revisar que `exportacion.ts` no llama a ningún `guardar*` ni `setItem` (RF-009, CE-007)
+- [X] T028 Ejecutar `npm run build` (`tsc -b` + `vite build`) y corregir cualquier error de tipos o build (quickstart.md)
+- [X] T029 Ejecutar la validación manual de `quickstart.md` (escenarios 1–5) y confirmar los criterios CE-001..CE-007 y RF-014; incluir una prueba de escala con 200 presupuestos numerados para verificar RF-010 (la exportación completa sin bloqueo perceptible y la barra de progreso avanza hasta la descarga)
+- [X] T030 [P] Actualizar `AGENTS.md` con la nueva dependencia JSZip y la convención de exportación (usar el skill `update-context` si procede)
 
 ---
 

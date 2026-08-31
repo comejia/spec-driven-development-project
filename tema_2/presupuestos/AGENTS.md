@@ -11,6 +11,7 @@ Aplicación web SPA para que un freelancer español cree presupuestos profesiona
 | UI | React 19 + TypeScript 6 | Componentes por dominio en `src/components/` |
 | Bundler | Vite 8 | Dev server + build estática |
 | PDF | jsPDF + jsPDF-AutoTable | Generación 100% en cliente |
+| Exportación | JSZip 3.10.1 (fijada) | Copia de seguridad `.zip` (PDFs + `datos.json`) 100% en cliente |
 | Routing | react-router-dom 7 | SPA con rutas declarativas |
 | Storage | localStorage | Cero backend, offline-capable |
 | Tests | Vitest + React Testing Library + jsdom | Tests en `tests/` |
@@ -35,6 +36,7 @@ npm run build        # build de producción
 - Principio rector: simplicidad — la solución más simple que funcione.
 - No implementar nada que no esté especificado (ver constitución).
 - Tests obligatorios para lógica de negocio (`services/`).
+- Exportación: la copia de seguridad se genera 100% en cliente con JSZip como operación de solo lectura y atómica (aborta sin descargar si falla algún PDF). Contiene un PDF por presupuesto numerado (idéntico al individual, reutiliza `construirDocumentoPDF`) y un único `datos.json` (presupuestos, catálogo, perfil, contador; sin clientes). Lógica en `src/services/exportacion.ts`; nombres saneados con `src/utils/nombreArchivo.ts`; fecha local del `.zip` con `fechaLocalISO()`.
 - Commits atómicos; un commit por tarea lógica.
 
 ---
