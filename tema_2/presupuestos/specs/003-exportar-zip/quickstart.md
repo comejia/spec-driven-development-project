@@ -62,7 +62,7 @@ Cobertura esperada de los tests (en `tests/services/`):
 
 ### Escenario 5 — Fallo controlado (RF-014)
 1. (Caso teórico) Si un presupuesto no pudiera generar su PDF, la exportación se **aborta**.
-2. **Esperado**: se muestra un aviso claro en español y **no** se descarga ningún `.zip` (nunca una
+2. **Esperado**: se muestra el aviso "No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo." y **no** se descarga ningún `.zip` (nunca una
    copia parcial).
 
 ## Criterios de aceptación cubiertos

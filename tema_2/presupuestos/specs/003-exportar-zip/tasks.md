@@ -102,15 +102,15 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 
 ### Tests para Historia de usuario 3 (escribir primero, deben FALLAR) ⚠️
 
-- [ ] T019 [P] [US3] Añadir a `tests/services/exportacion.test.ts` casos: (a) 0 numerados → `{ ok: false, motivo: 'sin-numerados' }` y NO se construye/descarga zip (RF-011, CE-004); (b) atomicidad: si `construirDocumentoPDF` lanza para un presupuesto → `{ ok: false, motivo: 'fallo-pdf' }` y no se produce blob (RF-014); (c) `onProgreso(generados, total)` se invoca `total` veces con valores `1..total` (RF-012, CE-006)
+- [ ] T019 [P] [US3] Añadir a `tests/services/exportacion.test.ts` casos: (a) 0 numerados → `{ ok: false, motivo: 'sin-numerados' }` y NO se construye/descarga zip (RF-011, CE-004); (b) atomicidad: si `construirDocumentoPDF` lanza para un presupuesto → `{ ok: false, motivo: 'fallo-pdf' }` y no se produce blob (RF-014); (c) `onProgreso(generados, total)` se invoca `total` veces con valores `1..total`, verificado también con un lote grande (p. ej. 200 numerados) para cubrir RF-010 y CE-006 (RF-012)
 
 ### Implementación para Historia de usuario 3
 
 - [ ] T020 [US3] En `src/services/exportacion.ts`, implementar el caso vacío: si no hay numerados, devolver `{ ok: false, motivo: 'sin-numerados', mensaje: 'No hay nada que exportar' }` sin construir zip (RF-011)
-- [ ] T021 [US3] En `src/services/exportacion.ts`, implementar atomicidad: envolver la generación de PDFs en try/catch; si alguno lanza, abortar y devolver `{ ok: false, motivo: 'fallo-pdf', mensaje: <aviso en español> }` sin descargar (RF-014)
+- [ ] T021 [US3] En `src/services/exportacion.ts`, implementar atomicidad: envolver la generación de PDFs en try/catch; si alguno lanza, abortar y devolver `{ ok: false, motivo: 'fallo-pdf', mensaje: 'No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.' }` sin descargar (RF-014)
 - [ ] T022 [US3] En `src/services/exportacion.ts`, invocar `onProgreso(generados, total)` tras generar cada PDF (contador real `1..total`) (RF-012)
 - [ ] T023 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar barra de progreso con texto "X de N" alimentada por `onProgreso`, deshabilitar el botón durante la exportación y ocultar la barra al terminar (contracts/exportacion.md — estados de UI)
-- [ ] T024 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar tooltip "No hay nada que exportar" cuando `motivo === 'sin-numerados'` y aviso claro en español cuando `motivo === 'fallo-pdf'` (RF-011, RF-014, RF-013)
+- [ ] T024 [US3] En `src/components/Presupuestos/PresupuestosPage.tsx`, mostrar tooltip "No hay nada que exportar" cuando `motivo === 'sin-numerados'` y, cuando `motivo === 'fallo-pdf'`, mostrar el mensaje devuelto por el servicio ("No se pudo generar la copia. No se ha descargado ningún archivo. Inténtalo de nuevo.") (RF-011, RF-014, RF-013)
 - [ ] T025 [US3] Ejecutar `npm run test` y verificar que T019 pasa; ajustar hasta verde
 
 **Checkpoint**: Las tres historias funcionan de forma independiente.
@@ -124,7 +124,7 @@ description: "Lista de tareas para: Exportar todos los presupuestos en un .zip"
 - [ ] T026 [P] Añadir estilos CSS para el botón "Exportar todo (.zip)" y la barra de progreso en `src/styles/global.css` (o el CSS del dominio), usando variables CSS nativas y diseño responsive (AGENTS.md — CSS puro)
 - [ ] T027 Verificar solo lectura de extremo a extremo: revisar que `exportacion.ts` no llama a ningún `guardar*` ni `setItem` (RF-009, CE-007)
 - [ ] T028 Ejecutar `npm run build` (`tsc -b` + `vite build`) y corregir cualquier error de tipos o build (quickstart.md)
-- [ ] T029 Ejecutar la validación manual de `quickstart.md` (escenarios 1–5) y confirmar los criterios CE-001..CE-007 y RF-014
+- [ ] T029 Ejecutar la validación manual de `quickstart.md` (escenarios 1–5) y confirmar los criterios CE-001..CE-007 y RF-014; incluir una prueba de escala con 200 presupuestos numerados para verificar RF-010 (la exportación completa sin bloqueo perceptible y la barra de progreso avanza hasta la descarga)
 - [ ] T030 [P] Actualizar `AGENTS.md` con la nueva dependencia JSZip y la convención de exportación (usar el skill `update-context` si procede)
 
 ---
