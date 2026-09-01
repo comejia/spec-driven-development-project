@@ -36,7 +36,7 @@ npm run build        # build de producción
 - Principio rector: simplicidad — la solución más simple que funcione.
 - No implementar nada que no esté especificado (ver constitución).
 - Tests obligatorios para lógica de negocio (`services/`).
-- Exportación: la copia de seguridad se genera 100% en cliente con JSZip como operación de solo lectura y atómica (aborta sin descargar si falla algún PDF). Contiene un PDF por presupuesto numerado (idéntico al individual, reutiliza `construirDocumentoPDF`) y un único `datos.json` (presupuestos, catálogo, perfil, contador; sin clientes). Lógica en `src/services/exportacion.ts`; nombres saneados con `src/utils/nombreArchivo.ts`; fecha local del `.zip` con `fechaLocalISO()`.
+- Exportación/copias de seguridad: se generan 100% en cliente, como operación de solo lectura y atómica (nunca una copia parcial). La lógica vive aislada en `services/` (detalles de cada copia en `specs/`).
 - Commits atómicos; un commit por tarea lógica.
 
 ---
