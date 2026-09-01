@@ -18,13 +18,17 @@ const COLORS = {
   tableHead: [248, 250, 252] as [number, number, number],   // #f8fafc
 }
 
-export function generarDocumentoPDF(presupuesto: Presupuesto): void {
+export function construirDocumentoPDF(presupuesto: Presupuesto): jsPDF {
   const doc = new jsPDF()
 
   const perfil = presupuesto.perfilSnapshot
   const cliente = presupuesto.clienteSnapshot ?? cargarClientes().find((c) => c.id === presupuesto.clienteId) ?? null
 
-  if (!perfil || !cliente) return
+  if (!perfil || !cliente) {
+    throw new Error(
+      `No se puede generar el PDF del presupuesto ${presupuesto.numero ?? presupuesto.id}: faltan datos de perfil o cliente`,
+    )
+  }
 
   const pageWidth = doc.internal.pageSize.getWidth()
   const marginLeft = 20
@@ -209,7 +213,16 @@ export function generarDocumentoPDF(presupuesto: Presupuesto): void {
   doc.setTextColor(...COLORS.primary)
   doc.text(formatearMoneda(desglose.total), desgloseRight, totalsY, { align: 'right' })
 
-  // Download
+  return doc
+}
+
+/**
+ * Genera el PDF del presupuesto y lo descarga (comportamiento existente).
+ * Delega la construcción en construirDocumentoPDF para garantizar que el PDF
+ * del ZIP sea idéntico al individual (RF-003, CE-003).
+ */
+export function generarDocumentoPDF(presupuesto: Presupuesto): void {
+  const doc = construirDocumentoPDF(presupuesto)
   const fileName = `presupuesto_${presupuesto.numero ?? presupuesto.id}.pdf`
   doc.save(fileName)
 }

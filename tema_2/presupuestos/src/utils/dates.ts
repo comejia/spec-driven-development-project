@@ -39,3 +39,15 @@ export function isoAEspanol(fechaISO: string): string {
   const [anio, mes, dia] = fechaISO.split('-')
   return `${dia}/${mes}/${anio}`
 }
+
+/**
+ * Devuelve la fecha LOCAL del equipo en formato AAAA-MM-DD (no UTC).
+ * Se usa para el nombre del .zip de exportación (RF-006), evitando el desfase
+ * de día que introduciría toISOString() (que usa UTC).
+ */
+export function fechaLocalISO(fecha: Date = new Date()): string {
+  const anio = fecha.getFullYear()
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dia = String(fecha.getDate()).padStart(2, '0')
+  return `${anio}-${mes}-${dia}`
+}
