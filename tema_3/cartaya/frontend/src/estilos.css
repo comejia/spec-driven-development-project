@@ -1,0 +1,126 @@
+/* Estilos accesibles para La Estación.
+   Objetivos (spec "Carta legible a contraluz" / accesibilidad):
+   - Contraste alto: texto casi negro (#1a1a1a) sobre fondo claro (#fffdf8).
+   - Tipografía legible y grande: base 18px, títulos amplios.
+   - Objetivos táctiles grandes: mínimo 48x48px en elementos interactivos. */
+
+:root {
+  --color-fondo: #fffdf8;
+  --color-texto: #1a1a1a;      /* contraste ~ 15:1 sobre el fondo */
+  --color-acento: #8a3324;     /* rojo tierra, contraste alto sobre fondo claro */
+  --color-precio: #0b5d1e;     /* verde oscuro, alto contraste */
+  --color-borde: #d8d2c4;
+  --color-alergeno: #6b3f00;   /* ámbar oscuro, legible */
+  --tam-base: 18px;
+  --toque-min: 48px;
+  --radio: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: var(--tam-base);
+}
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.carta, .admin {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.carta__cabecera { text-align: center; margin-bottom: 1.5rem; }
+.carta__cabecera h1 { font-size: 2.2rem; margin: 0.2em 0; color: var(--color-acento); }
+.carta__subtitulo { font-size: 1.2rem; margin: 0; }
+
+.categoria { margin-bottom: 2rem; }
+.categoria__nombre {
+  font-size: 1.6rem;
+  border-bottom: 3px solid var(--color-acento);
+  padding-bottom: 0.3rem;
+}
+
+.categoria__platos { list-style: none; margin: 0; padding: 0; }
+
+.plato {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.plato__foto {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radio);
+  flex-shrink: 0;
+}
+
+.plato__cuerpo { flex: 1; min-width: 0; }
+
+.plato__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.plato__nombre { font-size: 1.25rem; margin: 0; }
+.plato__precio {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-precio);
+  white-space: nowrap;
+}
+.plato__descripcion { margin: 0.3rem 0; font-size: 1.05rem; }
+
+.alergenos {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+  color: var(--color-alergeno);
+  font-weight: 600;
+}
+.alergenos--sin { color: var(--color-precio); }
+.alergenos__etiqueta { text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* --- Administración: controles grandes, usable en móvil --- */
+.admin__titulo { color: var(--color-acento); }
+
+button, .boton {
+  min-height: var(--toque-min);
+  min-width: var(--toque-min);
+  font-size: 1.05rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radio);
+  border: 2px solid var(--color-acento);
+  background: var(--color-acento);
+  color: #fff;
+  cursor: pointer;
+}
+button.secundario { background: #fff; color: var(--color-acento); }
+
+input, select, textarea {
+  min-height: var(--toque-min);
+  font-size: 1.05rem;
+  padding: 0.5rem 0.7rem;
+  width: 100%;
+  border: 2px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+label { display: block; margin: 0.8rem 0 0.3rem; font-weight: 600; }
+
+:focus-visible { outline: 3px solid #0b5d1e; outline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .plato__foto { width: 72px; height: 72px; }
+  .carta__cabecera h1 { font-size: 1.8rem; }
+}

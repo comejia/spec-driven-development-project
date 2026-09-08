@@ -42,9 +42,9 @@ Estado actual: no hay specs vivas ni código previo; es el primer cambio funcion
 
 **API pública:** un único endpoint `GET /api/carta` devuelve categorías activas ordenadas, cada una con sus platos activos ordenados y sus alérgenos ya resueltos, en una sola respuesta JSON. Minimiza viajes de red para el objetivo <2s. Las fotos se sirven como estáticos con cabeceras de caché.
 
-**API de administración:** endpoints bajo `/api/admin/*` protegidos por middleware de sesión (contraseña de establecimiento). Cubren crear/editar/reordenar/archivar categorías y platos y subir fotos (multipart con validación de tamaño). Reutiliza la sesión de establecimiento existente en el stack; no introduce usuarios.
+**API de administración:** endpoints bajo `/api/admin/*` protegidos por middleware de sesión (contraseña de establecimiento). Cubren crear/editar/reordenar/archivar categorías y platos y subir fotos (multipart con validación de tamaño). Reutiliza la sesión de establecimiento existente en el stack; no introduce usuarios. Además, un endpoint de solo lectura `GET /api/admin/catalogo` (bajo la misma sesión) devuelve el catálogo completo de administración: todas las categorías no archivadas, incluidas las que no tienen platos, con sus platos no archivados. Se distingue de `GET /api/carta` en que no oculta las categorías vacías, para que el dueño pueda añadirles platos.
 
-**Frontend:** dos vistas React servidas como estáticos por Express: la carta pública (solo lectura, sin sesión) y la administración (tras la sesión). CSS propio con tokens de contraste alto, tipografía grande y objetivos táctiles amplios, aplicando accesibilidad a ambas vistas.
+**Frontend:** dos vistas React servidas como estáticos por Express: la carta pública (solo lectura, sin sesión) y la administración (tras la sesión). CSS propio con tokens de contraste alto, tipografía grande y objetivos táctiles amplios, aplicando accesibilidad a ambas vistas. En la vista de administración, el formulario de edición de un plato incluye un control de subida de foto (`<input type="file">` con formatos JPG/PNG/WebP) que envía la imagen como multipart a `POST /api/admin/platos/:id/foto`. La foto no se sube al crear el plato (que aún no tiene id) sino al editarlo.
 
 **Trazabilidad de tests:** cada escenario de las specs tendrá un test cuyo nombre referencie el escenario, según la regla del config.
 

@@ -18,6 +18,20 @@ El sistema MUST exigir la sesión de establecimiento (contraseña de establecimi
 - **WHEN** el dueño accede a la administración con la sesión de establecimiento válida
 - **THEN** el sistema le permite gestionar categorías y platos
 
+### Requirement: Vista del catálogo completo para administración
+
+El sistema MUST permitir al dueño, con sesión válida, consultar el catálogo completo de administración: todas las categorías no archivadas —tengan platos o no— con sus platos no archivados. Esta vista MUST incluir las categorías sin platos activos, a diferencia de la carta pública, para que el dueño pueda añadirles platos y gestionarlas. La consulta del catálogo de administración MUST rechazarse cuando no haya sesión válida.
+
+#### Scenario: El catálogo de administración muestra categorías sin platos
+
+- **WHEN** el dueño, con sesión válida, ha creado una categoría que todavía no tiene ningún plato
+- **THEN** el catálogo de administración muestra esa categoría, aunque la carta pública no la muestre, para que pueda añadirle platos
+
+#### Scenario: El catálogo de administración requiere sesión
+
+- **WHEN** alguien intenta consultar el catálogo de administración sin sesión de establecimiento válida
+- **THEN** el sistema deniega el acceso
+
 ### Requirement: Gestión de categorías
 
 El sistema MUST permitir al dueño crear una categoría, editar su nombre y establecer el orden manual de las categorías. El orden y los nombres definidos aquí MUST ser los que use la carta pública. El sistema MUST rechazar el nombre de una categoría que ya exista entre las categorías no archivadas, comparando sin distinguir mayúsculas ni espacios sobrantes.
@@ -116,9 +130,14 @@ El sistema MUST permitir al dueño subir una foto opcional para un plato en form
 
 ### Requirement: Administración usable desde el móvil
 
-El sistema MUST presentar la pantalla de administración de forma usable en un móvil, con elementos táctiles grandes y controles adecuados para gestionar el catálogo desde el teléfono.
+El sistema MUST presentar la pantalla de administración de forma usable en un móvil, con elementos táctiles grandes y controles adecuados para gestionar el catálogo desde el teléfono. Al editar un plato, la vista de administración MUST ofrecer un control para subir o cambiar su foto que use la subida de fotos con límite de tamaño y formato.
 
 #### Scenario: Administrar desde el móvil
 
 - **WHEN** el dueño accede a la administración desde su móvil
-- **THEN** puede crear, editar, reordenar y archivar categorías y platos con controles cómodos para pantalla táctil
+- **THEN** puede crear, editar, reordenar y archivar categorías y platos, y subir la foto de un plato al editarlo, con controles cómodos para pantalla táctil
+
+#### Scenario: Subir la foto de un plato desde la administración
+
+- **WHEN** el dueño, al editar un plato desde la vista de administración, elige una foto para ese plato
+- **THEN** la vista envía la foto a la subida de administración y, si es válida, la foto queda asociada al plato y se muestra en la carta pública
