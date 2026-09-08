@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { generarQRSvg } from './qr.js';
 
 const ALERGENOS = [
   ['gluten', 'Gluten'],
@@ -197,12 +198,56 @@ function NombreCategoria({ categoria, onGuardado }) {
   );
 }
 
+// Sección de mesas: lista las mesas con su QR (enlace /?mesa=<token>) para imprimir.
+// Solo visualización; el QR se genera en el cliente sin dependencias externas.
+function SeccionMesas() {
+  const [mesas, setMesas] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/admin/mesas')
+      .then((r) => r.json())
+      .then((d) => setMesas(d.mesas ?? []))
+      .catch(() => setError('No se pudieron cargar las mesas.'));
+  }, []);
+
+  if (error) return <section><h2>Mesas y QR</h2><p role="alert">{error}</p></section>;
+  if (!mesas) return <section><h2>Mesas y QR</h2><p>Cargando mesas…</p></section>;
+
+  return (
+    <section className="admin__mesas">
+      <h2>Mesas y QR</h2>
+      <p>Imprime el QR de cada mesa y pégalo en ella. Al escanearlo, el cliente abre la carta con la mesa ya identificada.</p>
+      {mesas.length === 0 && <p>No hay mesas configuradas.</p>}
+      <ul className="mesas__lista">
+        {mesas.map((m) => {
+          const enlace = `${window.location.origin}/?mesa=${m.token}`;
+          const svg = generarQRSvg(enlace, 200);
+          return (
+            <li key={m.token} className="mesa">
+              <h3 className="mesa__numero">Mesa {m.numero}</h3>
+              <div
+                className="mesa__qr"
+                aria-label={`Código QR de la mesa ${m.numero}`}
+                role="img"
+                dangerouslySetInnerHTML={{ __html: svg }}
+              />
+              <p className="mesa__enlace"><code>/?mesa={m.token}</code></p>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 export default function Admin() {
   const [autenticado, setAutenticado] = useState(false);
   const [carta, setCarta] = useState(null);
   const [nuevaCat, setNuevaCat] = useState('');
   const [error, setError] = useState(null);
   const [editandoPlato, setEditandoPlato] = useState(null); // id del plato en edición
+  const [pestana, setPestana] = useState('carta'); // pestaña activa: 'carta' | 'mesas'
 
   const recargar = useCallback(() => {
     // El admin consume el catálogo completo (incluye categorías sin platos),
@@ -273,6 +318,31 @@ export default function Admin() {
     <main className="admin">
       <h1 className="admin__titulo">Administración de la carta</h1>
 
+      <nav className="admin__pestanas" role="tablist" aria-label="Secciones de administración">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={pestana === 'carta'}
+          className={pestana === 'carta' ? '' : 'secundario'}
+          onClick={() => setPestana('carta')}
+        >
+          Carta
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={pestana === 'mesas'}
+          className={pestana === 'mesas' ? '' : 'secundario'}
+          onClick={() => setPestana('mesas')}
+        >
+          Mesas
+        </button>
+      </nav>
+
+      {pestana === 'mesas' && <SeccionMesas />}
+
+      {pestana === 'carta' && (
+      <>
       <section>
         <h2>Nueva categoría</h2>
         <form onSubmit={crearCategoria}>
@@ -330,6 +400,8 @@ export default function Admin() {
           <FormularioPlato categoriaId={cat.id} onGuardado={recargar} />
         </section>
       ))}
+      </>
+      )}
     </main>
   );
 }

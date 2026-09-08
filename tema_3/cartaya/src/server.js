@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { abrirBaseDeDatos } from './db.js';
 import { crearApp } from './app.js';
+import { sembrarMesas } from './pedidos.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,6 +13,14 @@ const DIR_ESTATICOS = path.join(__dirname, '..', 'frontend', 'dist');
 const DIR_FOTOS = path.join(__dirname, '..', 'data', 'fotos');
 
 const db = abrirBaseDeDatos(RUTA_BD);
+
+// Siembra idempotente de mesas (número visible + token opaco para el QR).
+// Configurable por CARTAYA_MESAS (p. ej. "1,2,3,4,5,6"); por defecto, 10 mesas.
+const NUMEROS_MESA = (process.env.CARTAYA_MESAS ?? '1,2,3,4,5,6,7,8,9,10')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+sembrarMesas(db, NUMEROS_MESA);
 const app = crearApp({
   db,
   password: process.env.CARTAYA_PASSWORD ?? 'la-estacion',

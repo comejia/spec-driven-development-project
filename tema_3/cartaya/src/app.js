@@ -8,6 +8,14 @@ import { fileURLToPath } from 'node:url';
 
 import { construirCarta, construirCatalogoAdmin } from './carta.js';
 import {
+  resolverMesaPorToken,
+  prepararPedido,
+  confirmarPedido,
+  obtenerPedidoPorNumero,
+  listarMesas,
+  ErrorPedido,
+} from './pedidos.js';
+import {
   crearCategoria,
   editarCategoria,
   reordenarCategorias,
@@ -64,6 +72,33 @@ export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir } 
     res.json(construirCarta(db));
   });
 
+  // ---- API pública: pedido desde la mesa (sin sesión ni datos personales) ----
+  // Resuelve una mesa por el token de su QR impreso.
+  app.get('/api/mesa/:token', (req, res) => {
+    const mesa = resolverMesaPorToken(db, req.params.token);
+    if (!mesa) return res.status(404).json({ error: 'La mesa no es válida.' });
+    res.json({ numero: mesa.numero });
+  });
+
+  // Previsualiza el pedido (resumen con total y líneas retiradas) sin persistir.
+  app.post('/api/pedidos/preparar', (req, res) => {
+    manejarPedido(res, () => prepararPedido(db, { lineas: req.body?.lineas ?? [] }));
+  });
+
+  // Confirma el pedido: revalida platos activos, retira inactivos y crea el pedido.
+  app.post('/api/pedidos', (req, res) => {
+    manejarPedido(res, () =>
+      confirmarPedido(db, { token: req.body?.token, lineas: req.body?.lineas ?? [] })
+    , 201);
+  });
+
+  // Consulta el estado de un pedido por su número.
+  app.get('/api/pedidos/:numeroPedido', (req, res) => {
+    const pedido = obtenerPedidoPorNumero(db, req.params.numeroPedido);
+    if (!pedido) return res.status(404).json({ error: 'El pedido no existe.' });
+    res.json(pedido);
+  });
+
   // ---- Autenticación de establecimiento ----
   app.post('/api/login', (req, res) => {
     const { password: pass } = req.body ?? {};
@@ -88,6 +123,11 @@ export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir } 
   // ---- Catálogo completo de administración (incluye categorías sin platos) ----
   app.get('/api/admin/catalogo', (req, res) => {
     res.json(construirCatalogoAdmin(db));
+  });
+
+  // ---- Mesas con su token, para generar/imprimir el QR (solo bajo sesión) ----
+  app.get('/api/admin/mesas', (req, res) => {
+    res.json({ mesas: listarMesas(db) });
   });
 
   // ---- Subida de fotos (multer en memoria para validar tamaño y formato) ----
@@ -200,6 +240,20 @@ function manejar(res, fn, exito = 200) {
     res.status(exito).json(resultado);
   } catch (err) {
     if (err instanceof ErrorValidacion) {
+      return res.status(422).json({ error: err.message });
+    }
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+// Ejecuta lógica de pedido, mapeando ErrorPedido (mesa inválida, pedido vacío,
+// cantidad/nota inválidas) a 422 y el resto a 500.
+function manejarPedido(res, fn, exito = 200) {
+  try {
+    const resultado = fn();
+    res.status(exito).json(resultado);
+  } catch (err) {
+    if (err instanceof ErrorPedido) {
       return res.status(422).json({ error: err.message });
     }
     return res.status(500).json({ error: 'Error interno del servidor.' });

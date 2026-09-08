@@ -29,7 +29,14 @@ test('esquema: volver a ejecutar la inicialización es idempotente y no falla', 
   // Segunda (y tercera) ejecución sobre la misma BD no debe lanzar.
   assert.doesNotThrow(() => inicializarEsquema(db));
   assert.doesNotThrow(() => inicializarEsquema(db));
-  // Las tablas siguen existiendo exactamente igual.
-  assert.deepEqual(tablas(db), ['categorias', 'platos', 'platos_alergenos']);
+  // Las tablas siguen existiendo exactamente igual (orden alfabético).
+  assert.deepEqual(tablas(db), [
+    'categorias',
+    'lineas_pedido',
+    'mesas',
+    'pedidos',
+    'platos',
+    'platos_alergenos',
+  ]);
   db.close();
 });
