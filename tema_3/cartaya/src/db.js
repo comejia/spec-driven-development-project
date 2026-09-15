@@ -87,5 +87,29 @@ export function inicializarEsquema(db) {
     CREATE INDEX IF NOT EXISTS idx_pedidos_mesa   ON pedidos(mesa_id);
     CREATE INDEX IF NOT EXISTS idx_lineas_pedido  ON lineas_pedido(pedido_id);
   `);
+  migrarColumnasEstadoPedido(db);
   return db;
+}
+
+/**
+ * Migración idempotente: añade a `pedidos` las marcas de tiempo de las
+ * transiciones del panel de cocina (ver openspec/specs/panel-cocina/spec.md).
+ *  - preparado_en: instante en que pasó a 'en_preparacion'.
+ *  - servido_en:   instante en que pasó a 'servido'.
+ *  - cancelado_en: instante de la cancelación (solo desde 'recibido'; no borra).
+ *
+ * SQLite no admite ADD COLUMN IF NOT EXISTS, así que se comprueba el esquema
+ * actual antes de alterar. Reejecutarla no falla ni duplica columnas.
+ *
+ * @param {import('better-sqlite3').Database} db
+ */
+export function migrarColumnasEstadoPedido(db) {
+  const columnas = new Set(
+    db.prepare('PRAGMA table_info(pedidos)').all().map((c) => c.name)
+  );
+  for (const columna of ['preparado_en', 'servido_en', 'cancelado_en']) {
+    if (!columnas.has(columna)) {
+      db.exec(`ALTER TABLE pedidos ADD COLUMN ${columna} TEXT DEFAULT NULL`);
+    }
+  }
 }

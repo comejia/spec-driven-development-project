@@ -183,3 +183,69 @@ label { display: block; margin: 0.8rem 0 0.3rem; font-weight: 600; }
   image-rendering: pixelated;
 }
 .mesa__enlace { margin: 0.6rem 0 0; font-size: 0.85rem; word-break: break-all; }
+
+/* ---- Panel de cocina ----
+   Accesible para uso en tablet en la barra: contraste alto, botones grandes
+   (objetivo táctil mínimo), tipografía legible. */
+
+.cocina {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.cocina__cabecera { text-align: center; margin-bottom: 1rem; }
+.cocina__titulo { font-size: 2rem; margin: 0.2em 0; color: var(--color-acento); }
+.cocina__subtitulo {
+  font-size: 1.5rem;
+  border-bottom: 3px solid var(--color-acento);
+  padding-bottom: 0.3rem;
+  margin-top: 1.5rem;
+}
+
+/* Aviso de pedido nuevo: visible y con alto contraste (aviso simple). */
+.cocina__aviso {
+  background: var(--color-acento);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radio);
+  margin: 0.5rem 0 1rem;
+}
+
+.cocina-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+
+.cocina-pedido {
+  border: 2px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  background: #fff;
+}
+.cocina-pedido--recibido { border-color: var(--color-acento); }
+.cocina-pedido--en_preparacion { border-color: var(--color-alergeno); }
+.cocina-pedido--servido, .cocina-pedido--cancelado { opacity: 0.85; }
+
+.cocina-pedido__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+.cocina-pedido__mesa { font-weight: 700; font-size: 1.3rem; }
+.cocina-pedido__estado {
+  font-weight: 700;
+  color: var(--color-acento);
+}
+.cocina-pedido__tiempo { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+.cocina-pedido__lineas { list-style: none; margin: 0.3rem 0; padding: 0; font-size: 1.1rem; }
+.cocina-pedido__lineas li { padding: 0.15rem 0; }
+.cocina-pedido__cantidad { font-weight: 700; }
+.cocina-pedido__nota { color: var(--color-alergeno); font-style: italic; }
+
+.cocina-pedido__acciones { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.cocina-pedido__acciones button { min-height: var(--toque-min); font-size: 1.1rem; }

@@ -40,3 +40,34 @@ test('esquema: volver a ejecutar la inicialización es idempotente y no falla', 
   ]);
   db.close();
 });
+
+function columnasPedidos(db) {
+  return db.prepare('PRAGMA table_info(pedidos)').all().map((c) => c.name);
+}
+
+test('panel-cocina :: el esquema de pedidos incluye las marcas de estado de cocina', () => {
+  const db = new Database(':memory:');
+  inicializarEsquema(db);
+  const columnas = columnasPedidos(db);
+  for (const columna of ['preparado_en', 'servido_en', 'cancelado_en']) {
+    assert.ok(columnas.includes(columna), `falta la columna ${columna} en pedidos`);
+  }
+  db.close();
+});
+
+test('panel-cocina :: la migración de columnas de estado es idempotente', () => {
+  const db = new Database(':memory:');
+  inicializarEsquema(db);
+  // Reejecutar la inicialización (que incluye la migración) no falla ni duplica.
+  assert.doesNotThrow(() => inicializarEsquema(db));
+  const columnas = columnasPedidos(db);
+  // Cada columna aparece exactamente una vez.
+  for (const columna of ['preparado_en', 'servido_en', 'cancelado_en']) {
+    assert.equal(
+      columnas.filter((c) => c === columna).length,
+      1,
+      `la columna ${columna} no debe duplicarse`
+    );
+  }
+  db.close();
+});

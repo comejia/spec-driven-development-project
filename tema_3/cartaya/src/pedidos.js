@@ -12,6 +12,7 @@
 import crypto from 'node:crypto';
 
 import { formatearPrecioEuros } from './carta.js';
+import { emisorCocina, EVENTO_PEDIDO_NUEVO } from './sse.js';
 
 export const MAX_NOTA = 140;
 export const ESTADO_INICIAL = 'recibido';
@@ -177,7 +178,7 @@ function normalizarNota(nota) {
  *   lineasRetiradas:Array }}
  * @throws {ErrorPedido} si el token no es válido o el pedido queda vacío.
  */
-export function confirmarPedido(db, { token, lineas = [] } = {}) {
+export function confirmarPedido(db, { token, lineas = [] } = {}, { emisor = emisorCocina } = {}) {
   const mesa = resolverMesaPorToken(db, token);
   if (!mesa) throw new ErrorPedido('La mesa no es válida.');
 
@@ -217,7 +218,15 @@ export function confirmarPedido(db, { token, lineas = [] } = {}) {
     };
   });
 
-  return tx();
+  const resultado = tx();
+  // Fuera de la transacción: el panel de cocina recibe el pedido nuevo en vivo.
+  emisor?.publicar?.(EVENTO_PEDIDO_NUEVO, {
+    numeroPedido: resultado.numeroPedido,
+    mesa: mesa.numero,
+    estado: resultado.estado,
+    total: resultado.total,
+  });
+  return resultado;
 }
 
 function siguienteNumeroPedido(db) {

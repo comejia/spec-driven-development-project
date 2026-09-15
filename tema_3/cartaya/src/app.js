@@ -16,6 +16,13 @@ import {
   ErrorPedido,
 } from './pedidos.js';
 import {
+  avanzarEstado,
+  cancelarPedido,
+  listarActivosDelDia,
+  listarHistoricoDelDia,
+} from './cocina.js';
+import { emisorCocina } from './sse.js';
+import {
   crearCategoria,
   editarCategoria,
   reordenarCategorias,
@@ -44,7 +51,7 @@ export const FORMATOS_FOTO = Object.freeze({
  * @param {string} [opts.fotosDir] Directorio donde se guardan las fotos.
  * @param {string} [opts.staticsDir] Directorio de estáticos del frontend (build de Vite).
  */
-export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir } = {}) {
+export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir, emisor = emisorCocina } = {}) {
   const app = express();
   const dirFotos = fotosDir ?? path.join(__dirname, '..', 'data', 'fotos');
   fs.mkdirSync(dirFotos, { recursive: true });
@@ -88,7 +95,7 @@ export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir } 
   // Confirma el pedido: revalida platos activos, retira inactivos y crea el pedido.
   app.post('/api/pedidos', (req, res) => {
     manejarPedido(res, () =>
-      confirmarPedido(db, { token: req.body?.token, lineas: req.body?.lineas ?? [] })
+      confirmarPedido(db, { token: req.body?.token, lineas: req.body?.lineas ?? [] }, { emisor })
     , 201);
   });
 
@@ -128,6 +135,41 @@ export function crearApp({ db, password = 'la-estacion', fotosDir, staticsDir } 
   // ---- Mesas con su token, para generar/imprimir el QR (solo bajo sesión) ----
   app.get('/api/admin/mesas', (req, res) => {
     res.json({ mesas: listarMesas(db) });
+  });
+
+  // ---- Panel de cocina (solo bajo sesión) ----
+  // Vista activa del día: pedidos recibidos y en preparación, por antigüedad.
+  app.get('/api/admin/cocina/pedidos', (req, res) => {
+    res.json({ pedidos: listarActivosDelDia(db) });
+  });
+
+  // Histórico del día: pedidos servidos y cancelados.
+  app.get('/api/admin/cocina/historico', (req, res) => {
+    res.json({ pedidos: listarHistoricoDelDia(db) });
+  });
+
+  // Avanza el estado siguiendo la secuencia estricta (recibido→en_preparacion→servido).
+  app.post('/api/admin/cocina/pedidos/:numeroPedido/avanzar', (req, res) => {
+    manejarPedido(res, () =>
+      avanzarEstado(db, req.params.numeroPedido, req.body?.estado, { emisor })
+    );
+  });
+
+  // Cancela un pedido (solo si está en 'recibido'); registra el momento, no borra.
+  app.post('/api/admin/cocina/pedidos/:numeroPedido/cancelar', (req, res) => {
+    manejarPedido(res, () => cancelarPedido(db, req.params.numeroPedido, { emisor }));
+  });
+
+  // Stream SSE de eventos del panel: alta del suscriptor y limpieza al cerrar.
+  app.get('/api/admin/cocina/stream', (req, res) => {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    });
+    res.flushHeaders?.();
+    const baja = emisor.suscribir(res);
+    req.on('close', () => baja());
   });
 
   // ---- Subida de fotos (multer en memoria para validar tamaño y formato) ----

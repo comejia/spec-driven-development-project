@@ -91,6 +91,7 @@ Luego abre:
 
 - **Carta pública:** <http://localhost:3000/>
 - **Administración:** <http://localhost:3000/admin> (contraseña por defecto: `la-estacion`)
+- **Panel de cocina:** <http://localhost:3000/cocina> (misma sesión de establecimiento)
 
 > La carta arranca vacía. Entra en `/admin`, inicia sesión y crea una categoría
 > con al menos un plato: la carta pública solo muestra categorías con platos
@@ -165,6 +166,11 @@ PORT=4000 CARTAYA_PASSWORD=miclave npm start
 | `POST` | `/api/admin/platos/reordenar`          | Reordena platos (`{ categoriaId, ids: [...] }`) |
 | `POST` | `/api/admin/platos/:id/archivar`       | Archiva un plato |
 | `POST` | `/api/admin/platos/:id/foto`           | Sube/cambia la foto (multipart, campo `foto`; JPG/PNG/WebP, máx. 5 MB) |
+| `GET`  | `/api/admin/cocina/pedidos`            | Vista activa del panel de cocina: pedidos del día `recibido`/`en_preparacion` por antigüedad |
+| `GET`  | `/api/admin/cocina/historico`          | Histórico del día: pedidos `servido`/`cancelado` |
+| `POST` | `/api/admin/cocina/pedidos/:numeroPedido/avanzar`  | Avanza el estado (`{ estado }`) siguiendo `recibido → en_preparacion → servido` |
+| `POST` | `/api/admin/cocina/pedidos/:numeroPedido/cancelar` | Cancela un pedido (solo en `recibido`); registra el momento, no borra |
+| `GET`  | `/api/admin/cocina/stream`             | Stream SSE (`text/event-stream`) de eventos del panel (`pedido-nuevo`, `pedido-actualizado`) |
 
 ## Reglas de negocio destacadas
 
@@ -180,6 +186,12 @@ PORT=4000 CARTAYA_PASSWORD=miclave npm start
   conservando el estado individual de cada plato.
 - **Privacidad por diseño**: la carta pública no crea sesión ni pide datos del
   cliente.
+- **Panel de cocina**: los pedidos avanzan con transiciones estrictas
+  `recibido → en_preparacion → servido` (sin saltos ni retrocesos). Un pedido
+  solo se cancela mientras está en `recibido`; la cancelación registra el momento
+  y no borra el pedido. La vista activa muestra los pedidos del día por
+  antigüedad y se actualiza en vivo por SSE; los servidos y cancelados pasan al
+  histórico del día.
 
 ## Tests
 
