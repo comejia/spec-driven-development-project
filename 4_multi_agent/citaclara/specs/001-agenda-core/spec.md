@@ -154,12 +154,13 @@ con una clave incorrecta o vacía (acceso denegado).
 
 ### Functional Requirements
 
-- **FR-001**: El sistema MUST permitir registrar clínicas, cada una con una clave de panel que
-  habilita el acceso a su agenda (autenticación simplificada v1).
-- **FR-002**: El sistema MUST permitir registrar profesionales con nombre y especialidad,
-  asociados a una clínica.
-- **FR-003**: El sistema MUST permitir registrar servicios con nombre, duración en minutos y
-  precio en euros.
+- **FR-001**: El sistema MUST disponer de clínicas, cada una con una clave de panel que habilita
+  el acceso a su agenda (autenticación simplificada v1); en la 001 se aprovisionan por semilla o
+  administración fuera del flujo de recepción (ver Assumptions).
+- **FR-002**: El sistema MUST disponer de profesionales con nombre y especialidad, asociados a
+  una clínica (aprovisionados por semilla/administración en la 001; ver Assumptions).
+- **FR-003**: El sistema MUST disponer de servicios con nombre, duración en minutos y precio en
+  euros (aprovisionados por semilla/administración en la 001; ver Assumptions).
 - **FR-004**: El sistema MUST permitir registrar pacientes con nombre, teléfono y email como
   fichas (los pacientes no acceden al sistema en la 001).
 - **FR-004a**: El sistema MUST tratar el teléfono como identificador único del paciente dentro de
@@ -251,8 +252,10 @@ La semilla determinista de la 001 MUST reproducir exactamente:
   en el 100 % de las citas creadas.
 - **SC-004**: Todos los importes mostrados cuadran al céntimo (0 descuadres) y todas las fechas y
   horas se muestran en formato inequívoco para España.
-- **SC-005**: Una persona de recepción sin formación previa localiza la agenda del día de un
-  profesional y da de alta una cita válida en menos de 2 minutos.
+- **SC-005**: El flujo de alta de una cita válida se completa en un máximo de 5 interacciones
+  (seleccionar profesional, servicio y paciente, indicar la hora de inicio y confirmar), sin pasos
+  que requieran conocimientos técnicos ni consultar un manual; verificable con un recorrido e2e
+  que cuente los pasos.
 - **SC-006**: La agenda del día muestra correctamente ocupado frente a libre y solo las citas del
   profesional seleccionado en el 100 % de las consultas.
 - **SC-007**: Al regenerar los datos de demostración con la misma semilla, la historia resultante
@@ -273,6 +276,10 @@ La semilla determinista de la 001 MUST reproducir exactamente:
 - Los estados "cancelada" y "no_asistida" son finales en la 001 y liberan el hueco para nuevas
   reservas; "completada" es final y mantiene el hueco ocupado a efectos de solape histórico.
 - El tamaño típico de clínica es de 2 a 5 profesionales.
+- En la 001, la clínica, los profesionales y los servicios se aprovisionan mediante la semilla
+  determinista o administración fuera del flujo de recepción; no hay pantallas de alta/edición de
+  estas entidades. La recepción solo gestiona pacientes y citas. El alta y edición de
+  clínica/profesionales/servicios se abordará en una spec propia.
 
 ## Fuera de alcance (001)
 
@@ -284,3 +291,5 @@ Se abordarán en specs propias:
 - Pagos online.
 - Reprogramación de citas (editar hora/profesional in situ); en la 001 se resuelve cancelando y
   creando una cita nueva.
+- Pantallas de alta/edición de clínica, profesionales y servicios (en la 001 se aprovisionan por
+  semilla/administración).

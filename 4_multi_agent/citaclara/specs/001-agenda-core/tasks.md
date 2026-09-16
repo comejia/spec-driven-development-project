@@ -188,6 +188,7 @@ ninguna agenda.
 - [ ] T049 [P] Test e2e de exactitud de presentación: importes al céntimo en es-ES y fechas/horas 24h inequívocas en `tests/e2e/formato-es.spec.ts` (FR-019, SC-004)
 - [ ] T050 Ejecutar la validación completa de `quickstart.md` (V1–V12) y dejar constancia
 - [ ] T051 [P] Verificar la suite completa en verde como condición de merge y documentar la trazabilidad FR/RN→test (Principio 6)
+- [ ] T052 [P] Test e2e que verifica que el alta de una cita válida se completa en ≤ 5 interacciones sin pasos técnicos en `tests/e2e/alta-flujo.spec.ts` (SC-005)
 
 ---
 
