@@ -35,3 +35,6 @@
 - Validación superada en la primera iteración: no quedan marcadores [NEEDS CLARIFICATION];
   las decisiones no especificadas se resolvieron con defaults razonables documentados en
   la sección "Assumptions".
+- Sesión de clarificación 2026-09-16: 5 preguntas integradas (granularidad de 5 min, solape de
+  paciente entre profesionales, teléfono único, franja 08:00–21:00, reprogramación fuera de
+  alcance). Sin regresiones; todos los ítems siguen en verde.

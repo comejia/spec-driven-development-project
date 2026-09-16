@@ -8,6 +8,16 @@
 
 **Input**: User description: "Núcleo de agenda de CitaClara. Clínicas pequeñas (2-5 profesionales); la recepción gestiona la agenda; los pacientes solo existen como fichas. Entidades, cita con estados, RN1 anti-solape, RN2 no citas en pasado, agenda del día de recepción, semilla determinista, y exclusiones de alcance."
 
+## Clarifications
+
+### Session 2026-09-16
+
+- Q: ¿Con qué granularidad de tiempo se registran las horas de inicio de las citas? → A: Minutos en múltiplos de 5 (p. ej. 09:00, 09:05, 09:10)
+- Q: ¿Puede un mismo paciente tener dos citas que se solapen en el tiempo con profesionales distintos? → A: No; el paciente tampoco puede solapar citas activas, aunque sean de profesionales distintos
+- Q: ¿Qué identifica de forma única a una ficha de paciente dentro de una clínica? → A: Teléfono único por clínica (no se repiten dos fichas con el mismo teléfono)
+- Q: ¿Qué franja horaria muestra la "agenda del día" de un profesional? → A: Franja fija 08:00–21:00 para todos los profesionales
+- Q: ¿Puede la recepción cambiar la hora o el profesional de una cita ya creada (reprogramar) en la 001? → A: Fuera de alcance; para cambiar hora/profesional se cancela y se crea una cita nueva
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Alta de cita sin solapes (Priority: P1)
@@ -133,6 +143,12 @@ con una clave incorrecta o vacía (acceso denegado).
   un día sin citas (todo libre) y no mezcla citas de días contiguos.
 - **Concurrencia en el mismo instante (RN1)**: dos altas simultáneas del mismo hueco del mismo
   profesional resultan en exactamente una cita registrada.
+- **Inicio no válido por granularidad**: intentar crear una cita con inicio en un minuto no
+  múltiplo de 5 (p. ej. 09:07) se rechaza.
+- **Paciente solapado entre profesionales**: intentar crear una cita para un paciente que ya
+  tiene otra cita activa solapada con otro profesional se rechaza (FR-012a).
+- **Teléfono duplicado**: intentar fichar un paciente con un teléfono ya existente en la clínica
+  se rechaza (FR-004a).
 
 ## Requirements *(mandatory)*
 
@@ -146,8 +162,12 @@ con una clave incorrecta o vacía (acceso denegado).
   precio en euros.
 - **FR-004**: El sistema MUST permitir registrar pacientes con nombre, teléfono y email como
   fichas (los pacientes no acceden al sistema en la 001).
+- **FR-004a**: El sistema MUST tratar el teléfono como identificador único del paciente dentro de
+  una clínica; MUST impedir crear dos fichas con el mismo teléfono en la misma clínica.
 - **FR-005**: El sistema MUST permitir crear una cita que une un profesional, un servicio y un
   paciente, con una hora de inicio.
+- **FR-005a**: El sistema MUST aceptar horas de inicio de cita solo en minutos múltiplos de 5
+  (p. ej. 09:00, 09:05, 09:10); MUST rechazar inicios en minutos no múltiplos de 5.
 - **FR-006**: El sistema MUST calcular la hora de fin de la cita automáticamente como
   inicio + duración del servicio; el fin no se introduce manualmente.
 - **FR-007**: El sistema MUST asignar el estado "reservada" a toda cita recién creada.
@@ -164,6 +184,9 @@ con una clave incorrecta o vacía (acceso denegado).
 - **FR-012**: El sistema MUST considerar que dos citas se solapan cuando sus intervalos
   [inicio, fin) se intersecan; citas adyacentes (el fin de una coincide con el inicio de la
   otra) NO se consideran solape.
+- **FR-012a**: El sistema MUST impedir que un mismo paciente tenga dos citas activas (en estado
+  "reservada" o "completada") cuyos intervalos [inicio, fin) se solapen, aunque sean de
+  profesionales distintos. Las citas "cancelada" o "no_asistida" no cuentan para este control.
 - **FR-013 (RN2)**: El sistema MUST rechazar la creación de citas cuyo inicio esté en el pasado.
 - **FR-014**: El sistema MUST rechazar la creación de una cita si falta el profesional, el
   servicio, el paciente o la hora de inicio, o si el paciente no está fichado, informando del
@@ -172,8 +195,13 @@ con una clave incorrecta o vacía (acceso denegado).
   fecha dada, viendo sus citas en orden cronológico con inicio, fin, servicio, paciente y estado.
 - **FR-016**: La agenda del día MUST distinguir visualmente los tramos ocupados de los libres y
   MUST mostrar únicamente las citas del profesional seleccionado.
+- **FR-016a**: La agenda del día MUST presentar una franja horaria fija de 08:00 a 21:00 para
+  todos los profesionales; los tramos libres se pintan dentro de esa franja. (Los horarios
+  configurables por profesional quedan fuera de alcance en la 001.)
 - **FR-017**: La recepción MUST poder marcar una cita como completada, cancelada o no asistida
   desde la agenda.
+- **FR-017a**: La 001 NO incluye reprogramación: para cambiar la hora o el profesional de una
+  cita, la recepción MUST cancelar la cita y crear una nueva (que revalida RN1 y RN2).
 - **FR-018**: El sistema MUST exigir la clave de la clínica para acceder a su agenda y MUST
   denegar el acceso cuando la clave sea incorrecta o esté ausente.
 - **FR-019**: El sistema MUST mostrar todos los importes cuadrados al céntimo y todas las fechas
@@ -205,8 +233,8 @@ La semilla determinista de la 001 MUST reproducir exactamente:
   clínica. No puede tener dos citas activas (reservada o completada) solapadas.
 - **Servicio**: prestación ofertada. Atributos: nombre, duración (minutos), precio (euros).
   Determina la duración de la cita.
-- **Paciente**: ficha de la persona atendida. Atributos: nombre, teléfono, email. No accede al
-  sistema en la 001.
+- **Paciente**: ficha de la persona atendida. Atributos: nombre, teléfono (identificador único
+  dentro de la clínica), email. No accede al sistema en la 001.
 - **Cita**: unión de profesional + servicio + paciente en una franja [inicio, fin). Atributos:
   inicio, fin (derivado), estado (reservada, completada, cancelada, no_asistida). fin = inicio +
   duración del servicio.
@@ -254,3 +282,5 @@ Se abordarán en specs propias:
 - Recordatorios (email, SMS u otros).
 - Analítica e informes.
 - Pagos online.
+- Reprogramación de citas (editar hora/profesional in situ); en la 001 se resuelve cancelando y
+  creando una cita nueva.
