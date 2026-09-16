@@ -1,0 +1,25 @@
+/opsx:propose add-panel-cocina — Panel de cocina de CartaYa. Contexto:
+este cambio añade la pantalla con la que cocina y barra gestionan los 
+pedidos entrantes, en una tablet apoyada en la barra.
+
+Reglas de negocio:
+- El panel requiere la autenticación de establecimiento (la misma sesión
+  simple de la administración de carta-publica).
+- Los pedidos confirmados entran en estado "recibido". La cocina los pasa
+  a "en_preparacion" cuando empieza a prepararlos y a "servido" cuando
+  salen a la mesa. Las transiciones válidas son exactamente esas:
+  recibido → en_preparacion → servido, sin saltos ni retrocesos.
+- Un pedido solo puede cancelarse mientras está en estado "recibido"
+  (si la plancha ya está encendida, no se cancela desde la aplicación:
+  se resuelve hablando, como toda la vida). La cancelación registra el
+  momento y no borra el pedido.
+- El panel muestra los pedidos del día ordenados por antigüedad, con
+  mesa, platos, cantidades, notas del cliente y tiempo transcurrido, y se
+  actualiza en tiempo real sin recargar la página (los pedidos "aparecen
+  solos"), mediante SSE como fija el contexto de config.yaml.
+- Los pedidos servidos se archivan de la vista activa pero son
+  consultables en un histórico del día.
+
+Fuera de alcance: métricas y estadísticas, impresión de tickets, gestión
+de turnos o empleados, notificaciones sonoras configurables (un aviso
+simple basta).

@@ -1,0 +1,10 @@
+Necesito un cambio urgente en CartaYa, directo al código, sin crear ningún
+change de OpenSpec ni tocar nada de openspec/ (no hay tiempo). En el panel
+de cocina, añade a cada plato del catálogo un interruptor "Agotado". Cuando
+un plato está marcado como agotado: en la carta pública debe seguir viéndose
+pero con una etiqueta "Agotado hoy" y con el botón de añadir al pedido
+deshabilitado; y si un cliente tenía ese plato en un pedido sin confirmar,
+al confirmar debe avisarle de que el plato ya no está disponible y quitarlo
+del pedido. El estado de agotado se guarda en la base de datos y se puede
+activar y desactivar desde el panel de cocina en cualquier momento. Hazlo
+funcionar ya; los tests los vemos otro día.

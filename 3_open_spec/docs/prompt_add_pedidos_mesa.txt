@@ -1,0 +1,26 @@
+/opsx:propose add-pedidos-mesa — Pedidos desde la mesa para CartaYa.
+Contexto: existe la capacidad carta-digital (openspec/specs/carta-digital/);
+este cambio añade que el cliente pueda pedir desde ella.
+
+Reglas de negocio:
+- Cada mesa de la cafetería tiene un código QR único e impreso que abre la
+  carta con la mesa ya identificada. Un pedido pertenece a una mesa, nunca
+  a una persona (principio 3 de config.yaml: cero datos personales del
+  cliente).
+- El cliente añade platos de la carta a su pedido, indica cantidades y
+  puede añadir una nota libre por plato ("sin cebolla", "poco hecho") con
+  un límite de 140 caracteres.
+- Antes de enviar, el cliente ve un resumen del pedido con el total en
+  euros y lo confirma. La confirmación no requiere registro, email,
+  teléfono ni dato personal alguno.
+- Un pedido confirmado llega a cocina (capacidad futura panel-cocina) y el
+  cliente ve en su móvil una confirmación con número de pedido y estado.
+- Una mesa puede tener varios pedidos abiertos a lo largo del servicio
+  (se pide dos veces, se pide el postre después); cada confirmación es un
+  pedido independiente.
+- Si un plato deja de estar activo entre que el cliente lo añadió y la
+  confirmación, el sistema se lo indica y lo retira del pedido antes de
+  enviar (la carta puede cambiar mientras el cliente decide).
+
+Fuera de alcance: pago online (se paga en caja, como siempre), propinas,
+dividir la cuenta, llamar al camarero, y pedidos para llevar.

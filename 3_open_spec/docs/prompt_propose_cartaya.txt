@@ -1,0 +1,34 @@
+/opsx:propose add-carta-digital — La carta digital pública de CartaYa para
+la cafetería La Estación. Es la pantalla que ve un cliente al escanear el
+QR de su mesa (el flujo de pedido será otro cambio; este cubre solo la
+consulta de la carta y la administración del catálogo).
+
+Qué queremos y por qué: sustituir las cartas plastificadas, siempre
+desactualizadas, por una carta digital que el dueño mantiene al día desde
+su panel y que el cliente consulta desde el móvil sin instalar nada.
+
+Reglas de negocio:
+- La carta se organiza en categorías definidas por el dueño (desayunos,
+  bocadillos, raciones, bebidas, postres...), en el orden que él decida y
+  con orden manual de platos dentro de cada categoría.
+- La carta muestra todos los platos activos de cada categoría. Un plato
+  "activo" es un plato que el dueño no ha eliminado del catálogo; los
+  platos eliminados no aparecen jamás, pero se conservan archivados en el
+  sistema (los pedidos históricos los referencian).
+- Cada plato muestra: nombre, precio (euros, IVA incluido), descripción
+  corta, foto opcional y sus alérgenos. Los alérgenos se muestran SIEMPRE
+  y de forma visible en todos los platos, con los 14 alérgenos de
+  declaración obligatoria de la normativa europea; un plato sin alérgenos
+  declara explícitamente "sin alérgenos" (la ausencia de información no es
+  una opción legal).
+- La carta es pública: no requiere identificación para consultarse, y
+  carga en menos de 2 segundos en un móvil de gama media con 4G.
+- El dueño gestiona el catálogo (crear, editar, archivar platos y
+  categorías, subir fotos con límite de tamaño) desde una pantalla de
+  administración protegida con la sesión de establecimiento, pensada para
+  usarse desde un móvil.
+
+Fuera de alcance: el pedido desde la mesa (siguiente cambio), el panel de
+cocina, precios por franjas horarias, múltiples idiomas, y cualquier forma
+de cuenta o registro del cliente final (prohibido por el principio 3
+de config.yaml).
