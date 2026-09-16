@@ -1,0 +1,28 @@
+/speckit-specify Núcleo de agenda de CitaClara. Contexto: clínicas
+pequeñas (2-5 profesionales); la recepción gestiona la agenda; los
+pacientes, de momento, solo existen como fichas. Alcance de la 001:
+
+- Entidades: clínica (con clave de panel; auth simplificada v1, deuda
+  consciente), profesionales (nombre, especialidad), servicios (nombre,
+  duración en minutos, precio en euros), pacientes (nombre, teléfono,
+  email) y citas.
+- Una cita une profesional + servicio + paciente con inicio y fin (fin =
+  inicio + duración del servicio). Estados: reservada → completada |
+  cancelada | no_asistida. "No asistida" significa exclusivamente que el
+  paciente no se presentó a una cita que seguía reservada.
+- RN1 (capital): imposible crear una cita que solape otra reservada o
+  completada del mismo profesional — también si dos reservas del mismo
+  hueco llegan a la vez: solo una puede quedar registrada. RN2: no se
+  crean citas en el pasado.
+- Interfaz (recepción): "agenda del día" por profesional, con vista clara
+  de huecos ocupados y libres; alta de cita; y acciones para marcar
+  completada / cancelada / no asistida. Diseño moderno, limpio y
+  responsive (constitución p.7). Acceso con clave de clínica.
+- Semilla determinista según constitución p.5: Clínica Eleva, 3
+  profesionales (María y Jorge, fisioterapia; Lucía, nutrición), 4
+  servicios (sesión fisio 45' 40 €, primera visita fisio 60' 50 €,
+  consulta nutrición 30' 35 €, primera nutrición 45' 45 €), ~40
+  pacientes, 8 semanas de historia con ~10 % de no asistencia y ~8 % de
+  cancelaciones, 2 semanas futuras con reservas.
+- Fuera de alcance de la 001 (van en specs propias): cualquier acceso del
+  paciente, recordatorios, analítica, pagos online.

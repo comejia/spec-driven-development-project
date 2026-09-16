@@ -1,0 +1,34 @@
+/speckit-constitution Redacta la constitución de CitaClara, un gestor de
+citas para clínicas y consultas pequeñas (fisioterapia, nutrición,
+podología). Producto greenfield que nace con SDD y aspira a operar con
+varias features y varios agentes en paralelo desde el primer mes.
+Principios de negocio y calidad — ni una decisión técnica: el stack, los
+formatos y las estructuras se deciden en el plan.
+
+1. Spec first: todo comportamiento observable nace de una spec aprobada
+   en specs/, y todo cambio de comportamiento empieza corrigiendo o
+   creando su spec. La propiedad de cada spec vive en specs/MAPA.md: un
+   propietario por spec.
+2. Los números no admiten creatividad: todos los importes cuadran al
+   céntimo, siempre, y toda fecha u hora se muestra sin ambigüedad
+   posible para una clínica española.
+3. El solape es el fallo capital: un profesional no puede tener dos citas
+   a la vez, jamás — ni siquiera si dos reservas del mismo hueco llegan
+   en el mismo instante. Toda feature que escriba en la agenda incluye
+   pruebas que intenten provocar un solape.
+4. Simplicidad y cero alcance fantasma: ante dos soluciones, la más
+   simple; nada se construye ni se añade (funcionalidad o dependencia)
+   sin estar justificado en una spec.
+5. Demostrable con datos reproducibles: el producto mantiene datos de
+   demostración deterministas (misma semilla, misma historia) para que
+   specs, ejemplos y analítica citen números que cualquiera puede
+   reproducir.
+6. Los tests acompañan a la spec: cada regla de negocio y criterio de
+   aceptación relevante tiene su test que la referencia; la suite en
+   verde es condición de merge.
+7. La interfaz es clara y moderna: recepción la usa sin formación y sin
+   manual; nada de jerga técnica en pantalla, contraste y tamaños
+   accesibles, y funciona en el portátil de recepción y en el móvil de
+   un paciente. (Esto es calidad, no stack: la tecnología de la UI se
+   decide en el plan.)
+8. Español de España en todo.
