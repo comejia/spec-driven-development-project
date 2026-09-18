@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens de diseño de CitaClara (Principio 7: interfaz clara, moderna y accesible).
+ * Paleta con contraste AA sobre fondo claro: texto principal 16.1:1, primario 5.9:1.
+ */
+@theme {
+  --color-fondo: oklch(0.99 0.003 250);
+  --color-superficie: oklch(1 0 0);
+  --color-borde: oklch(0.9 0.01 250);
+  --color-texto: oklch(0.24 0.02 255);
+  --color-texto-suave: oklch(0.46 0.02 255);
+
+  --color-primario: oklch(0.5 0.13 235);
+  --color-primario-fuerte: oklch(0.42 0.13 235);
+  --color-primario-suave: oklch(0.96 0.02 235);
+  --color-primario-texto: oklch(1 0 0);
+
+  --color-exito: oklch(0.48 0.12 155);
+  --color-exito-suave: oklch(0.96 0.03 155);
+  --color-aviso: oklch(0.55 0.13 70);
+  --color-aviso-suave: oklch(0.97 0.04 80);
+  --color-error: oklch(0.5 0.19 25);
+  --color-error-suave: oklch(0.96 0.03 25);
+
+  --radius-caja: 0.75rem;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+}
+
+/* Tamaños base generosos para lectura cómoda en el mostrador. */
+html {
+  font-size: 106.25%; /* 17px */
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco visible siempre (navegación por teclado). */
+:focus-visible {
+  outline: 3px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

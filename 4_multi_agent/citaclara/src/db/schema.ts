@@ -1,0 +1,130 @@
+import {
+  check,
+  customType,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+
+/**
+ * Esquema de la 001 (ver specs/001-agenda-core/data-model.md).
+ *
+ * El invariante capital (Principio 3, RN1) se ancla en la base de datos mediante
+ * restricciones de exclusión `EXCLUDE USING gist` sobre la franja temporal. Drizzle no
+ * expresa exclusiones en su DSL, por lo que se añaden en la migración
+ * `src/db/migrations/0001_invariantes_agenda.sql` junto a la extensión `btree_gist`.
+ */
+
+/** Rango temporal de la cita, `[inicio, fin)`: las citas adyacentes NO solapan (FR-012). */
+const tstzrange = customType<{ data: string; driverData: string }>({
+  dataType() {
+    return 'tstzrange';
+  },
+});
+
+/** Estados de la cita (FR-007/008/009). */
+export const estadoCitaEnum = pgEnum('estado_cita', [
+  'reservada',
+  'completada',
+  'cancelada',
+  'no_asistida',
+]);
+
+/** Estados que ocupan el hueco: cancelada y no_asistida lo liberan (FR-010). */
+export const ESTADOS_ACTIVOS = ['reservada', 'completada'] as const;
+
+export const clinica = pgTable('clinica', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  nombre: text('nombre').notNull(),
+  /** Hash argon2/bcrypt de la clave de panel (FR-018, D5). Nunca la clave en claro. */
+  claveHash: text('clave_hash').notNull(),
+});
+
+export const profesional = pgTable('profesional', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clinicaId: uuid('clinica_id')
+    .notNull()
+    .references(() => clinica.id, { onDelete: 'cascade' }),
+  nombre: text('nombre').notNull(),
+  especialidad: text('especialidad').notNull(),
+});
+
+export const servicio = pgTable(
+  'servicio',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    clinicaId: uuid('clinica_id')
+      .notNull()
+      .references(() => clinica.id, { onDelete: 'cascade' }),
+    nombre: text('nombre').notNull(),
+    /** Duración en minutos enteros, > 0 (FR-003). */
+    duracionMin: integer('duracion_min').notNull(),
+    /** Precio en céntimos de euro: enteros, sin coma flotante (D2, FR-019). */
+    precioCentimos: integer('precio_centimos').notNull(),
+  },
+  (t) => [
+    check('servicio_duracion_positiva', sql`${t.duracionMin} > 0`),
+    check('servicio_precio_no_negativo', sql`${t.precioCentimos} >= 0`),
+  ],
+);
+
+export const paciente = pgTable(
+  'paciente',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    clinicaId: uuid('clinica_id')
+      .notNull()
+      .references(() => clinica.id, { onDelete: 'cascade' }),
+    nombre: text('nombre').notNull(),
+    telefono: text('telefono').notNull(),
+    email: text('email'),
+  },
+  // Teléfono único por clínica (FR-004a).
+  (t) => [unique('paciente_telefono_unico_por_clinica').on(t.clinicaId, t.telefono)],
+);
+
+export const cita = pgTable(
+  'cita',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    clinicaId: uuid('clinica_id')
+      .notNull()
+      .references(() => clinica.id, { onDelete: 'cascade' }),
+    profesionalId: uuid('profesional_id')
+      .notNull()
+      .references(() => profesional.id, { onDelete: 'restrict' }),
+    servicioId: uuid('servicio_id')
+      .notNull()
+      .references(() => servicio.id, { onDelete: 'restrict' }),
+    pacienteId: uuid('paciente_id')
+      .notNull()
+      .references(() => paciente.id, { onDelete: 'restrict' }),
+    /** Instante en UTC; se interpreta y muestra en Europe/Madrid (D3). */
+    inicio: timestamp('inicio', { withTimezone: true, mode: 'date' }).notNull(),
+    /** Derivado en el servicio: inicio + duración del servicio (FR-006). */
+    fin: timestamp('fin', { withTimezone: true, mode: 'date' }).notNull(),
+    /** Franja `[inicio, fin)` generada por la base de datos (D1). */
+    franja: tstzrange('franja').generatedAlwaysAs(sql`tstzrange(inicio, fin, '[)')`),
+    estado: estadoCitaEnum('estado').notNull().default('reservada'),
+  },
+  (t) => [
+    // Granularidad de 5 minutos (FR-005a). Se usa el epoch (inmutable y sin
+    // dependencia de la zona horaria de la sesión): 300 s = 5 min.
+    check('cita_granularidad_5min', sql`(EXTRACT(EPOCH FROM ${t.inicio})::numeric % 300) = 0`),
+    check('cita_fin_posterior_a_inicio', sql`${t.fin} > ${t.inicio}`),
+  ],
+);
+
+export const schema = { clinica, profesional, servicio, paciente, cita, estadoCitaEnum };
+
+export type Clinica = typeof clinica.$inferSelect;
+export type Profesional = typeof profesional.$inferSelect;
+export type Servicio = typeof servicio.$inferSelect;
+export type Paciente = typeof paciente.$inferSelect;
+export type Cita = typeof cita.$inferSelect;
+export type EstadoCita = (typeof estadoCitaEnum.enumValues)[number];
