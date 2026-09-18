@@ -1,0 +1,23 @@
+# PostgreSQL 16 para desarrollo local y pruebas e2e.
+# La imagen oficial incluye los módulos contrib necesarios para `btree_gist` (D1).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: citaclara-postgres
+    environment:
+      POSTGRES_USER: citaclara
+      POSTGRES_PASSWORD: citaclara
+      POSTGRES_DB: citaclara
+      TZ: Europe/Madrid
+    ports:
+      - '5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U citaclara -d citaclara']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - citaclara-pgdata:/var/lib/postgresql/data
+
+volumes:
+  citaclara-pgdata:
