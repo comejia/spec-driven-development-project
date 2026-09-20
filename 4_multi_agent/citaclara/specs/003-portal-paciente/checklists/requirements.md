@@ -32,7 +32,8 @@
 ## Notes
 
 - Las tres decisiones de negocio (acceso sin cuentas, ventana de cancelación de 24 h y
-  destino del hueco liberado) se han cerrado con valores por defecto recomendados en la
-  sección "Clarifications" y quedan pendientes de confirmación por Sara vía
-  `/speckit.clarify`. La spec es completa y planificable con esos valores.
+  destino del hueco liberado) quedaron cerradas en `/speckit.specify` y confirmadas en la
+  sesión de `/speckit.clarify` (2026-09-19), junto con tres decisiones adicionales: alcance
+  del enlace (por paciente), persistencia del token (no caduca, revocable) y refuerzo
+  obligatorio de los 4 dígitos del teléfono. La spec es completa y planificable.
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`.

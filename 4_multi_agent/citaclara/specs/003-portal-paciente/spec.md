@@ -18,15 +18,24 @@ Sara vía `/speckit.clarify`; hasta entonces, la spec asume estas respuestas par
 planificarse por completo.
 
 - Q: ¿Cómo accede el paciente sin crear cuentas ni contraseñas? → A: Enlace personal con
-  token secreto por cita/paciente (magic link) que la clínica comparte; sin registro ni
-  contraseña. Como refuerzo opcional, el paciente confirma los 4 últimos dígitos de su
-  teléfono al abrir el enlace.
+  token secreto por paciente (magic link) que la clínica comparte; sin registro ni
+  contraseña. El paciente confirma los 4 últimos dígitos de su teléfono al abrir el enlace
+  (segundo factor obligatorio).
 - Q: ¿Hasta cuándo puede cancelar una cita futura? → A: Hasta 24 horas antes de la hora de
   inicio de la cita. Dentro de esa ventana (menos de 24 h o cita ya empezada/pasada) el
   botón de cancelar no está disponible y se indica que debe llamar a la clínica.
 - Q: ¿Qué pasa con el hueco liberado al cancelar? → A: El hueco queda libre en la agenda de
   recepción de forma inmediata (la cita pasa a "cancelada", que libera el tramo según la
   001); no se reasigna ni se ofrece automáticamente a otros pacientes en la v1.
+- Q: ¿El enlace personal da acceso a todas las citas del paciente o solo a una cita? → A: Un
+  enlace por paciente que muestra todas sus citas (futuras y pasadas) y permite cancelar
+  cualquiera que sea cancelable; el token es secreto y no adivinable, vinculado al paciente.
+- Q: ¿Cuándo caduca el enlace personal del paciente? → A: Persistente (no caduca); el mismo
+  enlace sirve siempre para ese paciente. El riesgo de reenvío se mitiga con la confirmación
+  obligatoria de los 4 dígitos del teléfono (ver siguiente decisión).
+- Q: ¿El refuerzo de los 4 últimos dígitos del teléfono es obligatorio en la v1? → A:
+  Obligatorio siempre; todo acceso pide los 4 últimos dígitos del teléfono antes de mostrar
+  las citas (segundo factor ligero, dado que el enlace no caduca).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -102,9 +111,10 @@ enlace solo da acceso a las citas de ese paciente.
 —clínicas pequeñas que no van a gestionar altas de usuarios— hace que este mecanismo sea
 condición para las US1 y US2. Es P1 porque las habilita.
 
-**Independent Test**: Abrir un enlace personal válido y comprobar que se accede a las citas
-del paciente correcto; abrir un enlace inválido, caducado o manipulado y comprobar que el
-acceso se deniega sin revelar datos de ningún paciente.
+**Independent Test**: Abrir un enlace personal válido, superar la confirmación de los 4
+dígitos del teléfono y comprobar que se accede a las citas del paciente correcto; abrir un
+enlace inválido, revocado o manipulado y comprobar que el acceso se deniega sin revelar
+datos de ningún paciente.
 
 **Acceptance Scenarios**:
 
@@ -112,12 +122,12 @@ acceso se deniega sin revelar datos de ningún paciente.
    **Then** accede directamente a sus citas sin pantalla de registro ni contraseña.
 2. **Given** un enlace manipulado o inexistente, **When** se intenta abrir, **Then** el
    acceso se deniega con un mensaje neutro y no se muestra ninguna cita ni dato personal.
-3. **Given** un enlace válido pero caducado, **When** el paciente lo abre, **Then** se le
-   informa de que el enlace ha caducado y se le indica cómo obtener uno nuevo (contactar con
-   la clínica), sin exponer sus datos.
-4. **Given** el refuerzo opcional activado, **When** el paciente abre un enlace válido,
-   **Then** se le pide confirmar los 4 últimos dígitos de su teléfono antes de ver sus
-   citas, y un valor incorrecto no da acceso.
+3. **Given** un enlace que ha sido revocado por la clínica, **When** el paciente lo abre,
+   **Then** se le informa de que el enlace ya no es válido y se le indica cómo obtener uno
+   nuevo (contactar con la clínica), sin exponer sus datos.
+4. **Given** un enlace personal válido, **When** el paciente lo abre, **Then** se le pide
+   confirmar los 4 últimos dígitos de su teléfono antes de ver sus citas; un valor incorrecto
+   no da acceso y los intentos fallidos están limitados.
 
 ---
 
@@ -128,9 +138,9 @@ acceso se deniega sin revelar datos de ningún paciente.
 - **Cancelación simultánea paciente/recepción**: si el paciente cancela a la vez que
   recepción cambia el estado de la misma cita, el resultado final es coherente (una sola
   cancelación efectiva) y nunca deja la cita en un estado imposible.
-- **Enlace reenviado a un tercero**: quien tenga el enlace puede ver las citas del paciente;
-  el refuerzo opcional de los 4 dígitos del teléfono mitiga el reenvío accidental (decisión
-  de negocio documentada en Assumptions).
+- **Enlace reenviado a un tercero**: quien tenga el enlace no accede sin conocer también los
+  4 últimos dígitos del teléfono del paciente; esta confirmación obligatoria mitiga el reenvío
+  accidental del enlace (decisión de negocio documentada en Assumptions).
 - **Paciente sin citas**: el portal se abre correctamente y muestra estados vacíos claros,
   sin errores.
 - **Cita en el pasado que sigue "reservada"** (paciente que no acudió y aún no se marcó):
@@ -148,13 +158,19 @@ acceso se deniega sin revelar datos de ningún paciente.
   muestra únicamente sus propias citas, sin crear cuenta ni contraseña.
 - **FR-002**: El sistema MUST dar acceso mediante un enlace personal con un token secreto
   asociado al paciente (no adivinable), que la clínica facilita al paciente por su canal
-  habitual.
-- **FR-003**: El sistema MUST denegar el acceso cuando el token sea inexistente, esté
-  manipulado o haya caducado, con un mensaje neutro que no revele datos de ningún paciente
-  ni confirme si un token concreto existió.
-- **FR-004**: El sistema MAY reforzar el acceso pidiendo al paciente los 4 últimos dígitos de
-  su teléfono al abrir un enlace válido; cuando este refuerzo esté activo, un valor
-  incorrecto MUST impedir el acceso. (Configurable; ver Assumptions.)
+  habitual. Un único enlace por paciente da acceso a todas sus citas (futuras y pasadas); no
+  se emite un enlace por cita.
+- **FR-003**: El sistema MUST denegar el acceso cuando el token sea inexistente o esté
+  manipulado, con un mensaje neutro que no revele datos de ningún paciente ni confirme si un
+  token concreto existió. (Los enlaces son persistentes y no caducan; ver FR-003a para la
+  revocación.)
+- **FR-003a**: El sistema MAY permitir que recepción revoque el enlace de un paciente si este
+  lo solicita; un enlace revocado se trata como inexistente a efectos de FR-003. La revocación
+  no es un flujo de recepción obligatorio en la v1.
+- **FR-004**: El sistema MUST reforzar el acceso pidiendo al paciente los 4 últimos dígitos
+  de su teléfono al abrir un enlace válido, antes de mostrar ninguna cita; un valor incorrecto
+  MUST impedir el acceso. El sistema MUST limitar los intentos fallidos de este paso para
+  evitar el adivinado por fuerza bruta.
 - **FR-005**: El portal MUST mostrar las citas del paciente separadas en "Próximas citas"
   (futuras) e "Historial" (pasadas), determinando futura/pasada por la hora de inicio en la
   zona peninsular española.
@@ -208,9 +224,10 @@ acceso se deniega sin revelar datos de ningún paciente.
   con estado reservada/completada/cancelada/no_asistida). El portal la lee y, para citas
   futuras "reservada", puede transitarla a "cancelada".
 - **Acceso personal (token de portal)**: credencial no adivinable que vincula un enlace con
-  un paciente concreto, con posible caducidad. Es el mecanismo de acceso sin cuenta ni
-  contraseña. Atributos conceptuales: a qué paciente pertenece, si sigue vigente, cuándo
-  caduca. (Su forma concreta se decide en el plan.)
+  un paciente concreto. Es el mecanismo de acceso sin cuenta ni contraseña. Es persistente
+  (no caduca) y puede revocarse manualmente por recepción a petición del paciente. Atributos
+  conceptuales: a qué paciente pertenece y si sigue vigente (revocado o no). (Su forma
+  concreta se decide en el plan.)
 
 ## Success Criteria *(mandatory)*
 
@@ -224,7 +241,7 @@ acceso se deniega sin revelar datos de ningún paciente.
   en la agenda de recepción de forma inmediata.
 - **SC-004**: En el 100 % de los intentos, no se permite cancelar desde el portal una cita a
   la que falten menos de 24 horas, ya empezada o en un estado distinto de "reservada".
-- **SC-005**: En el 100 % de los intentos, un enlace inválido, manipulado o caducado no da
+- **SC-005**: En el 100 % de los intentos, un enlace inválido, manipulado o revocado no da
   acceso a ninguna cita ni dato personal.
 - **SC-006**: Ninguna combinación de acciones simultáneas (paciente + recepción) deja una
   cita en un estado imposible ni produce dos cancelaciones efectivas.
@@ -237,14 +254,15 @@ acceso se deniega sin revelar datos de ningún paciente.
 
 - **Reutiliza la 001**: pacientes, citas y estados provienen del núcleo de agenda (001). El
   portal no crea entidades de negocio nuevas salvo el mecanismo de acceso personal.
-- **Acceso sin cuentas (decisión de negocio, confirmable por Sara)**: se asume acceso por
-  enlace personal con token secreto, sin registro ni contraseña, porque las clínicas pequeñas
-  no gestionarán altas de usuarios. El refuerzo de "4 últimos dígitos del teléfono" es
-  opcional y está activado por defecto como equilibrio entre comodidad y protección.
-- **Ventana de cancelación (decisión de negocio, confirmable por Sara)**: 24 horas antes del
+- **Acceso sin cuentas (decisión confirmada, sesión 2026-09-19)**: acceso por enlace personal
+  con token secreto, persistente (no caduca) y revocable por recepción, sin registro ni
+  contraseña, porque las clínicas pequeñas no gestionarán altas de usuarios. La confirmación
+  de los "4 últimos dígitos del teléfono" es obligatoria en todo acceso como segundo factor
+  ligero.
+- **Ventana de cancelación (decisión confirmada, sesión 2026-09-19)**: 24 horas antes del
   inicio. Por debajo de ese umbral, la cancelación se deriva a la llamada telefónica, para
   que la clínica pueda gestionar el hueco de última hora.
-- **Hueco liberado (decisión de negocio, confirmable por Sara)**: al cancelar, el hueco queda
+- **Hueco liberado (decisión confirmada, sesión 2026-09-19)**: al cancelar, el hueco queda
   simplemente libre en la agenda (estado "cancelada" de la 001). No hay lista de espera ni
   reasignación automática en la v1.
 - **Zona horaria**: todas las citas se interpretan en la zona peninsular española, coherente
