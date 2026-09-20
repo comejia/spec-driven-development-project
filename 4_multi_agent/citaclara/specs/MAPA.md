@@ -7,6 +7,7 @@ coordina su propietario.
 | Spec | Directorio | Título | Propietario | Estado |
 |------|------------|--------|-------------|--------|
 | 001  | `specs/001-agenda-core` | Núcleo de Agenda | recepción-core (por asignar nominalmente) | Draft |
+| 003  | `specs/003-portal-paciente` | Portal del Paciente | portal-paciente (por asignar nominalmente) | Draft |
 
 ## Notas
 
