@@ -8,6 +8,14 @@
 
 **Input**: User description: "Recordatorios de cita. El dolor número uno del cliente piloto: la no asistencia. Alcance: un proceso diario genera un recordatorio por email para cada cita reservada de las próximas 24-48 horas, sin duplicar envíos; el email incluye los datos de la cita y una forma de que el paciente cancele si no va a ir (mejor un hueco libre que un no-show). Correo en modo simulado sin SMTP configurado: se escriben ficheros .eml en datos/salida-correo/. Preguntas cerradas para Sara: antelación exacta, qué pasa si el paciente cancela desde el email y con cuánta antelación puede, y si el recordatorio se reenvía cuando la cita se mueve. Fuera de alcance v1: SMS y WhatsApp."
 
+## Clarifications
+
+### Session 2026-09-19
+
+- Q: ¿Con qué antelación exacta se envía el recordatorio dentro del rango 24-48 h? → A: Cualquier cita cuya hora de inicio caiga entre 24 y 48 h por delante del momento de ejecución; una única ejecución diaria cubre toda la ventana.
+- Q: ¿Con cuánta antelación mínima puede el paciente cancelar desde el email? → A: Hasta 2 horas antes del inicio de la cita; con menos de 2 h se rechaza por fuera de plazo.
+- Q: ¿Se reenvía el recordatorio cuando la cita se mueve? → A: Sí; como mover una cita en la 001 equivale a cancelar y crear una nueva, la cita nueva es elegible por sí misma y genera su propio recordatorio si entra en la ventana.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Envío diario de recordatorios sin duplicados (Priority: P1)
@@ -87,12 +95,12 @@ estado resultante de la cita en cada caso.
 
 **Acceptance Scenarios**:
 
-1. **Given** una cita "reservada" con recordatorio enviado y una cancelación solicitada con la
-   antelación mínima permitida o más, **When** el paciente cancela desde el email, **Then** la
-   cita pasa a "cancelada" y el hueco queda libre.
-2. **Given** una cita "reservada" y una cancelación solicitada con menos antelación de la
-   permitida, **When** el paciente intenta cancelar desde el email, **Then** la cancelación se
-   rechaza con un mensaje claro y la cita permanece "reservada".
+1. **Given** una cita "reservada" con recordatorio enviado y una cancelación solicitada con al
+   menos 2 horas de antelación respecto al inicio, **When** el paciente cancela desde el email,
+   **Then** la cita pasa a "cancelada" y el hueco queda libre.
+2. **Given** una cita "reservada" y una cancelación solicitada con menos de 2 horas de antelación
+   respecto al inicio, **When** el paciente intenta cancelar desde el email, **Then** la
+   cancelación se rechaza con un mensaje claro y la cita permanece "reservada".
 3. **Given** una cita que ya no está "reservada" (por ejemplo ya "cancelada" o "completada"),
    **When** el paciente usa el enlace de cancelación, **Then** el sistema informa de que la
    cita ya no puede cancelarse por esta vía y no realiza ningún cambio.
@@ -105,10 +113,11 @@ estado resultante de la cita en cada caso.
   recordatorio; el proceso continúa con el resto de citas sin fallar.
 - **Reejecución dentro de la misma ventana**: ejecutar el proceso varias veces (mismo día o
   días consecutivos) mientras la cita sigue elegible no produce recordatorios duplicados.
-- **Cita que cambia de hora (se mueve)**: comportamiento del reenvío del recordatorio cuando
-  la cita se reprograma → depende de la decisión de Sara (ver Clarifications / FR-011).
-- **Cancelación fuera de plazo**: intentar cancelar desde el email con menos antelación que la
-  permitida se rechaza sin cambiar la cita.
+- **Cita que cambia de hora (se mueve)**: al mover una cita (cancelar + crear nueva en la 001),
+  la cita nueva es elegible por sí misma y genera su propio recordatorio si cae dentro de la
+  ventana de 24-48 h y aún no ha sido recordada (FR-011).
+- **Cancelación fuera de plazo**: intentar cancelar desde el email con menos de 2 horas de
+  antelación respecto al inicio se rechaza sin cambiar la cita.
 - **Enlace de cancelación manipulado o inexistente**: un identificador de cancelación que no
   corresponde a ninguna cita se rechaza sin exponer datos de otras citas.
 - **Cita ya no reservada al llegar el recordatorio**: si entre la generación del recordatorio
@@ -141,22 +150,25 @@ estado resultante de la cita en cada caso.
 - **FR-007**: El recordatorio MUST incluir una forma clara para que el paciente cancele la cita
   si no va a acudir, asociada inequívocamente a esa cita concreta.
 - **FR-008**: El sistema MUST permitir que el paciente cancele su cita desde el medio incluido en
-  el recordatorio, pasando la cita a "cancelada" y liberando el hueco, siempre que se respete la
-  antelación mínima permitida.
+  el recordatorio, pasando la cita a "cancelada" y liberando el hueco, siempre que la solicitud se
+  haga con al menos 2 horas de antelación respecto al inicio de la cita.
 - **FR-009**: El sistema MUST rechazar, con un mensaje claro y sin modificar la cita, cualquier
-  cancelación desde el email solicitada con menos antelación que la mínima permitida.
+  cancelación desde el email solicitada con menos de 2 horas de antelación respecto al inicio de
+  la cita (fuera de plazo).
 - **FR-010**: El sistema MUST rechazar de forma segura, sin exponer datos de otras citas, las
   acciones de cancelación cuyo identificador no corresponda a una cita reservable/cancelable
   válida (enlace inexistente, manipulado o de una cita que ya no está "reservada").
-- **FR-011**: El sistema MUST tratar el reenvío del recordatorio cuando una cita se mueve
-  (reprograma) según [NEEDS CLARIFICATION: ¿debe reenviarse el recordatorio cuando la cita
-  cambia de hora/profesional, y en tal caso se considera un envío nuevo distinto del anterior?].
-- **FR-012**: El sistema MUST usar como antelación de la ventana de envío
-  [NEEDS CLARIFICATION: antelación exacta del envío dentro del rango 24-48 h — p. ej. enviar
-  cuando falten exactamente 24 h, o cualquier cita entre 24 y 48 h por delante].
-- **FR-013**: El sistema MUST aplicar como antelación mínima para cancelar desde el email
-  [NEEDS CLARIFICATION: con cuánta antelación mínima puede el paciente cancelar desde el email
-  — p. ej. hasta 24 h antes, hasta 2 h antes, hasta el inicio].
+- **FR-011**: Cuando una cita se mueve (en la 001 mover equivale a cancelar la cita original y
+  crear una cita nueva), la cita nueva MUST ser tratada como cualquier otra cita "reservada" a
+  efectos de recordatorio: si cae dentro de la ventana de antelación y aún no ha sido recordada,
+  MUST generar su propio recordatorio, independiente del que hubiera podido generar la cita
+  original ya cancelada.
+- **FR-012**: El sistema MUST considerar elegible para el envío toda cita "reservada" cuya hora
+  de inicio caiga entre 24 y 48 horas por delante del momento de ejecución del proceso diario;
+  una única ejecución diaria cubre la ventana completa sin dejar huecos.
+- **FR-013**: El sistema MUST admitir la cancelación desde el email siempre que se solicite con
+  al menos 2 horas de antelación respecto a la hora de inicio de la cita; una solicitud con menos
+  de 2 horas de antelación se considera fuera de plazo.
 - **FR-014**: En ausencia de SMTP configurado, el sistema MUST simular el envío escribiendo un
   fichero `.eml` por recordatorio en el directorio `datos/salida-correo/`, y MUST considerar el
   envío exitoso a efectos de no duplicación.

@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,7 +31,9 @@
 
 ## Notes
 
-- Quedan 3 marcadores [NEEDS CLARIFICATION] correspondientes a las tres preguntas cerradas
-  para Sara (antelación exacta, antelación mínima de cancelación, y reenvío al mover la cita).
-  Deben resolverse en `/speckit.clarify` (o respondiéndose aquí) antes de `/speckit.plan`.
-- El resto de criterios de calidad se cumplen tras la validación inicial.
+- Las tres preguntas cerradas para Sara se resolvieron en la sesión de clarificación
+  2026-09-19 (ver sección Clarifications en `spec.md`):
+  - Antelación de envío: cualquier cita entre 24 y 48 h por delante (FR-012).
+  - Antelación mínima de cancelación: hasta 2 h antes del inicio (FR-008, FR-009, FR-013).
+  - Reenvío al mover la cita: la cita nueva genera su propio recordatorio (FR-011).
+- Todos los criterios de calidad pasan. Spec lista para `/speckit.plan`.
