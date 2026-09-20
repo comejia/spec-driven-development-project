@@ -31,9 +31,12 @@
 
 ## Notes
 
-- Las tres preguntas cerradas para Sara se resolvieron en la sesión de clarificación
-  2026-09-19 (ver sección Clarifications en `spec.md`):
+- Preguntas cerradas para Sara resueltas en la sesión 2026-09-19 (ver Clarifications en `spec.md`):
   - Antelación de envío: cualquier cita entre 24 y 48 h por delante (FR-012).
   - Antelación mínima de cancelación: hasta 2 h antes del inicio (FR-008, FR-009, FR-013).
   - Reenvío al mover la cita: la cita nueva genera su propio recordatorio (FR-011).
-- Todos los criterios de calidad pasan. Spec lista para `/speckit.plan`.
+- Clarificaciones adicionales (`/speckit.clarify`, misma sesión):
+  - Cancelación vía página web de la app con confirmación al paciente (FR-007, FR-007a).
+  - Enlace protegido con token opaco único por cita, anti-enumeración (FR-010, entidad Recordatorio, SC-007).
+  - Idempotencia: como máximo un recordatorio por cita en toda su vida (FR-003).
+- Todos los criterios de calidad pasan (16/16). Spec lista para `/speckit.plan`.

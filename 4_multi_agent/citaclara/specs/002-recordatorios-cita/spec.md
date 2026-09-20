@@ -15,6 +15,9 @@
 - Q: ¿Con qué antelación exacta se envía el recordatorio dentro del rango 24-48 h? → A: Cualquier cita cuya hora de inicio caiga entre 24 y 48 h por delante del momento de ejecución; una única ejecución diaria cubre toda la ventana.
 - Q: ¿Con cuánta antelación mínima puede el paciente cancelar desde el email? → A: Hasta 2 horas antes del inicio de la cita; con menos de 2 h se rechaza por fuera de plazo.
 - Q: ¿Se reenvía el recordatorio cuando la cita se mueve? → A: Sí; como mover una cita en la 001 equivale a cancelar y crear una nueva, la cita nueva es elegible por sí misma y genera su propio recordatorio si entra en la ventana.
+- Q: ¿Qué ocurre al pulsar el enlace de cancelar del email? → A: El enlace abre una página web de la aplicación que cancela la cita (si está en plazo) y muestra al paciente una confirmación clara ("cita cancelada" o "fuera de plazo").
+- Q: ¿Cómo se protege el enlace de cancelación sin sesión del paciente? → A: Mediante un token opaco, único e imposible de adivinar por cita, almacenado con el recordatorio; solo ese token cancela esa cita, evitando la enumeración de identificadores.
+- Q: ¿Regla exacta de idempotencia para no duplicar recordatorios? → A: Como máximo un recordatorio por cita en toda su vida; una vez recordada no se reenvía aunque siga elegible en ejecuciones posteriores. Una cita movida es una cita nueva (FR-011) y recibe su propio y único recordatorio.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -118,8 +121,9 @@ estado resultante de la cita en cada caso.
   ventana de 24-48 h y aún no ha sido recordada (FR-011).
 - **Cancelación fuera de plazo**: intentar cancelar desde el email con menos de 2 horas de
   antelación respecto al inicio se rechaza sin cambiar la cita.
-- **Enlace de cancelación manipulado o inexistente**: un identificador de cancelación que no
-  corresponde a ninguna cita se rechaza sin exponer datos de otras citas.
+- **Enlace de cancelación manipulado o inexistente**: un token de cancelación que no corresponde
+  a ninguna cita (o ha sido manipulado) se rechaza sin exponer datos de otras citas y sin permitir
+  cancelar citas ajenas por enumeración.
 - **Cita ya no reservada al llegar el recordatorio**: si entre la generación del recordatorio
   y la acción del paciente la cita dejó de estar "reservada", la cancelación desde el email no
   aplica y se informa con claridad.
@@ -137,9 +141,11 @@ estado resultante de la cita en cada caso.
   un recordatorio por email para cada una.
 - **FR-002**: El sistema MUST considerar elegibles únicamente las citas en estado "reservada";
   las citas "cancelada", "completada" o "no_asistida" MUST quedar excluidas del envío.
-- **FR-003**: El sistema MUST garantizar que cada cita reciba como máximo un recordatorio: una
-  cita ya recordada NO MUST volver a generar recordatorio aunque el proceso se ejecute varias
-  veces mientras la cita siga dentro de la ventana (idempotencia por cita).
+- **FR-003**: El sistema MUST garantizar que cada cita reciba como máximo un recordatorio en toda
+  su vida: una vez recordada, NO MUST volver a generar recordatorio para esa misma cita aunque el
+  proceso se ejecute varias veces y la cita siga dentro de la ventana en días posteriores
+  (idempotencia por cita, no por día). Una cita movida constituye una cita nueva (FR-011) con su
+  propio y único recordatorio.
 - **FR-004**: El sistema MUST registrar, para cada cita, que su recordatorio ya fue generado, de
   forma que la no duplicación sea verificable y sobreviva a reejecuciones del proceso.
 - **FR-005**: El recordatorio MUST incluir, como mínimo, el nombre del paciente, el profesional,
@@ -147,17 +153,23 @@ estado resultante de la cita en cada caso.
 - **FR-006**: El sistema MUST mostrar la fecha y la hora del recordatorio de forma inequívoca
   para una clínica española (constitución p.2) y todo el contenido en español de España
   (constitución p.8).
-- **FR-007**: El recordatorio MUST incluir una forma clara para que el paciente cancele la cita
-  si no va a acudir, asociada inequívocamente a esa cita concreta.
+- **FR-007**: El recordatorio MUST incluir un enlace web claro para que el paciente cancele la
+  cita si no va a acudir, asociado inequívocamente a esa cita concreta.
+- **FR-007a**: Al abrir el enlace de cancelación, el sistema MUST mostrar al paciente una página
+  web de la aplicación que confirme el resultado con un mensaje claro en español: "cita cancelada"
+  si la cancelación se aplicó, o "fuera de plazo" / "la cita ya no puede cancelarse" cuando no
+  proceda. La página MUST ser usable y legible en móvil (constitución p.7).
 - **FR-008**: El sistema MUST permitir que el paciente cancele su cita desde el medio incluido en
   el recordatorio, pasando la cita a "cancelada" y liberando el hueco, siempre que la solicitud se
   haga con al menos 2 horas de antelación respecto al inicio de la cita.
 - **FR-009**: El sistema MUST rechazar, con un mensaje claro y sin modificar la cita, cualquier
   cancelación desde el email solicitada con menos de 2 horas de antelación respecto al inicio de
   la cita (fuera de plazo).
-- **FR-010**: El sistema MUST rechazar de forma segura, sin exponer datos de otras citas, las
-  acciones de cancelación cuyo identificador no corresponda a una cita reservable/cancelable
-  válida (enlace inexistente, manipulado o de una cita que ya no está "reservada").
+- **FR-010**: El enlace de cancelación MUST usar un token opaco, único e imposible de adivinar
+  por cita (no un identificador de cita secuencial o predecible); el sistema MUST aceptar la
+  cancelación únicamente cuando el token corresponda a la cita y MUST rechazar de forma segura,
+  sin exponer datos de otras citas, cualquier token inexistente, manipulado, o correspondiente a
+  una cita que ya no está "reservada".
 - **FR-011**: Cuando una cita se mueve (en la 001 mover equivale a cancelar la cita original y
   crear una cita nueva), la cita nueva MUST ser tratada como cualquier otra cita "reservada" a
   efectos de recordatorio: si cae dentro de la ventana de antelación y aún no ha sido recordada,
@@ -184,8 +196,9 @@ estado resultante de la cita en cada caso.
   estado. El recordatorio solo aplica a citas en estado "reservada". La cancelación desde el
   email transiciona la cita "reservada" → "cancelada" (transición ya prevista en la 001).
 - **Recordatorio**: constancia de que se ha generado un aviso para una cita concreta. Atributos:
-  cita asociada, momento de generación, resultado (enviado/simulado/omitido). Garantiza la no
-  duplicación (a lo sumo uno vigente por cita dentro de la ventana).
+  cita asociada, momento de generación, resultado (enviado/simulado/omitido) y token de
+  cancelación (opaco, único e imposible de adivinar) usado en el enlace del email. Garantiza la
+  no duplicación (a lo sumo uno vigente por cita dentro de la ventana).
 - **Paciente**: entidad existente (spec 001). Aporta nombre y email destino del recordatorio.
 - **Salida de correo simulada**: fichero `.eml` por recordatorio escrito en
   `datos/salida-correo/` cuando no hay SMTP; representa el email que se habría enviado.
@@ -208,7 +221,9 @@ estado resultante de la cita en cada caso.
   `.eml` correspondiente en `datos/salida-correo/`.
 - **SC-006**: Al ejecutar el proceso diario sobre la misma semilla y la misma fecha, el conjunto
   de recordatorios generados es idéntico en el 100 % de las ejecuciones (reproducibilidad).
-- **SC-007**: Reducción medible de la no asistencia frente al periodo sin recordatorios, medida
+- **SC-007**: El 100 % de los intentos de cancelación con un token inexistente, manipulado o
+  correspondiente a otra cita se rechazan sin cancelar ninguna cita ni exponer datos de otras.
+- **SC-008**: Reducción medible de la no asistencia frente al periodo sin recordatorios, medida
   como el porcentaje de citas recordadas que terminan en "no_asistida" comparado con la línea
   base histórica de la semilla.
 
