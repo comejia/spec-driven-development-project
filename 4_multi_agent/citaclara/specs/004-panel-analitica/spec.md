@@ -8,22 +8,29 @@
 
 **Input**: User description: "Panel de analítica para la clínica. Sara lo necesita para las renovaciones: 'enseñar a la clínica lo que CitaClara le ahorra'. Alcance: una página del panel (misma clave que la agenda), con interfaz moderna y gráficos claros: ocupación semanal por profesional, tasa de no asistencia por profesional, ingresos por servicio (citas completadas; importes exactos, al céntimo), y evolución de las últimas 8 semanas. Solo lectura: esta feature no escribe NADA. Construir los ejemplos con los números reales de la semilla."
 
-## Aclaraciones pendientes (preguntas cerradas para Sara)
+## Decisiones de negocio de Sara (resueltas)
 
-Estas dos definiciones cambian los números que se enseñan a la clínica, así que se dejan
-marcadas como decisión de negocio. Los ejemplos de esta spec usan la **opción por defecto**
-indicada; si Sara elige otra, se recalculan las cifras (son reproducibles con la semilla).
+Estas dos definiciones cambian los números que se enseñan a la clínica; Sara las decidió en
+la sesión de clarificación del 2026-09-19 (ver Clarifications). Los ejemplos de esta spec
+usan las definiciones acordadas y son reproducibles con la semilla.
 
-- **P1 — ¿Cómo se define exactamente la "tasa de no asistencia"?**
-  [NEEDS CLARIFICATION: definición del denominador de la tasa de no asistencia — ver
-  Q1 en la sección de validación. Por defecto se usa la **Definición A**: no asistidas ÷
-  (completadas + canceladas + no asistidas), es decir, sobre todas las citas pasadas que
-  ya tenían un desenlace.]
+- **P1 — Definición de "tasa de no asistencia"** (resuelta, ver Clarifications 2026-09-19):
+  Definición A = no asistidas ÷ (completadas + canceladas + no asistidas), es decir, sobre
+  todas las citas pasadas que ya tenían un desenlace. Los ejemplos de esta spec usan esta
+  definición.
 
-- **P2 — ¿Cómo se define exactamente la "ocupación"?**
-  [NEEDS CLARIFICATION: numerador y denominador de la ocupación — ver Q2 en la sección de
-  validación. Por defecto: minutos de citas que ocupan hueco (reservada + completada) ÷
-  minutos de la jornada visible de la clínica en esa semana.]
+- **P2 — Definición de "ocupación"** (resuelta, ver Clarifications 2026-09-19): numerador =
+  minutos de citas en estado reservada + completada (los estados que ocupan hueco);
+  denominador = jornada de actividad 09:00–19:00 en días laborables (600 min por día
+  laborable). Los ejemplos de esta spec usan esta definición.
+
+## Clarifications
+
+### Session 2026-09-19
+
+- Q: Para la tasa de no asistencia por profesional, ¿qué citas forman el denominador? → A: Definición A — no asistidas ÷ (completadas + canceladas + no asistidas), es decir, todas las citas pasadas con desenlace.
+- Q: Para la ocupación semanal por profesional, ¿qué numerador y denominador se usan? → A: Numerador = minutos de citas reservada + completada (estados que ocupan hueco); denominador = jornada de actividad 09:00–19:00 en días laborables (600 min/día laborable).
+- Q: ¿La ocupación semanal incluye semanas futuras con reservas o solo hasta la semana en curso? → A: Solo hasta la semana en curso (histórico + semana actual); no se pintan semanas futuras.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -92,13 +99,13 @@ asistida", para detectar dónde se pierden huecos y valorar recordatorios (featu
 **Why this priority**: Aporta un argumento operativo potente ("CitaClara te ayuda a reducir
 esto"), pero el bloque económico (US1/US2) es el que cierra la renovación, así que va detrás.
 
-**Independent Test**: Con la semilla y la Definición A (por defecto), comprobar que las tasas
-por profesional coinciden con los valores esperados.
+**Independent Test**: Con la semilla y la Definición A (Clarifications 2026-09-19), comprobar
+que las tasas por profesional coinciden con los valores esperados.
 
 **Acceptance Scenarios**:
 
-1. **Given** la historia de la semilla y la definición por defecto de no asistencia
-   (Definición A), **When** se consulta la tasa por profesional, **Then** se muestra: María
+1. **Given** la historia de la semilla y la Definición A de no asistencia, **When** se
+   consulta la tasa por profesional, **Then** se muestra: María
    Ferrer **11,3 %** (32 no asistidas de 284 citas pasadas), Jorge Nieto **7,9 %** (22 de
    279) y Lucía Prados **11,0 %** (39 de 353).
 2. **Given** la tasa por profesional, **When** se muestra el porcentaje, **Then** aparece con
@@ -118,12 +125,13 @@ ocupado por citas, para entender su carga real y su margen de crecimiento.
 **Why this priority**: Complementa el relato ("tienes hueco para crecer" / "vas lleno"),
 pero es secundario frente al bloque económico.
 
-**Independent Test**: Con la semilla y la definición por defecto de ocupación, comprobar que
-la ocupación media por profesional coincide con los valores esperados.
+**Independent Test**: Con la semilla y la definición de ocupación acordada (Clarifications
+2026-09-19), comprobar que la ocupación media por profesional coincide con los valores
+esperados.
 
 **Acceptance Scenarios**:
 
-1. **Given** la historia de la semilla y la definición por defecto de ocupación, **When** se
+1. **Given** la historia de la semilla y la definición de ocupación acordada, **When** se
    consulta la ocupación semanal por profesional, **Then** la ocupación media aproximada es
    María Ferrer **46 %**, Jorge Nieto **47 %** y Lucía Prados **41 %**.
 2. **Given** la ocupación semanal, **When** se representa, **Then** cada profesional tiene su
@@ -132,6 +140,8 @@ la ocupación media por profesional coincide con los valores esperados.
 3. **Given** una semana sin jornada (p. ej. festivo completo), **When** se calcula la
    ocupación, **Then** el panel no muestra porcentajes por encima del 100 % ni divisiones por
    cero.
+4. **Given** semanas futuras con citas reservadas, **When** se consulta la ocupación,
+   **Then** el panel no pinta esas semanas futuras (solo hasta la semana en curso, FR-007a).
 
 ---
 
@@ -166,8 +176,9 @@ ingresos reproduce los valores esperados para las semanas del periodo.
 - **Clínica sin historia**: una clínica recién creada, sin citas, muestra cada bloque con un
   "sin datos" claro en lugar de ceros ambiguos o errores.
 - **Solo citas futuras**: si la clínica solo tiene reservas futuras y ninguna cita pasada,
-  ingresos y tasas de no asistencia muestran "sin datos"; la ocupación puede reflejar las
-  reservas futuras según la definición elegida (ver P2).
+  ingresos y tasas de no asistencia muestran "sin datos"; la ocupación no pinta esas semanas
+  futuras (FR-007a), por lo que también muestra "sin datos" hasta que haya semanas hasta la
+  semana en curso.
 - **Profesional sin citas en una semana**: su ocupación esa semana es 0 %, no "sin datos"
   (la jornada existía aunque no se usara).
 - **División por cero**: ningún cálculo (tasa, ocupación) puede fallar ni mostrar valores
@@ -197,18 +208,20 @@ ingresos reproduce los valores esperados para las semanas del periodo.
   formato inequívoco para España (constitución, Principio 2); MUST mostrar también el total
   general de ingresos por citas completadas.
 - **FR-006 (tasa de no asistencia)**: El sistema MUST calcular, por profesional, la tasa de
-  no asistencia como el porcentaje de sus citas pasadas con desenlace que terminaron en
-  "no_asistida". La definición exacta del denominador está pendiente de P1; por defecto,
-  Definición A = no_asistida ÷ (completada + cancelada + no_asistida).
+  no asistencia como no_asistida ÷ (completada + cancelada + no_asistida) de sus citas
+  pasadas con desenlace (Definición A, Clarifications 2026-09-19), expresada en porcentaje.
 - **FR-006a**: El sistema MUST tratar como "pasadas con desenlace" únicamente las citas cuyo
   estado ya no es "reservada" (completada, cancelada o no_asistida); las reservas futuras NO
   entran en el cálculo de la tasa de no asistencia.
 - **FR-007 (ocupación)**: El sistema MUST calcular, por profesional y por semana, la
-  ocupación como el porcentaje de la jornada ocupado por citas que ocupan hueco. La
-  definición exacta de numerador y denominador está pendiente de P2; por defecto, numerador
-  = minutos de citas en estado "reservada" o "completada" (los estados que ocupan hueco,
-  ESTADOS_ACTIVOS de la 001) y denominador = minutos de la jornada visible de la clínica esa
-  semana.
+  ocupación como (minutos de citas en estado "reservada" o "completada") ÷ (minutos de la
+  jornada de actividad de la clínica esa semana), expresada en porcentaje. La jornada de
+  actividad es 09:00–19:00 en días laborables (600 min por día laborable); reservada y
+  completada son los estados que ocupan hueco (ESTADOS_ACTIVOS de la 001), mientras que
+  cancelada y no_asistida NO ocupan (Clarifications 2026-09-19).
+- **FR-007a (alcance temporal de la ocupación)**: El sistema MUST mostrar la ocupación
+  semanal solo hasta la semana en curso de la clínica (histórico más la semana actual); NO
+  MUST pintar semanas futuras aunque ya tengan citas reservadas (Clarifications 2026-09-19).
 - **FR-008 (evolución 8 semanas)**: El sistema MUST mostrar la evolución de las últimas 8
   semanas con, al menos, citas completadas por semana e ingresos por semana, ordenadas
   cronológicamente.
@@ -246,8 +259,8 @@ puede reproducirlas regenerando la semilla (Principio 5). Total de citas generad
 | Consulta de nutrición | 144 | 5.040,00 € |
 | **Total** | **735** | **31.425,00 €** |
 
-**Tasa de no asistencia por profesional** (Definición A por defecto — no asistidas ÷ citas
-pasadas con desenlace):
+**Tasa de no asistencia por profesional** (Definición A acordada — no asistidas ÷ citas
+pasadas con desenlace; se incluye Def. B solo como referencia de contraste):
 
 | Profesional | Especialidad | No asistidas | Citas pasadas | Tasa (Def. A) | Tasa (Def. B) |
 |-------------|--------------|--------------|---------------|---------------|---------------|
@@ -258,7 +271,7 @@ pasadas con desenlace):
 - Def. A = no_asistida ÷ (completada + cancelada + no_asistida).
 - Def. B = no_asistida ÷ (completada + no_asistida) (excluye canceladas del denominador).
 
-**Ocupación media por profesional** (definición por defecto — minutos activos ÷ minutos de
+**Ocupación media por profesional** (definición acordada — minutos activos ÷ minutos de
 jornada; jornada de referencia de la semilla 09:00–19:00, 5 días laborables):
 
 | Profesional | Ocupación media |
@@ -307,12 +320,12 @@ Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
 - **SC-003**: El panel no realiza ninguna escritura: tras abrirlo e interactuar con todos sus
   controles, el estado de la clínica (citas y demás datos) es idéntico byte a byte al previo
   (verificable comparando la historia antes y después).
-- **SC-004**: Sobre los datos de la semilla y con la definición acordada en P1, la tasa de no
-  asistencia por profesional reproduce los valores de esta spec (con la Definición A por
-  defecto: 11,3 %, 7,9 % y 11,0 %).
-- **SC-005**: Sobre los datos de la semilla y con la definición acordada en P2, la ocupación
-  media por profesional reproduce los valores de esta spec (≈ 46 %, ≈ 47 %, ≈ 41 % con la
-  definición por defecto).
+- **SC-004**: Sobre los datos de la semilla y con la Definición A de no asistencia
+  (Clarifications 2026-09-19), la tasa por profesional reproduce los valores de esta spec:
+  11,3 %, 7,9 % y 11,0 %.
+- **SC-005**: Sobre los datos de la semilla y con la definición de ocupación acordada
+  (Clarifications 2026-09-19), la ocupación media por profesional reproduce los valores de
+  esta spec (≈ 46 %, ≈ 47 %, ≈ 41 %).
 - **SC-006**: La evolución muestra como máximo 8 semanas, ordenadas cronológicamente, y sobre
   los datos de la semilla reproduce la serie de citas completadas e ingresos de las semanas
   completas del periodo.
@@ -336,9 +349,9 @@ Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
   plan y no cambia el valor de negocio.
 - Los importes provienen del precio del servicio en el momento del cálculo; la 001 no
   contempla histórico de precios, por lo que se usa el precio vigente del servicio.
-- La "jornada" de referencia para la ocupación es la franja de actividad de la clínica; su
-  definición exacta se cierra en P2 (por defecto, la franja de generación de la semilla
-  09:00–19:00 en días laborables).
+- La "jornada" de referencia para la ocupación es la franja de actividad de la clínica,
+  fijada en 09:00–19:00 en días laborables (600 min por día laborable), coherente con la
+  franja de generación de la semilla (Clarifications 2026-09-19).
 - Los estados que ocupan hueco (reservada y completada) son los que cuentan como "ocupación",
   de forma coherente con la regla anti-solape de la 001; cancelada y no_asistida liberan el
   hueco y no ocupan.

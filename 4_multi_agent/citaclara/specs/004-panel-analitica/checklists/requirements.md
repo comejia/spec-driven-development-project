@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,12 +31,10 @@
 
 ## Notes
 
-- Se mantienen **2 marcadores [NEEDS CLARIFICATION]** deliberados (P1: definición de "tasa
-  de no asistencia"; P2: definición de "ocupación"), presentados como preguntas cerradas a
-  Sara. Son decisiones de negocio con múltiples interpretaciones razonables y distinto
-  impacto en las cifras que se enseñan a la clínica; no tienen un único valor por defecto
-  obvio, por lo que se dejan para que Sara decida. La spec incluye una opción por defecto
-  para cada uno, de modo que sigue siendo completa y planificable, y los ejemplos usan esas
-  opciones por defecto.
+- Las **2 decisiones de negocio** (definición de "tasa de no asistencia" y de "ocupación")
+  fueron resueltas por Sara en la sesión de clarificación del 2026-09-19 (ver
+  `spec.md` › Clarifications). Ya no quedan marcadores [NEEDS CLARIFICATION]. Además se
+  cerró una tercera decisión derivada: la ocupación se muestra solo hasta la semana en curso
+  (no se pintan semanas futuras con reservas).
 - Todos los números de ejemplo están verificados contra la semilla determinista real
   (ejecutada sobre la base de datos), cumpliendo el Principio 5 (reproducibilidad).
