@@ -7,7 +7,7 @@ coordina su propietario.
 | Spec | Directorio | Título | Propietario | Estado |
 |------|------------|--------|-------------|--------|
 | 001  | `specs/001-agenda-core` | Núcleo de Agenda | recepción-core (por asignar nominalmente) | Draft |
-| 004  | `specs/004-panel-analitica` | Panel de Analítica | analítica-Sara (por asignar nominalmente) | Draft |
+| 004  | `specs/004-panel-analitica` | Panel de Analítica | analítica-Sara (por asignar nominalmente) | Implementado |
 
 ## Notas
 
