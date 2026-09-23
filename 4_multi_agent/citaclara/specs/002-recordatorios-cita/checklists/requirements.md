@@ -31,12 +31,21 @@
 
 ## Notes
 
-- Preguntas cerradas para Sara resueltas en la sesión 2026-09-19 (ver Clarifications en `spec.md`):
-  - Antelación de envío: cualquier cita entre 24 y 48 h por delante (FR-012).
-  - Antelación mínima de cancelación: hasta 2 h antes del inicio (FR-008, FR-009, FR-013).
-  - Reenvío al mover la cita: la cita nueva genera su propio recordatorio (FR-011).
-- Clarificaciones adicionales (`/speckit.clarify`, misma sesión):
-  - Cancelación vía página web de la app con confirmación al paciente (FR-007, FR-007a).
-  - Enlace protegido con token opaco único por cita, anti-enumeración (FR-010, entidad Recordatorio, SC-007).
-  - Idempotencia: como máximo un recordatorio por cita en toda su vida (FR-003).
-- Todos los criterios de calidad pasan (16/16). Spec lista para `/speckit.plan`.
+- **Actualización 2026-09-22 (revisión cruzada)**: 002 se alinea con 005/001/004 (constitución:
+  un propietario por spec). Ver "Contexto y propiedad" y la sesión Clarifications 2026-09-22 en
+  `spec.md`. Conflictos resueltos:
+  - **S1** (umbral de cancelación): 002 ya no fija 2 h; remite a la política de **005** (24 h) y,
+    dentro de la ventana, al teléfono de la clínica (FR-008, FR-009, FR-010; SC-004, SC-007).
+  - **S3** (identidad/acceso): eliminado el token por cita; el enlace del recordatorio apunta a
+    `/p/[token]` de **005** (FR-005, FR-007; entidad Recordatorio; SC-003). Sin segundo factor propio.
+  - **S2/S7** (transición y concurrencia): la transición `reservada→cancelada` y la liberación del
+    hueco son de **001**; concurrencia = una sola cancelación efectiva (FR-010, FR-010a).
+  - **S4** (métrica): SC-008 renombrada "eficacia del recordatorio" (denominador = citas
+    recordadas); la tasa oficial de no asistencia remite a **004**; documentado "la cancelación
+    sustituye al no-show".
+  - **S6** (mover = cancelar + crear): FR-011 anota dependencia explícita de **FR-017a de 001**.
+- Preguntas cerradas para Sara (sesión 2026-09-19): antelación de envío = citas entre 24 y 48 h
+  (FR-012); reenvío al mover = la cita nueva genera su propio recordatorio (FR-011). El umbral de
+  cancelación propio de 002 (2 h) queda **superado**: ahora es propiedad de 005 (24 h).
+- No quedan marcadores [NEEDS CLARIFICATION]. Todos los criterios de calidad pasan (16/16).
+  Spec lista para `/speckit.plan`.
