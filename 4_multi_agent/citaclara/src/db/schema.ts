@@ -43,6 +43,12 @@ export const clinica = pgTable('clinica', {
   nombre: text('nombre').notNull(),
   /** Hash argon2/bcrypt de la clave de panel (FR-018, D5). Nunca la clave en claro. */
   claveHash: text('clave_hash').notNull(),
+  /**
+   * Teléfono de contacto de la clínica (005 FR-008): se muestra al paciente dentro de la
+   * ventana de cancelación (< 24 h) para gestionarlo por llamada. Atributo de la entidad
+   * Clínica (propiedad de 001) que la 005 consume.
+   */
+  telefono: text('telefono').notNull().default(''),
 });
 
 export const profesional = pgTable('profesional', {
@@ -120,7 +126,25 @@ export const cita = pgTable(
   ],
 );
 
-export const schema = { clinica, profesional, servicio, paciente, cita, estadoCitaEnum };
+/**
+ * Enlace de acceso del paciente (005, FR-001/004, data-model.md).
+ *
+ * Relación 1:1 con `paciente`: cada paciente tiene UN token opaco estable que da acceso a
+ * todas sus citas vía `/p/[token]`. La regeneración (FR-004) sustituye el token en esta
+ * misma fila, invalidando el anterior de inmediato. El token es único e indexado.
+ */
+export const accesoPaciente = pgTable('acceso_paciente', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  pacienteId: uuid('paciente_id')
+    .notNull()
+    .unique()
+    .references(() => paciente.id, { onDelete: 'cascade' }),
+  /** Token opaco (≥128 bits, URL-safe); único y no adivinable (FR-001, research D2). */
+  token: text('token').notNull().unique(),
+  creadoEn: timestamp('creado_en', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+});
+
+export const schema = { clinica, profesional, servicio, paciente, cita, estadoCitaEnum, accesoPaciente };
 
 export type Clinica = typeof clinica.$inferSelect;
 export type Profesional = typeof profesional.$inferSelect;
@@ -128,3 +152,4 @@ export type Servicio = typeof servicio.$inferSelect;
 export type Paciente = typeof paciente.$inferSelect;
 export type Cita = typeof cita.$inferSelect;
 export type EstadoCita = (typeof estadoCitaEnum.enumValues)[number];
+export type AccesoPaciente = typeof accesoPaciente.$inferSelect;

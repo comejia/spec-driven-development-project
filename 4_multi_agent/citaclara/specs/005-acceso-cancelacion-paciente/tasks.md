@@ -34,8 +34,8 @@ de exclusión) permanece intacto y se reutiliza para validar el hueco liberado.
 
 **Purpose**: preparar el entorno; no hay dependencias nuevas respecto a la 001.
 
-- [ ] T001 Verificar entorno de la 001 operativo (Node 22, PostgreSQL 16 con `btree_gist`, `.env.local`) ejecutando `npm install` y `npm run typecheck` en la raíz del proyecto
-- [ ] T002 [P] Confirmar que lint y formato pasan con `npm run lint` y `npm run format:check` antes de empezar
+- [X] T001 Verificar entorno de la 001 operativo (Node 22, PostgreSQL 16 con `btree_gist`, `.env.local`) ejecutando `npm install` y `npm run typecheck` en la raíz del proyecto
+- [X] T002 [P] Confirmar que lint y formato pasan con `npm run lint` y `npm run format:check` antes de empezar
 
 ---
 
@@ -46,14 +46,14 @@ historias necesitan.
 
 **⚠️ CRITICAL**: ninguna historia puede empezar hasta completar esta fase.
 
-- [ ] T003 Añadir la tabla `acceso_paciente` (1:1 con `paciente`: `id`, `paciente_id` único FK, `token` texto único, `creado_en` timestamptz) en `src/db/schema.ts`, con tipos `AccesoPaciente` exportados (data-model.md)
-- [ ] T004 Añadir la columna de contacto `telefono` (texto) a la tabla `clinica` en `src/db/schema.ts` (FR-008, data-model.md; atributo consumido de la entidad de 001)
-- [ ] T005 Generar y revisar la migración con `npm run db:generate`; asegurar índice único sobre `acceso_paciente.token` y único sobre `paciente_id` en `src/db/migrations/`
-- [ ] T006 [P] Añadir helper de generación de token opaco (`node:crypto` `randomBytes(32)` → base64url) en `src/domain/token.ts` (research D2)
-- [ ] T007 [P] Implementar la función pura de política de cancelación `decidirCancelacion(inicio, estado, ahora)` → `{ ofrecerCancelar, permitirCancelar, motivoBloqueo }` con umbral de 24 h (24 h exactas = cancelable) en `src/domain/politica-cancelacion.ts` (FR-007/008/009, data-model.md, research D5)
-- [ ] T008 [P] Añadir esquemas Zod (`tokenSchema`, `cancelarPorPacienteSchema` con `citaId`) en `src/validation/index.ts`
-- [ ] T009 Añadir el código de error `FUERA_DE_PLAZO` (403, mensaje es-ES que remite al teléfono de la clínica) al catálogo en `src/domain/errores.ts` (contracts/cancelacion.md, FR-008)
-- [ ] T010 Extender la semilla determinista para asignar un `token` estable por paciente (en `acceso_paciente`) y un `telefono` por clínica en `src/seed/seed.ts` y sus datos en `src/seed/datos.ts` (Principio 5, research D9)
+- [X] T003 Añadir la tabla `acceso_paciente` (1:1 con `paciente`: `id`, `paciente_id` único FK, `token` texto único, `creado_en` timestamptz) en `src/db/schema.ts`, con tipos `AccesoPaciente` exportados (data-model.md)
+- [X] T004 Añadir la columna de contacto `telefono` (texto) a la tabla `clinica` en `src/db/schema.ts` (FR-008, data-model.md; atributo consumido de la entidad de 001)
+- [X] T005 Generar y revisar la migración con `npm run db:generate`; asegurar índice único sobre `acceso_paciente.token` y único sobre `paciente_id` en `src/db/migrations/`
+- [X] T006 [P] Añadir helper de generación de token opaco (`node:crypto` `randomBytes(32)` → base64url) en `src/domain/token.ts` (research D2)
+- [X] T007 [P] Implementar la función pura de política de cancelación `decidirCancelacion(inicio, estado, ahora)` → `{ ofrecerCancelar, permitirCancelar, motivoBloqueo }` con umbral de 24 h (24 h exactas = cancelable) en `src/domain/politica-cancelacion.ts` (FR-007/008/009, data-model.md, research D5)
+- [X] T008 [P] Añadir esquemas Zod (`tokenSchema`, `cancelarPorPacienteSchema` con `citaId`) en `src/validation/index.ts`
+- [X] T009 Añadir el código de error `FUERA_DE_PLAZO` (403, mensaje es-ES que remite al teléfono de la clínica) al catálogo en `src/domain/errores.ts` (contracts/cancelacion.md, FR-008)
+- [X] T010 Extender la semilla determinista para asignar un `token` estable por paciente (en `acceso_paciente`) y un `telefono` por clínica en `src/seed/seed.ts` y sus datos en `src/seed/datos.ts` (Principio 5, research D9)
 
 **Checkpoint**: esquema + política + semilla listos; las historias pueden empezar (en paralelo).
 
@@ -70,14 +70,14 @@ da acceso a las mismas citas.
 
 ### Tests for User Story 1 ⚠️ (escribir primero, deben FALLAR antes de implementar)
 
-- [ ] T011 [P] [US1] Test de integración de acceso por token (válido, inexistente, manipulado, aislamiento entre pacientes, regeneración) contra PostgreSQL real en `tests/integration/contract-acceso-paciente.test.ts` (FR-001/002/003/004, SC-001/002/003)
-- [ ] T012 [P] [US1] Test unitario de generación/formato del token opaco en `tests/unit/token.test.ts` (research D2)
+- [X] T011 [P] [US1] Test de integración de acceso por token (válido, inexistente, manipulado, aislamiento entre pacientes, regeneración) contra PostgreSQL real en `tests/integration/contract-acceso-paciente.test.ts` (FR-001/002/003/004, SC-001/002/003)
+- [X] T012 [P] [US1] Test unitario de generación/formato del token opaco en `tests/unit/token.test.ts` (research D2)
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Implementar el servicio de acceso: `resolverToken(token)` → paciente + `clinicaId`; `listarCitasDePaciente(pacienteId)`; `regenerarToken(clinicaId, pacienteId)` en `src/services/acceso-paciente.ts` (FR-001/002/003/004, data-model.md, research D3/D7) — depende de T003, T006, T008
-- [ ] T014 [US1] Implementar la página pública `app/p/[token]/page.tsx`: resuelve el token, lista las citas del paciente ordenadas por inicio (formato es-ES, `Europe/Madrid`), y en token inválido muestra la vista neutra de "enlace no válido" (FR-002/003/005/006/013, D4) — depende de T013, T007
-- [ ] T015 [US1] Aplicar `decidirCancelacion` por cita en la vista para calcular `ofrecerCancelar`/`motivoBloqueo` y mostrar el teléfono de la clínica cuando no se ofrece cancelar (FR-008) — depende de T014, T007
+- [X] T013 [US1] Implementar el servicio de acceso: `resolverToken(token)` → paciente + `clinicaId`; `listarCitasDePaciente(pacienteId)`; `regenerarToken(clinicaId, pacienteId)` en `src/services/acceso-paciente.ts` (FR-001/002/003/004, data-model.md, research D3/D7) — depende de T003, T006, T008
+- [X] T014 [US1] Implementar la página pública `app/p/[token]/page.tsx`: resuelve el token, lista las citas del paciente ordenadas por inicio (formato es-ES, `Europe/Madrid`), y en token inválido muestra la vista neutra de "enlace no válido" (FR-002/003/005/006/013, D4) — depende de T013, T007
+- [X] T015 [US1] Aplicar `decidirCancelacion` por cita en la vista para calcular `ofrecerCancelar`/`motivoBloqueo` y mostrar el teléfono de la clínica cuando no se ofrece cancelar (FR-008) — depende de T014, T007
 
 **Checkpoint**: US1 funcional y testeable de forma independiente (acceso + listado + denegación neutra).
 
@@ -94,15 +94,15 @@ hueco admite una nueva cita; dos cancelaciones simultáneas → exactamente una 
 
 ### Tests for User Story 2 ⚠️ (escribir primero, deben FALLAR antes de implementar)
 
-- [ ] T016 [P] [US2] Test de integración de cancelación dentro de plazo + liberación de hueco (crear nueva cita en el hueco liberado) contra PostgreSQL real en `tests/integration/cancelacion-paciente.test.ts` (FR-010, SC-004/005) — reutiliza el invariante de 001
-- [ ] T017 [P] [US2] Test de integración de concurrencia: dos cancelaciones simultáneas sobre la misma cita → una `cancelada`, la otra `TRANSICION_INVALIDA` (prueba hostil V9) en `tests/integration/cancelacion-concurrencia.test.ts` (FR-011, SC-006, Principio 3/6)
-- [ ] T018 [P] [US2] Test unitario de la política para el caso "cancelable" (estado `reservada` y ≥ 24 h, incluido el límite exacto de 24 h) en `tests/unit/politica-cancelacion.test.ts` (FR-007)
+- [X] T016 [P] [US2] Test de integración de cancelación dentro de plazo + liberación de hueco (crear nueva cita en el hueco liberado) contra PostgreSQL real en `tests/integration/cancelacion-paciente.test.ts` (FR-010, SC-004/005) — reutiliza el invariante de 001
+- [X] T017 [P] [US2] Test de integración de concurrencia: dos cancelaciones simultáneas sobre la misma cita → una `cancelada`, la otra `TRANSICION_INVALIDA` (prueba hostil V9) en `tests/integration/cancelacion-concurrencia.test.ts` (FR-011, SC-006, Principio 3/6)
+- [X] T018 [P] [US2] Test unitario de la política para el caso "cancelable" (estado `reservada` y ≥ 24 h, incluido el límite exacto de 24 h) en `tests/unit/politica-cancelacion.test.ts` (FR-007)
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Implementar el servicio `cancelarPorPaciente(token, citaId)`: resuelve token, verifica pertenencia de la cita al paciente (FR-003), aplica `decidirCancelacion` y delega en `cambiarEstado` de 001 en `src/services/cancelar-por-paciente.ts` (FR-009/010/011, research D6) — depende de T013, T007, T008
-- [ ] T020 [US2] Implementar el endpoint `POST app/api/p/[token]/cancelar/route.ts`: valida `citaId`, invoca el servicio y traduce errores de negocio a HTTP (`{ error: { codigo, mensaje } }`); éxito → `{ cita: { id, estado: 'cancelada' } }` (contracts/cancelacion.md) — depende de T019
-- [ ] T021 [US2] Conectar la acción de cancelar en `app/p/[token]/page.tsx` (botón visible solo cuando `ofrecerCancelar`), con confirmación y refresco tras cancelar; mensaje "ya no procede" ante `TRANSICION_INVALIDA` (FR-011) — depende de T020, T015
+- [X] T019 [US2] Implementar el servicio `cancelarPorPaciente(token, citaId)`: resuelve token, verifica pertenencia de la cita al paciente (FR-003), aplica `decidirCancelacion` y delega en `cambiarEstado` de 001 en `src/services/cancelar-por-paciente.ts` (FR-009/010/011, research D6) — depende de T013, T007, T008
+- [X] T020 [US2] Implementar el endpoint `POST app/api/p/[token]/cancelar/route.ts`: valida `citaId`, invoca el servicio y traduce errores de negocio a HTTP (`{ error: { codigo, mensaje } }`); éxito → `{ cita: { id, estado: 'cancelada' } }` (contracts/cancelacion.md) — depende de T019
+- [X] T021 [US2] Conectar la acción de cancelar en `app/p/[token]/page.tsx` (botón visible solo cuando `ofrecerCancelar`), con confirmación y refresco tras cancelar; mensaje "ya no procede" ante `TRANSICION_INVALIDA` (FR-011) — depende de T020, T015
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente; el hueco se libera vía 001.
 
@@ -118,13 +118,13 @@ cancelación → `FUERA_DE_PLAZO` sin cambios; cita ya pasada → mismo bloqueo.
 
 ### Tests for User Story 3 ⚠️ (escribir primero, deben FALLAR antes de implementar)
 
-- [ ] T022 [P] [US3] Test unitario de la política para los casos bloqueados (< 24 h `fuera_de_plazo`, ya iniciada/pasada `ya_iniciada`, estado no `reservada` `estado_no_cancelable`, y el borde 23 h 59 min) en `tests/unit/politica-cancelacion.test.ts` (FR-008/009, edge cases) — mismo archivo que T018, ejecutar tras él
-- [ ] T023 [P] [US3] Test de integración: intento directo de cancelar fuera de plazo o sobre estado no `reservada` → rechazo sin cambios en `tests/integration/cancelacion-paciente.test.ts` (FR-008/009) — mismo archivo que T016, ejecutar tras él
+- [X] T022 [P] [US3] Test unitario de la política para los casos bloqueados (< 24 h `fuera_de_plazo`, ya iniciada/pasada `ya_iniciada`, estado no `reservada` `estado_no_cancelable`, y el borde 23 h 59 min) en `tests/unit/politica-cancelacion.test.ts` (FR-008/009, edge cases) — mismo archivo que T018, ejecutar tras él
+- [X] T023 [P] [US3] Test de integración: intento directo de cancelar fuera de plazo o sobre estado no `reservada` → rechazo sin cambios en `tests/integration/cancelacion-paciente.test.ts` (FR-008/009) — mismo archivo que T016, ejecutar tras él
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Verificar/ajustar en `app/p/[token]/page.tsx` que, cuando `ofrecerCancelar` es falso, se muestra el teléfono de la clínica y el mensaje según `motivoBloqueo`, sin botón de cancelar (FR-008) — depende de T015
-- [ ] T025 [US3] Verificar/ajustar en `src/services/cancelar-por-paciente.ts` que un intento directo fuera de plazo o sobre estado no `reservada` lanza el error de negocio adecuado (`FUERA_DE_PLAZO` / `TRANSICION_INVALIDA`) sin invocar la transición (FR-008/009) — depende de T019
+- [X] T024 [US3] Verificar/ajustar en `app/p/[token]/page.tsx` que, cuando `ofrecerCancelar` es falso, se muestra el teléfono de la clínica y el mensaje según `motivoBloqueo`, sin botón de cancelar (FR-008) — depende de T015
+- [X] T025 [US3] Verificar/ajustar en `src/services/cancelar-por-paciente.ts` que un intento directo fuera de plazo o sobre estado no `reservada` lanza el error de negocio adecuado (`FUERA_DE_PLAZO` / `TRANSICION_INVALIDA`) sin invocar la transición (FR-008/009) — depende de T019
 
 **Checkpoint**: las tres historias funcionan de forma independiente; política única de 24 h coherente.
 
@@ -134,11 +134,11 @@ cancelación → `FUERA_DE_PLAZO` sin cambios; cita ya pasada → mismo bloqueo.
 
 **Purpose**: coherencia de textos, accesibilidad, E2E y validación final.
 
-- [ ] T026 [P] Test E2E de `/p/[token]` (listado, cancelar dentro de plazo, bloqueo + teléfono dentro de la ventana, ejes de accesibilidad y responsive móvil) en `tests/e2e/portal-paciente.spec.ts` (FR-013, SC-008; patrón de `tests/e2e/apoyo.ts`)
-- [ ] T027 [P] Revisar coherencia de textos de política (todos comunican 24 h; dentro de la ventana remiten al teléfono) en la vista y el catálogo de errores (FR-012, SC-007)
-- [ ] T028 Actualizar `specs/005-acceso-cancelacion-paciente/` con un `trazabilidad.md` que mapee FR/SC → tests (paridad con 001) — depende de T011–T023, T026
-- [ ] T029 Ejecutar la suite completa `npm run test:all` (unit + integración + e2e) y `npm run typecheck`/`npm run lint`; dejar todo en verde (condición de merge, Principio 6)
-- [ ] T030 Ejecutar la validación del `quickstart.md` (V1–V12) contra la semilla determinista y confirmar cada escenario
+- [X] T026 [P] Test E2E de `/p/[token]` (listado, cancelar dentro de plazo, bloqueo + teléfono dentro de la ventana, ejes de accesibilidad y responsive móvil) en `tests/e2e/portal-paciente.spec.ts` (FR-013, SC-008; patrón de `tests/e2e/apoyo.ts`)
+- [X] T027 [P] Revisar coherencia de textos de política (todos comunican 24 h; dentro de la ventana remiten al teléfono) en la vista y el catálogo de errores (FR-012, SC-007)
+- [X] T028 Actualizar `specs/005-acceso-cancelacion-paciente/` con un `trazabilidad.md` que mapee FR/SC → tests (paridad con 001) — depende de T011–T023, T026
+- [X] T029 Ejecutar la suite completa `npm run test:all` (unit + integración + e2e) y `npm run typecheck`/`npm run lint`; dejar todo en verde (condición de merge, Principio 6)
+- [X] T030 Ejecutar la validación del `quickstart.md` (V1–V12) contra la semilla determinista y confirmar cada escenario
 
 ---
 
