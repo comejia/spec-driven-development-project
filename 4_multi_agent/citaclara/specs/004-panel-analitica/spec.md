@@ -20,9 +20,31 @@ usan las definiciones acordadas y son reproducibles con la semilla.
   definición.
 
 - **P2 — Definición de "ocupación"** (resuelta, ver Clarifications 2026-09-19): numerador =
-  minutos de citas en estado reservada + completada (los estados que ocupan hueco);
-  denominador = jornada de actividad 09:00–19:00 en días laborables (600 min por día
-  laborable). Los ejemplos de esta spec usan esta definición.
+  minutos de citas en estado reservada + completada (los estados que ocupan hueco, por
+  referencia a la 001 FR-010/RN1); denominador = jornada de actividad 09:00–19:00 en días
+  laborables (600 min por día laborable). Los ejemplos de esta spec usan esta definición.
+
+## Propiedad y consumo entre specs (revisión cruzada jul 2026)
+
+Esta sección resuelve los solapamientos **S4** y **S5** del informe
+`specs/000-revision-cruzada-jul2026.md`, siguiendo el Principio 1 (Spec Primero) y la regla
+"un propietario por concepto". La 004 **no cambia el comportamiento del núcleo 001**: lo
+consume por referencia tal como está hoy.
+
+- **S4 — 004 es la propietaria única de la métrica "tasa de no asistencia"** (Definición A,
+  denominador explícito en FR-006). Cualquier otra spec que hable de "tasa de no asistencia"
+  DEBE remitir a la 004 y no inventar su propia fórmula.
+  - El **estado `no_asistida`** (su significado) es propiedad de la **001** (001 FR-009): la
+    004 lo **cita**, no lo redefine.
+  - La métrica de eficacia del recordatorio de la **002** (porcentaje de citas recordadas que
+    acaban en `no_asistida`) **no es** la tasa oficial de la clínica: usa un denominador
+    distinto (citas recordadas). La 002 remite a la 004 para la tasa oficial; la 004 **no**
+    adopta la fórmula de la 002.
+- **S5 — 004 consume por referencia el conjunto de "estados que ocupan hueco"** (reservada y
+  completada), que define la **001** en su regla anti-solape (001 FR-010, RN1). La 004 **no
+  publica ni inventa** una constante `ESTADOS_ACTIVOS` atribuida a la 001; describe el
+  conjunto citando su fuente real. Si la 001 cambiara algún día qué estado ocupa hueco, el
+  FR-007 de la 004 DEBE revisarse (nota de dependencia).
 
 ## Clarifications
 
@@ -31,6 +53,13 @@ usan las definiciones acordadas y son reproducibles con la semilla.
 - Q: Para la tasa de no asistencia por profesional, ¿qué citas forman el denominador? → A: Definición A — no asistidas ÷ (completadas + canceladas + no asistidas), es decir, todas las citas pasadas con desenlace.
 - Q: Para la ocupación semanal por profesional, ¿qué numerador y denominador se usan? → A: Numerador = minutos de citas reservada + completada (estados que ocupan hueco); denominador = jornada de actividad 09:00–19:00 en días laborables (600 min/día laborable).
 - Q: ¿La ocupación semanal incluye semanas futuras con reservas o solo hasta la semana en curso? → A: Solo hasta la semana en curso (histórico + semana actual); no se pintan semanas futuras.
+
+### Session 2026-09-22 (revisión cruzada, S4/S5)
+
+- Q: ¿Quién es el propietario de la métrica "tasa de no asistencia"? → A: La 004, como propietaria única (Definición A, denominador explícito); las demás specs remiten a la 004.
+- Q: ¿De quién es el significado del estado `no_asistida`? → A: De la 001 (FR-009); la 004 lo cita, no lo redefine.
+- Q: ¿Cómo consume la 004 el conjunto "estados que ocupan hueco" para la ocupación? → A: Por referencia a la regla anti-solape de la 001 (FR-010, RN1) = "reservada" + "completada"; sin inventar una constante con nombre atribuida a la 001, y con nota de dependencia si la 001 cambia.
+- Q: ¿Cómo debe leerse la tendencia de la tasa cuando 005/002 facilitan la cancelación del paciente? → A: Al crecer las cancelaciones sube el denominador de la Definición A, por lo que la tasa puede bajar en parte por "conversión de no-show en cancelación", no solo por menos no-shows; se documenta para no atribuir toda la mejora a los recordatorios.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -114,6 +143,11 @@ que las tasas por profesional coinciden con los valores esperados.
 3. **Given** un profesional sin citas pasadas en el periodo, **When** se calcula su tasa,
    **Then** el panel muestra "sin datos" en lugar de un porcentaje engañoso o una división
    por cero.
+4. **Given** que la clínica usa la cancelación por el paciente (specs 005/002) y crecen las
+   cancelaciones, **When** se muestra la tasa de no asistencia, **Then** el panel acompaña la
+   cifra de una nota que advierte de que parte de la bajada puede deberse a no-shows
+   convertidos en cancelaciones (aumento del denominador, Definición A), y no solo a menos
+   no-shows (FR-006c).
 
 ---
 
@@ -207,18 +241,40 @@ ingresos reproduce los valores esperados para las semanas del periodo.
 - **FR-005**: El sistema MUST mostrar todos los importes cuadrados al céntimo, en euros y en
   formato inequívoco para España (constitución, Principio 2); MUST mostrar también el total
   general de ingresos por citas completadas.
-- **FR-006 (tasa de no asistencia)**: El sistema MUST calcular, por profesional, la tasa de
-  no asistencia como no_asistida ÷ (completada + cancelada + no_asistida) de sus citas
-  pasadas con desenlace (Definición A, Clarifications 2026-09-19), expresada en porcentaje.
+- **FR-006 (tasa de no asistencia — métrica propiedad de la 004)**: La 004 es la **propietaria
+  única** de la métrica oficial "tasa de no asistencia" de la clínica. El sistema MUST
+  calcularla, por profesional, como no_asistida ÷ (completada + cancelada + no_asistida) de
+  sus citas pasadas con desenlace (Definición A, Clarifications 2026-09-19), expresada en
+  porcentaje. Cualquier otra spec que hable de "tasa de no asistencia" MUST remitir a esta
+  definición y NO usar una fórmula propia.
 - **FR-006a**: El sistema MUST tratar como "pasadas con desenlace" únicamente las citas cuyo
   estado ya no es "reservada" (completada, cancelada o no_asistida); las reservas futuras NO
   entran en el cálculo de la tasa de no asistencia.
+- **FR-006b (significado de `no_asistida`, propiedad de la 001)**: El sistema MUST interpretar
+  el estado `no_asistida` exactamente como lo define la **001 (FR-009)**: el paciente no se
+  presentó a una cita que seguía reservada. La 004 **cita** ese significado y NO lo redefine.
+- **FR-006c (efecto "la cancelación sustituye al no-show")**: El panel MUST acompañar la tasa
+  de no asistencia de una lectura que advierta que, al facilitar la cancelación por el
+  paciente (specs 005 y 002), el número de citas "cancelada" crece y con él el **denominador**
+  de la Definición A; por tanto la tasa puede **bajar en parte por un cambio de comportamiento**
+  (no-shows que se convierten en cancelaciones), no solo por menos no-shows. La clínica NO debe
+  atribuir toda la mejora a los recordatorios.
+- **FR-006d (delimitación frente a la métrica de la 002)**: La métrica de eficacia del
+  recordatorio de la **002** (porcentaje de citas recordadas que terminan en `no_asistida`)
+  NO es la tasa oficial de no asistencia: tiene un denominador distinto (citas recordadas). La
+  002 remite a la 004 para la tasa oficial; la 004 NO adopta la fórmula de la 002.
 - **FR-007 (ocupación)**: El sistema MUST calcular, por profesional y por semana, la
   ocupación como (minutos de citas en estado "reservada" o "completada") ÷ (minutos de la
   jornada de actividad de la clínica esa semana), expresada en porcentaje. La jornada de
-  actividad es 09:00–19:00 en días laborables (600 min por día laborable); reservada y
-  completada son los estados que ocupan hueco (ESTADOS_ACTIVOS de la 001), mientras que
-  cancelada y no_asistida NO ocupan (Clarifications 2026-09-19).
+  actividad es 09:00–19:00 en días laborables (600 min por día laborable). El conjunto de
+  estados que ocupan hueco —"reservada" y "completada"— se **consume por referencia a la
+  regla anti-solape de la 001 (FR-010, RN1)**, que es quien define qué estados bloquean el
+  hueco; "cancelada" y "no_asistida" NO ocupan (001 FR-010). La 004 NO define ni publica una
+  constante con nombre propia para este conjunto.
+- **FR-007b (nota de dependencia con la 001)**: El conjunto de estados que ocupan hueco usado
+  en FR-007 depende de la 001 (FR-010, RN1). Si la 001 cambiara en el futuro qué estados
+  ocupan hueco (p. ej. si "completada" dejara de contar para el solape), el FR-007 de la 004
+  MUST revisarse para seguir alineado con la fuente.
 - **FR-007a (alcance temporal de la ocupación)**: El sistema MUST mostrar la ocupación
   semanal solo hasta la semana en curso de la clínica (histórico más la semana actual); NO
   MUST pintar semanas futuras aunque ya tengan citas reservadas (Clarifications 2026-09-19).
@@ -301,8 +357,8 @@ jornada; jornada de referencia de la semilla 09:00–19:00, 5 días laborables):
 Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
 
 - **Cita**: fuente de todos los indicadores. Relevan su estado (reservada, completada,
-  cancelada, no_asistida), su franja [inicio, fin) —para minutos de ocupación— y su
-  servicio —para ingresos e importe.
+  cancelada, no_asistida —significado propiedad de la 001, FR-009), su franja [inicio, fin)
+  —para minutos de ocupación— y su servicio —para ingresos e importe.
 - **Servicio**: aporta el importe (precio en céntimos) que se suma en los ingresos de citas
   completadas y su nombre para el desglose.
 - **Profesional**: dimensión de agrupación de la ocupación y de la tasa de no asistencia.
@@ -335,6 +391,9 @@ Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
   por cero) ni errores cuando falta base de cálculo; en su lugar aparece "sin datos".
 - **SC-009**: El panel es legible y usable tanto en portátil como en móvil, con contraste y
   tamaños accesibles, y sin jerga técnica en pantalla.
+- **SC-010**: Junto a la tasa de no asistencia, el panel muestra en el 100 % de los casos la
+  nota de lectura del efecto "la cancelación sustituye al no-show" (FR-006c), de modo que la
+  tendencia no se atribuya por completo a los recordatorios.
 
 ## Assumptions
 
@@ -353,8 +412,8 @@ Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
   fijada en 09:00–19:00 en días laborables (600 min por día laborable), coherente con la
   franja de generación de la semilla (Clarifications 2026-09-19).
 - Los estados que ocupan hueco (reservada y completada) son los que cuentan como "ocupación",
-  de forma coherente con la regla anti-solape de la 001; cancelada y no_asistida liberan el
-  hueco y no ocupan.
+  por referencia a la regla anti-solape de la 001 (FR-010, RN1); cancelada y no_asistida
+  liberan el hueco y no ocupan. La 004 consume ese conjunto, no lo redefine (S5).
 - Esta feature no incluye exportación (PDF/CSV), comparación entre clínicas, ni filtros
   avanzados de rango de fechas más allá de las últimas 8 semanas; se abordarían en specs
   propias si se piden.
@@ -366,4 +425,6 @@ Esta feature NO crea entidades nuevas; solo lee y agrega las de la 001.
 - Comparativas entre clínicas o agregados multiclínica.
 - Rangos de fecha configurables más allá de las últimas 8 semanas y de la ocupación semanal.
 - Predicciones o proyecciones de ingresos (solo se muestran datos históricos reales).
-- Recordatorios para reducir la no asistencia (feature aparte, 002).
+- Recordatorios para reducir la no asistencia (feature aparte, 002). La 004 no mide la
+  eficacia del recordatorio; la 002 tiene su propia métrica con denominador distinto y remite
+  a la 004 para la tasa oficial de no asistencia (S4).
