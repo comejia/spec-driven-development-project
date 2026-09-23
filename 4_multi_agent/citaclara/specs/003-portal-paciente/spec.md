@@ -8,34 +8,76 @@
 
 **Input**: User description: "Portal del paciente. Los pacientes de la clínica quieren ver sus citas y cancelarlas sin llamar por teléfono (Sonia, recepción de Eleva, dedica 'la mitad de la mañana' a esto). Alcance: un paciente accede a una página personal moderna donde ve sus citas futuras y pasadas y puede cancelar una cita futura. Interfaz limpia y responsive, pensada para móvil. Preguntas que la spec debe dejar decididas (cerradas, para Sara): cómo accede el paciente sin crear cuentas ni contraseñas, hasta cuándo puede cancelar, y qué pasa con el hueco liberado. Datos: casos reales de la semilla en los ejemplos. Fuera de alcance v1: reservar o mover citas online, pagos."
 
+## Contexto y propiedad *(consumidor de 005 y 001)*
+
+Tras la revisión cruzada (`specs/000-revision-cruzada-jul2026.md`), la propiedad de dos
+conceptos que antes definía 003 se traslada a la spec **005 (Acceso y cancelación del
+paciente)**. **003 es ahora consumidor**, no propietario:
+
+- **Acceso e identidad del paciente** (enlace personal `/p/[token]`, token opaco, regeneración):
+  propiedad de **005** (FR-001..FR-006). 003 los consume para identificar al paciente y mostrar
+  sus citas (resuelve S3).
+- **Política de cancelación del paciente** (umbral único de **24 h** y acción dentro de la
+  ventana): propiedad de **005** (FR-007/FR-008/FR-012). 003 la remite y conserva el
+  comportamiento observable, sin fijar el umbral (resuelve S1).
+- **Ciclo de vida de la cita** (transición `reservada → cancelada`, liberación del hueco) y
+  **concurrencia** (una sola cancelación efectiva, atómica e idempotente): propiedad del núcleo
+  **001**. 003 solo decide si puede dispararse la cancelación (acceso de 005 + ventana de 005) e
+  **invoca** la operación de 001 (resuelve S2 y S7).
+
+003 mantiene la propiedad de la **experiencia del portal**: ver citas futuras/pasadas, estados
+vacíos, orden, presentación accesible en móvil y escritorio, y el flujo de confirmación de la
+cancelación antes de invocar 001. No modifica el comportamiento de 001, 002 ni 005: los
+referencia.
+
 ## Clarifications
 
-### Session 2026-09-19
+### Session 2026-09-22 (resolución de revisión cruzada — alineación con 005)
 
-Las tres decisiones que el enunciado pide dejar cerradas se resuelven aquí con los
-valores por defecto recomendados (marcados con "→ A"). Están abiertas a confirmación de
-Sara vía `/speckit.clarify`; hasta entonces, la spec asume estas respuestas para poder
-planificarse por completo.
+Tras la revisión cruzada (`specs/000-revision-cruzada-jul2026.md`) y la creación de la spec
+**005 (Acceso y cancelación del paciente)**, cambia la propiedad de dos conceptos que antes
+vivían en 003. **003 pasa a ser consumidor**, no propietario:
 
-- Q: ¿Cómo accede el paciente sin crear cuentas ni contraseñas? → A: Enlace personal con
-  token secreto por paciente (magic link) que la clínica comparte; sin registro ni
-  contraseña. El paciente confirma los 4 últimos dígitos de su teléfono al abrir el enlace
-  (segundo factor obligatorio).
-- Q: ¿Hasta cuándo puede cancelar una cita futura? → A: Hasta 24 horas antes de la hora de
-  inicio de la cita. Dentro de esa ventana (menos de 24 h o cita ya empezada/pasada) el
-  botón de cancelar no está disponible y se indica que debe llamar a la clínica.
+- Q: ¿Quién es la fuente de verdad del **acceso del paciente** (enlace/token)? → A: La **005**.
+  003 consume el enlace personal estable `/p/[token]` definido en 005 (FR-001..FR-006); ya no
+  define su propio token ni su ciclo de vida. Se elimina de 003 el enlace persistente propio y
+  el segundo factor propio (ver decisión siguiente).
+- Q: ¿Qué pasa con el **segundo factor** (4 últimos dígitos del teléfono) que 003 tenía? → A:
+  **Se elimina de 003** (opción a). 005 define que el acceso se basa en la posesión del token
+  opaco y deja cualquier segundo factor como posible **ampliación de la política de 005**, no
+  como una identidad paralela. 003 no mantiene una postura de seguridad propia; si el refuerzo
+  se desea, lo propondrá y decidirá la propietaria de 005.
+- Q: ¿Quién es la fuente de verdad de la **política de cancelación** (umbral)? → A: La **005**
+  (FR-007/FR-008: **24 horas**). 003 remite a esa política; conserva el comportamiento
+  observable (fuera de ventana → no ofrecer cancelar y mostrar el teléfono de la clínica) pero
+  atribuido a 005, no como umbral propio.
+- Q: ¿Quién realiza la **transición de estado y la liberación del hueco** al cancelar, y la
+  **concurrencia**? → A: El **núcleo 001**. 003 solo decide si puede dispararse la cancelación
+  (acceso de 005 + ventana de 005) e invoca la operación de cancelación atómica e idempotente
+  de 001; no implementa control de concurrencia propio (resuelve S2 y S7).
+
+### Session 2026-09-19 (histórica — algunas decisiones reasignadas a 005)
+
+> Nota: las decisiones de esta sesión sobre **acceso del paciente** y **umbral de
+> cancelación** quedaron **reasignadas a la spec 005** en la sesión 2026-09-22. Se conservan
+> aquí como registro histórico; las reglas vigentes son las de 005 (ver arriba).
+
+- Q: ¿Cómo accede el paciente sin crear cuentas ni contraseñas? → A (histórica; ahora en 005):
+  enlace personal con token secreto por paciente. **Vigente**: 005 define `/p/[token]` como
+  único acceso; 003 lo consume.
+- Q: ¿Hasta cuándo puede cancelar una cita futura? → A (histórica; ahora en 005): hasta 24 h
+  antes del inicio. **Vigente**: la política de cancelación (24 h) es propiedad de 005; 003 la
+  remite.
 - Q: ¿Qué pasa con el hueco liberado al cancelar? → A: El hueco queda libre en la agenda de
-  recepción de forma inmediata (la cita pasa a "cancelada", que libera el tramo según la
-  001); no se reasigna ni se ofrece automáticamente a otros pacientes en la v1.
-- Q: ¿El enlace personal da acceso a todas las citas del paciente o solo a una cita? → A: Un
-  enlace por paciente que muestra todas sus citas (futuras y pasadas) y permite cancelar
-  cualquiera que sea cancelable; el token es secreto y no adivinable, vinculado al paciente.
-- Q: ¿Cuándo caduca el enlace personal del paciente? → A: Persistente (no caduca); el mismo
-  enlace sirve siempre para ese paciente. El riesgo de reenvío se mitiga con la confirmación
-  obligatoria de los 4 dígitos del teléfono (ver siguiente decisión).
-- Q: ¿El refuerzo de los 4 últimos dígitos del teléfono es obligatorio en la v1? → A:
-  Obligatorio siempre; todo acceso pide los 4 últimos dígitos del teléfono antes de mostrar
-  las citas (segundo factor ligero, dado que el enlace no caduca).
+  recepción de forma inmediata (la cita pasa a "cancelada", que libera el tramo, transición
+  propiedad de la **001**); no se reasigna ni se ofrece automáticamente a otros pacientes en
+  la v1.
+- Q: ¿El enlace personal da acceso a todas las citas del paciente o solo a una cita? → A
+  (histórica; ahora en 005 FR-001): un enlace por paciente que da acceso a todas sus citas.
+- Q: ¿Cuándo caduca el enlace personal del paciente? → A (histórica; ahora en 005): el enlace
+  es estable; 005 define que recepción puede **regenerarlo** si se compromete (FR-004).
+- Q: ¿El refuerzo de los 4 últimos dígitos del teléfono es obligatorio? → A (reasignada): **se
+  elimina de 003**; queda como posible ampliación de la política de acceso de 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -80,17 +122,20 @@ ahorra a recepción la media mañana descrita. Junto con la US1 forma el MVP com
 portal.
 
 **Independent Test**: Con datos de la semilla, abrir el portal de un paciente con una cita
-futura cancelable (a más de 24 h), cancelarla y comprobar que pasa a "cancelada", que ya no
-se ofrece cancelarla de nuevo y que el hueco queda libre en la agenda del profesional.
+futura cancelable **según la política de 005** (a 24 h o más del inicio), cancelarla y
+comprobar que pasa a "cancelada" (transición de 001), que ya no se ofrece cancelarla de nuevo
+y que el hueco queda libre en la agenda del profesional.
 
 **Acceptance Scenarios**:
 
-1. **Given** un paciente con una cita reservada dentro de más de 24 horas, **When** pulsa
-   "Cancelar cita" y confirma, **Then** la cita pasa a estado "cancelada", se muestra una
-   confirmación clara y el hueco queda libre en la agenda de recepción.
-2. **Given** una cita reservada cuya hora de inicio es dentro de menos de 24 horas,
-   **When** el paciente ve esa cita, **Then** la opción de cancelar no está disponible y se
-   le indica que, para cancelar con tan poca antelación, debe llamar a la clínica.
+1. **Given** un paciente con una cita reservada cancelable según la política de 005 (24 h o
+   más para el inicio), **When** pulsa "Cancelar cita" y confirma, **Then** la cita pasa a
+   estado "cancelada" (transición realizada por 001), se muestra una confirmación clara y el
+   hueco queda libre en la agenda de recepción.
+2. **Given** una cita reservada dentro de la ventana de bloqueo de 005 (menos de 24 h para el
+   inicio), **When** el paciente ve esa cita, **Then** la opción de cancelar no está disponible
+   y se muestra el teléfono de la clínica para gestionarlo por llamada (comportamiento definido
+   por 005 FR-008).
 3. **Given** una cita ya pasada, completada, cancelada o marcada como no asistida,
    **When** el paciente la ve en su historial, **Then** no se ofrece la opción de cancelar.
 4. **Given** una cita ya cancelada por el paciente, **When** intenta cancelarla de nuevo
@@ -101,76 +146,79 @@ se ofrece cancelarla de nuevo y que el hueco queda libre en la agenda del profes
 
 ---
 
-### User Story 3 - Acceso personal sin cuentas ni contraseñas (Priority: P1)
+### User Story 3 - Acceso personal sin cuentas ni contraseñas (consume 005) (Priority: P1)
 
-El paciente entra a su portal mediante un enlace personal que le facilita la clínica (por
-el canal que ya usa: SMS, email o en persona), sin registrarse ni recordar contraseñas. El
-enlace solo da acceso a las citas de ese paciente.
+El paciente entra a su portal mediante el enlace personal estable `/p/[token]` **definido por
+la spec 005**, sin registrarse ni recordar contraseñas. 003 no define este acceso: lo
+**consume**. El enlace identifica al paciente y da acceso a todas sus citas; su ciclo de vida
+(token opaco, regeneración por recepción si se compromete) es propiedad de 005.
 
-**Why this priority**: Sin una forma de acceso, no hay portal. La restricción del negocio
-—clínicas pequeñas que no van a gestionar altas de usuarios— hace que este mecanismo sea
-condición para las US1 y US2. Es P1 porque las habilita.
+**Why this priority**: Sin una forma de acceso, no hay portal. 003 depende del acceso de 005
+para identificar al paciente; por eso es P1, pero como **consumidor**: cualquier regla de
+token, revocación o refuerzo la decide 005.
 
-**Independent Test**: Abrir un enlace personal válido, superar la confirmación de los 4
-dígitos del teléfono y comprobar que se accede a las citas del paciente correcto; abrir un
-enlace inválido, revocado o manipulado y comprobar que el acceso se deniega sin revelar
-datos de ningún paciente.
+**Independent Test**: Abrir el enlace `/p/[token]` de 005 para un paciente con citas y
+comprobar que el portal muestra sus citas y ninguna de otro paciente; abrir un enlace con
+token inexistente, manipulado o regenerado y comprobar que 005 deniega el acceso, con lo que
+el portal no muestra dato alguno.
 
 **Acceptance Scenarios**:
 
-1. **Given** un enlace personal válido de un paciente, **When** el paciente lo abre,
-   **Then** accede directamente a sus citas sin pantalla de registro ni contraseña.
-2. **Given** un enlace manipulado o inexistente, **When** se intenta abrir, **Then** el
-   acceso se deniega con un mensaje neutro y no se muestra ninguna cita ni dato personal.
-3. **Given** un enlace que ha sido revocado por la clínica, **When** el paciente lo abre,
-   **Then** se le informa de que el enlace ya no es válido y se le indica cómo obtener uno
-   nuevo (contactar con la clínica), sin exponer sus datos.
-4. **Given** un enlace personal válido, **When** el paciente lo abre, **Then** se le pide
-   confirmar los 4 últimos dígitos de su teléfono antes de ver sus citas; un valor incorrecto
-   no da acceso y los intentos fallidos están limitados.
+1. **Given** un enlace `/p/[token]` válido de 005, **When** el paciente lo abre, **Then** el
+   portal muestra sus citas sin pantalla de registro ni contraseña (identidad resuelta por 005).
+2. **Given** un token inexistente o manipulado, **When** se intenta abrir el enlace, **Then**
+   005 deniega el acceso con un mensaje neutro y el portal no muestra ninguna cita ni dato
+   personal.
+3. **Given** un token que recepción ha **regenerado** en 005, **When** se usa el enlace
+   antiguo, **Then** el acceso se deniega; **When** se usa el enlace nuevo, **Then** el portal
+   muestra las mismas citas del paciente (comportamiento definido por 005 FR-004).
 
 ---
 
 ### Edge Cases
 
-- **Cita justo en el límite de 24 h**: una cita cuyo inicio es exactamente dentro de 24 h se
-  trata de forma determinista y consistente (ver FR-011: el límite es "faltan 24 h o más").
-- **Cancelación simultánea paciente/recepción**: si el paciente cancela a la vez que
-  recepción cambia el estado de la misma cita, el resultado final es coherente (una sola
-  cancelación efectiva) y nunca deja la cita en un estado imposible.
-- **Enlace reenviado a un tercero**: quien tenga el enlace no accede sin conocer también los
-  4 últimos dígitos del teléfono del paciente; esta confirmación obligatoria mitiga el reenvío
-  accidental del enlace (decisión de negocio documentada en Assumptions).
+- **Cita justo en el límite de la ventana**: el trato del límite exacto (24 h) lo define la
+  política de cancelación de **005** (umbral "24 h o más"); 003 se comporta según esa política
+  y no fija un límite propio.
+- **Cancelación concurrente (paciente↔recepción y email↔portal)**: si la misma cita se cancela
+  o cambia de estado por varias vías casi a la vez (portal de 003, email de 002, recepción de
+  001), el resultado final es una **única cancelación efectiva** y ningún estado imposible. Esta
+  garantía la aporta la **transición atómica e idempotente de la 001**; 003 no implementa
+  control de concurrencia propio (resuelve S7).
+- **Enlace compartido/manipulado**: el control de qué token da acceso y qué se muestra ante un
+  token inexistente, manipulado o regenerado es propiedad de **005**; 003 solo muestra las citas
+  cuando 005 concede el acceso.
 - **Paciente sin citas**: el portal se abre correctamente y muestra estados vacíos claros,
   sin errores.
 - **Cita en el pasado que sigue "reservada"** (paciente que no acudió y aún no se marcó):
-  aparece en el historial y no ofrece cancelar (ya ha pasado su hora de inicio).
-- **Zona horaria**: el cálculo de "futura/pasada" y de la ventana de 24 h se hace en la zona
-  peninsular española, coherente con el resto del producto.
+  aparece en el historial y no ofrece cancelar (fuera de la ventana de 005).
+- **Zona horaria**: el cálculo de "futura/pasada" (propio del portal) y el de la ventana de
+  cancelación (política de 005) se hacen en la zona peninsular española, coherente con el resto
+  del producto.
 - **Uso en móvil con conexión intermitente**: si la cancelación no llega a confirmarse, la
-  cita permanece reservada y el paciente puede reintentar; nunca queda un estado ambiguo.
+  cita permanece reservada y el paciente puede reintentar; la idempotencia de 001 evita estados
+  ambiguos.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: El sistema MUST permitir a un paciente acceder a una página personal que
-  muestra únicamente sus propias citas, sin crear cuenta ni contraseña.
-- **FR-002**: El sistema MUST dar acceso mediante un enlace personal con un token secreto
-  asociado al paciente (no adivinable), que la clínica facilita al paciente por su canal
-  habitual. Un único enlace por paciente da acceso a todas sus citas (futuras y pasadas); no
-  se emite un enlace por cita.
-- **FR-003**: El sistema MUST denegar el acceso cuando el token sea inexistente o esté
-  manipulado, con un mensaje neutro que no revele datos de ningún paciente ni confirme si un
-  token concreto existió. (Los enlaces son persistentes y no caducan; ver FR-003a para la
-  revocación.)
-- **FR-003a**: El sistema MAY permitir que recepción revoque el enlace de un paciente si este
-  lo solicita; un enlace revocado se trata como inexistente a efectos de FR-003. La revocación
-  no es un flujo de recepción obligatorio en la v1.
-- **FR-004**: El sistema MUST reforzar el acceso pidiendo al paciente los 4 últimos dígitos
-  de su teléfono al abrir un enlace válido, antes de mostrar ninguna cita; un valor incorrecto
-  MUST impedir el acceso. El sistema MUST limitar los intentos fallidos de este paso para
-  evitar el adivinado por fuerza bruta.
+- **FR-001**: El portal MUST mostrar a un paciente únicamente sus propias citas, identificando
+  al paciente a través del acceso definido por la spec **005** (enlace personal `/p/[token]`);
+  003 no define un mecanismo de acceso propio.
+- **FR-002**: El portal MUST consumir el enlace personal estable `/p/[token]` **propiedad de la
+  005** (005 FR-001..FR-006) para identificar al paciente y listar sus citas. El token, su
+  opacidad, su regeneración por recepción y la denegación ante tokens inválidos son propiedad de
+  005; 003 no los redefine ni mantiene un token paralelo.
+- **FR-003**: El portal MUST delegar en 005 la concesión o denegación del acceso: cuando 005
+  deniega el acceso (token inexistente, manipulado o regenerado), el portal MUST NOT mostrar
+  ninguna cita ni dato personal y MUST presentar el mensaje neutro que corresponda, sin añadir
+  una política de acceso propia.
+- **FR-004**: 003 MUST NOT introducir un segundo factor de autenticación propio (p. ej. los 4
+  últimos dígitos del teléfono): el acceso se basa en la posesión del token opaco según 005
+  FR-006. Si en el futuro se desea reforzar el acceso, se especificará como **ampliación de la
+  política de 005** (coordinada con su propietaria), nunca como una identidad o postura de
+  seguridad paralela en 003.
 - **FR-005**: El portal MUST mostrar las citas del paciente separadas en "Próximas citas"
   (futuras) e "Historial" (pasadas), determinando futura/pasada por la hora de inicio en la
   zona peninsular española.
@@ -181,27 +229,35 @@ datos de ningún paciente.
   el historial de la más reciente a la más antigua.
 - **FR-008**: El portal MUST mostrar estados vacíos claros cuando el paciente no tenga
   próximas citas o no tenga historial.
-- **FR-009**: El sistema MUST permitir al paciente cancelar una cita futura en estado
-  "reservada" desde su portal, sin intervención de recepción.
-- **FR-010**: Al cancelar, el sistema MUST llevar la cita al estado "cancelada" definido en
-  la 001, de modo que el hueco quede inmediatamente libre en la agenda de recepción (la 001
-  establece que "cancelada" libera el hueco). El sistema MUST NOT reasignar ni ofrecer
-  automáticamente ese hueco a otros pacientes en la v1.
-- **FR-011**: El sistema MUST permitir la cancelación por el paciente solo cuando falten 24
-  horas o más para la hora de inicio de la cita; MUST impedirla cuando falte menos de 24
-  horas o la cita ya haya empezado o pasado, informando de que para cancelar con menos
-  antelación debe llamar a la clínica.
-- **FR-012**: El sistema MUST NOT ofrecer la opción de cancelar sobre citas que no estén en
-  estado "reservada" (es decir, completadas, ya canceladas o no asistidas) ni sobre citas
-  pasadas.
-- **FR-013**: El sistema MUST exigir una confirmación explícita del paciente antes de aplicar
-  la cancelación; sin confirmación, la cita permanece reservada.
-- **FR-014**: El sistema MUST tratar la cancelación de forma idempotente: cancelar una cita
-  ya cancelada no produce cambios adicionales ni errores visibles confusos.
-- **FR-015**: El sistema MUST resolver de forma coherente la concurrencia entre la
-  cancelación del paciente y un cambio de estado de recepción sobre la misma cita, sin dejar
-  la cita en un estado imposible ni permitir dos transiciones contradictorias (coherente con
-  el control de estado de la 001).
+- **FR-009**: El portal MUST permitir al paciente disparar la cancelación de una cita futura
+  desde su portal, sin intervención de recepción, **cuando la política de cancelación de 005 lo
+  permita** (ver FR-011). 003 solo decide si ofrece la acción; la autorización temporal es de
+  005.
+- **FR-010**: Al cancelar, el portal MUST **invocar la operación de cancelación de la 001**
+  (transición `reservada → cancelada`), que es la que lleva la cita a "cancelada" y libera el
+  hueco de forma inmediata en la agenda de recepción. 003 NO reimplementa la transición ni la
+  liberación del hueco (propiedad de 001) y MUST NOT reasignar ni ofrecer automáticamente ese
+  hueco a otros pacientes en la v1.
+- **FR-011**: El portal MUST aplicar la **política de cancelación del paciente definida por la
+  005** (005 FR-007/FR-008: umbral único de 24 horas): ofrece cancelar solo cuando 005 lo
+  permite (24 h o más para el inicio) y, dentro de la ventana (menos de 24 h, o cita ya empezada
+  o pasada), MUST **no ofrecer** la acción de cancelar y MUST mostrar el **teléfono de la
+  clínica**. 003 NO define ni fija este umbral; lo remite a 005.
+- **FR-012**: El portal MUST NOT ofrecer la opción de cancelar sobre citas que no estén en
+  estado "reservada" (completadas, ya canceladas o no asistidas) ni sobre citas pasadas,
+  coherente con la política de 005 (005 FR-009).
+- **FR-013**: El portal MUST exigir una confirmación explícita del paciente antes de invocar la
+  cancelación; sin confirmación, la cita permanece reservada.
+- **FR-014**: El portal MUST comportarse de forma idempotente ante reintentos apoyándose en la
+  **garantía de idempotencia de la 001**: si la cita ya no está "reservada" (p. ej. ya cancelada),
+  la operación de 001 no produce cambios adicionales y el portal MUST mostrar un mensaje claro de
+  que ya no procede, sin errores confusos.
+- **FR-015**: El portal MUST delegar la resolución de la concurrencia en la **transición atómica
+  e idempotente de la 001**: ante varias solicitudes concurrentes sobre la misma cita —del propio
+  portal (003), del email de recordatorios (002) o de recepción (001)— queda **una sola
+  cancelación efectiva** y ningún estado imposible. 003 NO implementa un control de concurrencia
+  propio; se limita a invocar 001 y a mostrar el mensaje adecuado si la cita ya no estaba
+  "reservada" (resuelve S2 y S7).
 - **FR-016**: El portal MUST NOT permitir reservar citas nuevas ni cambiar la hora o el
   profesional de una cita (mover/reprogramar); esas acciones quedan fuera de alcance en la
   v1.
@@ -221,13 +277,15 @@ datos de ningún paciente.
 - **Paciente**: ficha existente de la 001 (nombre, teléfono único por clínica, email). En
   esta feature es quien accede al portal y ve/cancela sus citas. No se crean cuentas nuevas.
 - **Cita**: entidad existente de la 001 (profesional + servicio + paciente en [inicio, fin),
-  con estado reservada/completada/cancelada/no_asistida). El portal la lee y, para citas
-  futuras "reservada", puede transitarla a "cancelada".
-- **Acceso personal (token de portal)**: credencial no adivinable que vincula un enlace con
-  un paciente concreto. Es el mecanismo de acceso sin cuenta ni contraseña. Es persistente
-  (no caduca) y puede revocarse manualmente por recepción a petición del paciente. Atributos
-  conceptuales: a qué paciente pertenece y si sigue vigente (revocado o no). (Su forma
-  concreta se decide en el plan.)
+  con estado reservada/completada/cancelada/no_asistida). El portal la **lee** y, para citas
+  "reservada" cancelables según 005, **invoca** la transición `reservada → cancelada` de 001;
+  003 no define su ciclo de vida ni el efecto sobre el hueco.
+- **Enlace de acceso del paciente `/p/[token]`** (propiedad de **005**, referido aquí): token
+  opaco estable 1:1 con el paciente, regenerable por recepción. 003 lo **consume** para
+  identificar al paciente; no lo define ni lo almacena como concepto propio.
+- **Política de cancelación del paciente** (propiedad de **005**, referida aquí): umbral único
+  de 24 h antes del inicio y acción alternativa (mostrar teléfono de la clínica) dentro de la
+  ventana. 003 la **consume**; no fija el umbral.
 
 ## Success Criteria *(mandatory)*
 
@@ -239,12 +297,14 @@ datos de ningún paciente.
   menos desde su portal (abrir la cita, pulsar cancelar, confirmar), sin ayuda ni manual.
 - **SC-003**: En el 100 % de los casos, al cancelar una cita reservada el hueco queda libre
   en la agenda de recepción de forma inmediata.
-- **SC-004**: En el 100 % de los intentos, no se permite cancelar desde el portal una cita a
-  la que falten menos de 24 horas, ya empezada o en un estado distinto de "reservada".
-- **SC-005**: En el 100 % de los intentos, un enlace inválido, manipulado o revocado no da
-  acceso a ninguna cita ni dato personal.
-- **SC-006**: Ninguna combinación de acciones simultáneas (paciente + recepción) deja una
-  cita en un estado imposible ni produce dos cancelaciones efectivas.
+- **SC-004**: En el 100 % de los intentos, el portal no ofrece cancelar (y muestra el teléfono
+  de la clínica) cuando la política de cancelación de 005 lo bloquea —menos de 24 h, cita ya
+  empezada o estado distinto de "reservada"—, coherente con 005.
+- **SC-005**: En el 100 % de los intentos, cuando 005 deniega el acceso (token inválido,
+  manipulado o regenerado) el portal no muestra ninguna cita ni dato personal.
+- **SC-006**: Ante cancelaciones/cambios de estado concurrentes sobre la misma cita (portal,
+  email o recepción), en el 100 % de los casos queda exactamente una cancelación efectiva y
+  ningún estado imposible, gracias a la transición atómica e idempotente de la 001.
 - **SC-007**: El portal es usable y legible en móvil y en escritorio, con contraste y tamaños
   accesibles, verificado en un recorrido de extremo a extremo.
 - **SC-008**: Todas las fechas, horas e importes que se muestren cuadran y se presentan en
@@ -253,23 +313,30 @@ datos de ningún paciente.
 ## Assumptions
 
 - **Reutiliza la 001**: pacientes, citas y estados provienen del núcleo de agenda (001). El
-  portal no crea entidades de negocio nuevas salvo el mecanismo de acceso personal.
-- **Acceso sin cuentas (decisión confirmada, sesión 2026-09-19)**: acceso por enlace personal
-  con token secreto, persistente (no caduca) y revocable por recepción, sin registro ni
-  contraseña, porque las clínicas pequeñas no gestionarán altas de usuarios. La confirmación
-  de los "4 últimos dígitos del teléfono" es obligatoria en todo acceso como segundo factor
-  ligero.
-- **Ventana de cancelación (decisión confirmada, sesión 2026-09-19)**: 24 horas antes del
-  inicio. Por debajo de ese umbral, la cancelación se deriva a la llamada telefónica, para
-  que la clínica pueda gestionar el hueco de última hora.
-- **Hueco liberado (decisión confirmada, sesión 2026-09-19)**: al cancelar, el hueco queda
-  simplemente libre en la agenda (estado "cancelada" de la 001). No hay lista de espera ni
-  reasignación automática en la v1.
+  portal no crea entidades de negocio nuevas; consume acceso y política de 005 y el ciclo de
+  vida de 001.
+- **Acceso propiedad de 005**: el acceso del paciente (enlace `/p/[token]`, token opaco,
+  regeneración por recepción, denegación ante tokens inválidos) lo define y posee la **005**
+  (FR-001..FR-006). 003 lo consume; no mantiene token ni segundo factor propios.
+- **Segundo factor**: 003 no añade un segundo factor propio. Cualquier refuerzo sería una
+  ampliación de la política de acceso de 005, decidida por su propietaria (no una postura de
+  seguridad paralela en 003).
+- **Ventana de cancelación propiedad de 005**: el umbral único de **24 horas** y la acción
+  dentro de la ventana (mostrar el teléfono de la clínica) los define la **005** (FR-007/FR-008).
+  003 los remite; conserva el comportamiento observable atribuido a 005.
+- **Transición y liberación del hueco propiedad de 001**: al cancelar, la transición
+  `reservada → cancelada` y la liberación del hueco las realiza la **001**; 003 solo la invoca.
+  No hay lista de espera ni reasignación automática en la v1.
+- **Concurrencia propiedad de 001**: la atomicidad e idempotencia ante cancelaciones
+  concurrentes (portal 003, email 002, recepción 001) las garantiza la **001**; 003 no
+  implementa control de concurrencia propio.
+- **Coherencia de textos (005 FR-012)**: cualquier texto del portal sobre la política de
+  cancelación se deriva de 005 (24 h) y no afirma un plazo distinto.
 - **Zona horaria**: todas las citas se interpretan en la zona peninsular española, coherente
   con la 001.
-- **Canal de entrega del enlace fuera de alcance**: cómo se hace llegar el enlace al paciente
-  (SMS, email, en persona) no lo decide esta feature; el envío automático de recordatorios se
-  aborda en la spec de recordatorios (002).
+- **Canal de entrega del enlace fuera de alcance**: cómo se hace llegar el enlace `/p/[token]`
+  al paciente (SMS, email, en persona) no lo decide esta feature; el envío automático de
+  recordatorios se aborda en la spec de recordatorios (002), que también consume el acceso de 005.
 - **Datos de demostración**: se usan los de la semilla determinista (clínica "Clínica Eleva";
   profesionales María Ferrer, Jorge Nieto y Lucía Prados; servicios de 40,00 €, 50,00 €,
   35,00 € y 45,00 €; pacientes con email `paciente{n}@ejemplo.es`), que ya incluye 2 semanas
@@ -282,9 +349,12 @@ Se abordarán, si procede, en specs propias:
 - Reservar citas nuevas online por el paciente.
 - Mover o reprogramar citas (cambiar hora o profesional) desde el portal.
 - Pagos o cobros online.
-- Registro de pacientes con usuario y contraseña, roles o recuperación de credenciales.
-- Lista de espera o reasignación automática del hueco liberado.
+- Definición del acceso del paciente (token/enlace, regeneración, segundo factor): propiedad de
+  **005**; 003 lo consume.
+- Definición del umbral de cancelación y de la lista de espera: propiedad de **005** (la lista
+  de espera y el umbral de 2 h quedan como posible v2 en 005).
+- La transición de estado y la liberación del hueco: propiedad de **001**; 003 solo la invoca.
 - Envío automático del enlace o de recordatorios (competencia de la spec 002 de
-  recordatorios).
+  recordatorios, que también consume el acceso de 005).
 - Notificaciones al profesional o a recepción al cancelar (más allá de que el hueco quede
-  libre en la agenda).
+  libre en la agenda, efecto de la 001).

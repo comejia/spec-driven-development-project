@@ -31,9 +31,13 @@
 
 ## Notes
 
-- Las tres decisiones de negocio (acceso sin cuentas, ventana de cancelación de 24 h y
-  destino del hueco liberado) quedaron cerradas en `/speckit.specify` y confirmadas en la
-  sesión de `/speckit.clarify` (2026-09-19), junto con tres decisiones adicionales: alcance
-  del enlace (por paciente), persistencia del token (no caduca, revocable) y refuerzo
-  obligatorio de los 4 dígitos del teléfono. La spec es completa y planificable.
+- **Resolución de revisión cruzada (2026-09-22)**: 003 pasa a ser **consumidor** de la spec
+  005 (acceso `/p/[token]` y política de cancelación de 24 h) y del núcleo 001 (transición
+  `reservada → cancelada`, liberación del hueco y concurrencia atómica/idempotente). Se
+  resolvieron S1 (umbral remite a 005), S3 (acceso remite a 005; **segundo factor eliminado de
+  003**, opción a), y S2/S7 (transición y concurrencia remiten a 001).
+- 003 ya **no define** el umbral de cancelación ni el token/acceso del paciente, y no mantiene
+  una postura de seguridad paralela. Sin marcadores `[NEEDS CLARIFICATION]`.
+- Las tres decisiones originales de 2026-09-19 se conservan como registro histórico, anotando
+  qué quedó reasignado a 005.
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`.
