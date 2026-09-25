@@ -17,7 +17,7 @@ tests en verde que la referencian.
 | # | Nombre | Directorio | Propietario | Estado | Consume (depende de) | Consumida por |
 |---|--------|------------|-------------|--------|----------------------|---------------|
 | 001 | Núcleo de Agenda | `specs/001-agenda-core` | recepción-core (por asignar nominalmente) | implementada | — | 002, 003, 004, 005 |
-| 002 | Recordatorios de Cita | `specs/002-recordatorios-cita` | recordatorios (por asignar nominalmente) | en revisión | 001, 004, 005 | — |
+| 002 | Recordatorios de Cita | `specs/002-recordatorios-cita` | recordatorios (por asignar nominalmente) | implementada | 001, 004, 005 | — |
 | 003 | Portal del Paciente | `specs/003-portal-paciente` | portal (por asignar nominalmente) | en revisión | 001, 005 | — |
 | 004 | Panel de Analítica | `specs/004-panel-analitica` | analítica (por asignar nominalmente) | implementada | 001 | 002 (remite a su métrica) |
 | 005 | Acceso y cancelación del paciente | `specs/005-acceso-cancelacion-paciente` | acceso-paciente (por asignar nominalmente) | implementada | 001 | 002, 003 |
