@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { sql } from 'drizzle-orm';
 import { crearDb, obtenerDb, type BaseDatos } from '@/src/db';
-import { cita, clinica, paciente, profesional, servicio } from '@/src/db/schema';
+import { cita, clinica, paciente, profesional, servicio, accesoPaciente } from '@/src/db/schema';
 import type { EstadoCita } from '@/src/db/schema';
 import { calcularFin, fechaEnMadrid, instanteEnMadrid } from '@/src/domain/tiempo';
 import {
@@ -85,6 +85,19 @@ function salDeterminista(prng: () => number, coste = 10): string {
   return `$2b$${String(coste).padStart(2, '0')}$${sal}`;
 }
 
+/**
+ * Token opaco reproducible para la semilla (005 FR-001, research D2/D9). Usa el PRNG
+ * determinista en lugar de `node:crypto` para que la misma semilla produzca los mismos
+ * tokens. La longitud (48 caracteres base64url) coincide con la forma de `generarToken`.
+ */
+const ALFABETO_TOKEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+function tokenDeterminista(prng: () => number, longitud = 48): string {
+  let token = '';
+  for (let i = 0; i < longitud; i += 1) token += elegir(prng, [...ALFABETO_TOKEN]);
+  return token;
+}
+
 // ---------------------------------------------------------------------------
 // Semilla
 // ---------------------------------------------------------------------------
@@ -115,7 +128,7 @@ export interface ResumenSemilla {
 /** Borra todos los datos conservando el esquema y sus invariantes. */
 export async function vaciarDatos(db: BaseDatos = obtenerDb()): Promise<void> {
   await db.execute(
-    sql`TRUNCATE TABLE cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
+    sql`TRUNCATE TABLE acceso_paciente, cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
   );
 }
 
@@ -133,6 +146,7 @@ export async function sembrar(opciones: OpcionesSemilla = {}): Promise<ResumenSe
     .values({
       nombre: CLINICA_DEMO.nombre,
       claveHash: bcrypt.hashSync(clave, salDeterminista(prng)),
+      telefono: CLINICA_DEMO.telefono,
     })
     .returning({ id: clinica.id });
 
@@ -174,6 +188,15 @@ export async function sembrar(opciones: OpcionesSemilla = {}): Promise<ResumenSe
     .insert(paciente)
     .values(fichas)
     .returning({ id: paciente.id });
+
+  // 4b. Un token opaco estable por paciente (005 FR-001). El token se deriva de la semilla
+  // para que la historia sea reproducible (Principio 5): misma semilla → mismos tokens.
+  await db.insert(accesoPaciente).values(
+    pacientesCreados.map((p) => ({
+      pacienteId: p.id,
+      token: tokenDeterminista(prng),
+    })),
+  );
 
   // 5. Historia: 8 semanas pasadas + 2 semanas futuras, de lunes a viernes.
   const citasAInsertar: {

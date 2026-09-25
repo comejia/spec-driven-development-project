@@ -50,6 +50,11 @@ export const CATALOGO_ERRORES = {
     estado: 409,
     mensaje: 'Esta cita ya está cerrada, así que su estado no se puede volver a cambiar.',
   },
+  FUERA_DE_PLAZO: {
+    estado: 403,
+    mensaje:
+      'Esta cita ya no se puede cancelar por internet porque faltan menos de 24 horas. Llama a la clínica para gestionarlo.',
+  },
   TELEFONO_DUPLICADO: {
     estado: 409,
     mensaje: 'Ya hay una ficha con ese teléfono en la clínica.',

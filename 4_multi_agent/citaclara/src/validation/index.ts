@@ -65,3 +65,16 @@ export const accesoSchema = z.object({
   clave: z.string().min(1, 'Introduce la clave de la clínica.'),
 });
 export type AccesoEntrada = z.infer<typeof accesoSchema>;
+
+/** Token opaco de acceso del paciente en la ruta `/p/[token]` (005, FR-001). */
+export const tokenSchema = z
+  .string()
+  .trim()
+  .min(1, 'El enlace no es válido.');
+export type TokenEntrada = z.infer<typeof tokenSchema>;
+
+/** Entrada de POST /api/p/[token]/cancelar (005, contracts/cancelacion.md). */
+export const cancelarPorPacienteSchema = z.object({
+  citaId: uuidSchema,
+});
+export type CancelarPorPacienteEntrada = z.infer<typeof cancelarPorPacienteSchema>;

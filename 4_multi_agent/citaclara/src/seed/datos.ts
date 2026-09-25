@@ -9,6 +9,8 @@ export const CLINICA_DEMO = {
   nombre: 'Clínica Eleva',
   /** Clave de panel por defecto de la demostración; se guarda siempre hasheada (D5). */
   clavePorDefecto: 'eleva2026',
+  /** Teléfono de contacto que se muestra al paciente dentro de la ventana (005 FR-008). */
+  telefono: '910 123 456',
 } as const;
 
 export const PROFESIONALES_DEMO = [

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { sql } from 'drizzle-orm';
 import { inject } from 'vitest';
 import { crearDb, type BaseDatos } from '@/src/db';
-import { clinica, paciente, profesional, servicio } from '@/src/db/schema';
+import { clinica, paciente, profesional, servicio, accesoPaciente } from '@/src/db/schema';
 import { CLINICA_DEMO, PROFESIONALES_DEMO, SERVICIOS_DEMO } from '@/src/seed/datos';
 import { fechaEnMadrid, instanteEnMadrid } from '@/src/domain/tiempo';
 import { COOKIE_SESION, firmarSesion } from '@/src/services/session';
@@ -29,7 +29,7 @@ export async function cerrarConexion(): Promise<void> {
 /** Vacía todas las tablas conservando el esquema y sus invariantes. */
 export async function limpiarBase(cliente: BaseDatos = db): Promise<void> {
   await cliente.execute(
-    sql`TRUNCATE TABLE cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
+    sql`TRUNCATE TABLE acceso_paciente, cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
   );
 }
 
@@ -128,4 +128,20 @@ export function fechaPasada(diasAtras = 30): string {
 /** Cabecera `Cookie` con una sesión de clínica válida (FR-018). */
 export function cabeceraSesion(clinicaId: string): Record<string, string> {
   return { cookie: `${COOKIE_SESION}=${encodeURIComponent(firmarSesion(clinicaId))}` };
+}
+
+/**
+ * Crea (o sustituye) el token opaco de acceso de un paciente (005 FR-001) y lo devuelve.
+ * Usa un token con la forma de `generarToken` (base64url, 43 caracteres para 32 bytes).
+ */
+export async function crearTokenPaciente(
+  pacienteId: string,
+  token = `tok-${pacienteId.replace(/-/g, '')}${'x'.repeat(8)}`,
+  cliente: BaseDatos = db,
+): Promise<string> {
+  await cliente
+    .insert(accesoPaciente)
+    .values({ pacienteId, token })
+    .onConflictDoUpdate({ target: accesoPaciente.pacienteId, set: { token } });
+  return token;
 }

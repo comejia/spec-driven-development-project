@@ -15,6 +15,13 @@
       "when": 1789686030121,
       "tag": "0001_invariantes_agenda",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790128466888,
+      "tag": "0002_ordinary_the_twelve",
+      "breakpoints": true
     }
   ]
 }
