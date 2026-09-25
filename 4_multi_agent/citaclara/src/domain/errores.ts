@@ -38,6 +38,14 @@ export const CATALOGO_ERRORES = {
     estado: 404,
     mensaje: 'Esa cita no existe en la clínica.',
   },
+  ACCESO_DENEGADO: {
+    estado: 404,
+    mensaje: 'No hemos podido abrir este enlace. Solicita uno nuevo a tu clínica.',
+  },
+  FUERA_DE_PLAZO: {
+    estado: 409,
+    mensaje: 'Esta cita ya no se puede cancelar por Internet. Llama a la clínica para gestionarla.',
+  },
   SOLAPE_PROFESIONAL: {
     estado: 409,
     mensaje: 'El profesional ya tiene otra cita a esa hora. Elige un hueco libre.',

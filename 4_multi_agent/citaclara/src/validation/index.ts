@@ -65,3 +65,12 @@ export const accesoSchema = z.object({
   clave: z.string().min(1, 'Introduce la clave de la clínica.'),
 });
 export type AccesoEntrada = z.infer<typeof accesoSchema>;
+
+/**
+ * Entrada de POST /api/portal/[token]/cancelar (003, contracts/portal-cancelacion.md).
+ * Un `citaId` ausente o mal formado produce DATOS_INCOMPLETOS (400).
+ */
+export const cancelarPortalSchema = z.object({
+  citaId: uuidSchema,
+});
+export type CancelarPortalEntrada = z.infer<typeof cancelarPortalSchema>;
