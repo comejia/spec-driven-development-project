@@ -58,7 +58,7 @@ que TODAS las historias necesitan.
 
 - [ ] T004 [P] Definir los puertos consumidos de 005 en `src/portal/puertos.ts`: `ResultadoAcceso`, `PortalAccessGateway.resolverPaciente(token)`, `EvaluacionCancelacion`, `PoliticaCancelacion.evaluar(cita, ahora)` exactamente según `contracts/puertos-005.md` (sin implementar reglas, solo tipos/interfaces)
 - [ ] T005 [P] Añadir el esquema Zod de cancelación del portal en `src/validation/index.ts` (o módulo del portal): `{ citaId: string().uuid() }` que produce `DATOS_INCOMPLETOS` cuando falta/es inválido, coherente con `contracts/portal-cancelacion.md`
-- [ ] T006 Implementar el adaptador PROVISIONAL de acceso en `src/portal/acceso-desarrollo.ts` (implementa `PortalAccessGateway`): mapea token→paciente sobre la semilla (token derivado del `pacienteId`), devuelve `{ ok:false }` para token vacío/inexistente/manipulado sin filtrar información (D3). Marcar con comentario `PROVISIONAL — propiedad real: 005`. Depende de T004
+- [ ] T006 Implementar el adaptador PROVISIONAL de acceso en `src/portal/acceso-desarrollo.ts` (implementa `PortalAccessGateway`): mapea token→paciente sobre la semilla usando una derivación de desarrollo **determinista y documentada** — el token de prueba es `dev-<pacienteId>` (prefijo fijo `dev-` + UUID del paciente de la semilla); `resolverPaciente` acepta ese formato y devuelve `{ ok:true, pacienteId, clinicaId }`, y devuelve `{ ok:false }` para token vacío/sin prefijo/`pacienteId` inexistente/manipulado, sin filtrar información (D3). Documentar este esquema como referencia para el `<token>` del quickstart. Marcar con comentario `PROVISIONAL — propiedad real: 005`. Depende de T004
 - [ ] T007 Implementar el adaptador PROVISIONAL de política en `src/portal/politica-desarrollo.ts` (implementa `PoliticaCancelacion`): `cancelable=true` solo si `estado==='reservada'` y faltan ≥24 h para `inicio`; si no, `cancelable=false` con `motivo` (`FUERA_DE_PLAZO`/`ESTADO_NO_RESERVADA`/`YA_PASADA`) y `telefonoClinica`. El umbral 24 h se materializa "según 005", sin constante propia de plazo en textos. Depende de T004
 - [ ] T008 [P] Verificar/reutilizar utilidades de respuesta de error en `app/api/_lib/respuestas.ts` (forma `{ error: { codigo, mensaje } }`, es-ES) y de formato de fecha/hora en `src/domain/tiempo.ts` (`formatearFechaHora` → "dd/MM/yyyy HH:mm", `Europe/Madrid`); no duplicar, solo referenciar desde el portal
 
@@ -77,7 +77,7 @@ paciente; abrir un token inexistente/manipulado y comprobar acceso denegado neut
 
 ### Tests for User Story 3 ⚠️ (escribir primero, deben FALLAR)
 
-- [ ] T009 [P] [US3] Test unitario del adaptador de acceso en `tests/unit/portal-acceso.test.ts`: token válido→`{ ok:true, pacienteId, clinicaId }`; token vacío/inexistente/manipulado→`{ ok:false }`; regeneración simulada→antiguo `{ ok:false }`, nuevo `{ ok:true }` mismo `pacienteId` (contracts/puertos-005.md; FR-001..FR-004)
+- [ ] T009 [P] [US3] Test unitario del adaptador de acceso en `tests/unit/portal-acceso.test.ts`: token válido→`{ ok:true, pacienteId, clinicaId }`; token vacío/inexistente/manipulado→`{ ok:false }`; regeneración simulada→antiguo `{ ok:false }`, nuevo `{ ok:true }` mismo `pacienteId`. Aseverar explícitamente que `resolverPaciente` acepta **solo** el token (sin segundo factor ni parámetro adicional), materializando FR-004/D7 (003 no añade postura de seguridad paralela) (contracts/puertos-005.md; FR-001..FR-004)
 - [ ] T010 [P] [US3] Test de integración de acceso denegado en `tests/integration/contract-portal-acceso.test.ts` contra PostgreSQL real: `GET /api/portal/<token-invalido>` → `404 ACCESO_DENEGADO` neutro, cuerpo sin citas ni datos y sin el token (contracts/portal-vista.md; FR-003, SC-005)
 
 ### Implementation for User Story 3
@@ -106,7 +106,7 @@ comprobar los dos grupos, orden, campos y aislamiento por paciente.
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implementar el servicio de solo lectura en `src/portal/consultar-citas-paciente.ts`: leer `cita ⋈ servicio ⋈ profesional` filtrando por `pacienteId`/`clinicaId`, separar futuras/historial (RD-1), ordenar (FR-007), mapear a `CitaDelPortal` (id, inicioIso, fechaHoraTexto vía `tiempo.ts`, profesional, servicio, estado con `ETIQUETAS_ESTADO` de 001) y marcar `cancelable`/`telefonoClinica` con `PoliticaCancelacion` (data-model.md). Depende de T007, T008
+- [ ] T016 [US1] Implementar el servicio de solo lectura en `src/portal/consultar-citas-paciente.ts`: leer `cita ⋈ servicio ⋈ profesional` filtrando por `pacienteId`/`clinicaId`, separar futuras/historial (RD-1), ordenar (FR-007), mapear a `CitaDelPortal` (id, inicioIso, fechaHoraTexto vía `tiempo.ts`, profesional, servicio, estado con `ETIQUETAS_ESTADO` de 001) y marcar `cancelable`/`telefonoClinica` (nombre de campo canónico según `contracts/portal-vista.md`; el `telefonoClinicaSiBloqueada` de data-model.md se materializa como `telefonoClinica` en la salida) con `PoliticaCancelacion` (data-model.md). Depende de T007, T008
 - [ ] T017 [US1] Completar `app/api/portal/[token]/route.ts` (GET): tras resolver acceso (T012), invocar `consultar-citas-paciente` y devolver `VistaPortal` (`200`) según `contracts/portal-vista.md`. Depende de T012, T016
 - [ ] T018 [P] [US1] Implementar `components/portal/tarjeta-cita.tsx`: presenta una `CitaDelPortal` (fecha/hora ES, profesional, servicio, etiqueta de estado), accesible y sin jerga (FR-006, FR-018)
 - [ ] T019 [P] [US1] Implementar `components/portal/lista-citas.tsx`: renderiza los grupos "Próximas citas" e "Historial" con `tarjeta-cita`, incluyendo estados vacíos claros es-ES (FR-005, FR-008). Depende de T018
@@ -148,7 +148,7 @@ segundo intento no produce cambios.
 **Purpose**: Accesibilidad, responsive, e2e de extremo a extremo y validación del quickstart.
 
 - [ ] T028 [P] E2E ver citas en `tests/e2e/portal-ver-citas.spec.ts` (Playwright): abrir portal de la semilla, verificar grupos, orden, campos y aislamiento (V1 del quickstart; SC-001)
-- [ ] T029 [P] E2E cancelar en `tests/e2e/portal-cancelar.spec.ts`: cancelar dentro de plazo (V2), bloqueo dentro de ventana con teléfono (V3), idempotencia/segundo intento (V5), estados vacíos (V6) (SC-003, SC-004, SC-006)
+- [ ] T029 [P] E2E cancelar en `tests/e2e/portal-cancelar.spec.ts`: cancelar dentro de plazo (V2) **aseverando que el flujo se completa en ≤3 interacciones** (abrir cita → pulsar cancelar → confirmar, SC-002), bloqueo dentro de ventana con teléfono (V3), idempotencia/segundo intento (V5), estados vacíos (V6) (SC-002, SC-003, SC-004, SC-006)
 - [ ] T030 [P] E2E accesibilidad y responsive en `tests/e2e/portal-accesibilidad.spec.ts`: ejes de accesibilidad (contraste/tamaños) y viewports móvil/escritorio; acceso denegado neutro (V4) (FR-018, SC-005, SC-007)
 - [ ] T031 [P] Verificar formato ES inequívoco (fechas/horas) en textos del portal y ausencia de cualquier plazo escrito distinto de la política de 005 (FR-019, SC-008, 005 FR-012)
 - [ ] T032 Ejecutar la validación completa de `specs/003-portal-paciente/quickstart.md` (V1–V6) y `npm run test:all` en verde como puerta de merge (Principio 6)
