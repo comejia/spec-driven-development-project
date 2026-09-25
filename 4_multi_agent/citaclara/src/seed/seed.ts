@@ -191,10 +191,18 @@ export async function sembrar(opciones: OpcionesSemilla = {}): Promise<ResumenSe
 
   // 4b. Un token opaco estable por paciente (005 FR-001). El token se deriva de la semilla
   // para que la historia sea reproducible (Principio 5): misma semilla → mismos tokens.
+  //
+  // Importante: usa un PRNG DERIVADO e INDEPENDIENTE del principal. Generar los tokens
+  // consume valores pseudoaleatorios; si se tomaran del `prng` principal se desplazaría la
+  // secuencia que genera la historia de citas del paso 5, alterando los números canónicos
+  // que la analítica (004) fija en sus tests. Con un PRNG propio, el paso 5 ve exactamente
+  // la misma secuencia que antes de introducir los tokens, y ambos siguen siendo
+  // deterministas (misma semilla → mismos tokens y misma historia).
+  const prngTokens = crearPrng(`${semilla}::tokens`);
   await db.insert(accesoPaciente).values(
     pacientesCreados.map((p) => ({
       pacienteId: p.id,
-      token: tokenDeterminista(prng),
+      token: tokenDeterminista(prngTokens),
     })),
   );
 
