@@ -15,6 +15,13 @@
       "when": 1789686030121,
       "tag": "0001_invariantes_agenda",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790360053681,
+      "tag": "0002_recordatorios",
+      "breakpoints": true
     }
   ]
 }

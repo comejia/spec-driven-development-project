@@ -70,6 +70,11 @@ export const CATALOGO_ERRORES = {
     estado: 422,
     mensaje: 'La fecha indicada no es válida.',
   },
+  CONFIG_CORREO_INCOMPLETA: {
+    estado: 500,
+    mensaje:
+      'Falta configuración de correo de la clínica (remitente, teléfono, dirección o URL de acceso).',
+  },
 } as const;
 
 export type CodigoError = keyof typeof CATALOGO_ERRORES;

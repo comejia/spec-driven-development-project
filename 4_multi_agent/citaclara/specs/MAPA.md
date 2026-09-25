@@ -7,7 +7,7 @@ coordina su propietario.
 | Spec | Directorio | Título | Propietario | Estado |
 |------|------------|--------|-------------|--------|
 | 001  | `specs/001-agenda-core` | Núcleo de Agenda | recepción-core (por asignar nominalmente) | Draft |
-| 002  | `specs/002-recordatorios-cita` | Recordatorios de Cita | recordatorios (por asignar nominalmente) | Draft |
+| 002  | `specs/002-recordatorios-cita` | Recordatorios de Cita | recordatorios (por asignar nominalmente) | Implementada (tests verdes) |
 
 ## Notas
 

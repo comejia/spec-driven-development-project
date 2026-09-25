@@ -26,9 +26,9 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 **Purpose**: Preparar la estructura y los puntos de entrada nuevos de 002 sobre el proyecto existente de 001.
 
-- [ ] T001 Crear el directorio de salida simulada `datos/salida-correo/` con un `.gitkeep` y añadir `datos/salida-correo/*.eml` a `.gitignore` en la raíz del repositorio
-- [ ] T002 [P] Añadir el script `recordatorios:generar` (patrón `tsx`, igual que `db:seed` → `tsx src/seed/run-seed.ts`) en `package.json` apuntando a `src/scripts/generar-recordatorios.ts`
-- [ ] T003 [P] Verificar/ajustar configuración de Vitest para incluir los nuevos tests de `src/domain` y `tests/` en `vitest.config.ts` y `vitest.integration.config.ts`
+- [X] T001 Crear el directorio de salida simulada `datos/salida-correo/` con un `.gitkeep` y añadir `datos/salida-correo/*.eml` a `.gitignore` en la raíz del repositorio
+- [X] T002 [P] Añadir el script `recordatorios:generar` (patrón `tsx`, igual que `db:seed` → `tsx src/seed/run-seed.ts`) en `package.json` apuntando a `src/scripts/generar-recordatorios.ts`
+- [X] T003 [P] Verificar/ajustar configuración de Vitest para incluir los nuevos tests de `src/domain` y `tests/` en `vitest.config.ts` y `vitest.integration.config.ts`
 
 ---
 
@@ -38,13 +38,13 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 **⚠️ CRITICAL**: Ninguna historia de usuario puede empezar hasta completar esta fase.
 
-- [ ] T004 Añadir el enum `resultado_recordatorio` (`enviado`, `simulado`, `omitido`) y la tabla `recordatorio` (con `cita_id` FK→`cita` on delete cascade e índice único `recordatorio_cita_unico` sobre `cita_id`) en `src/db/schema.ts`
-- [ ] T005 Generar y añadir la migración Drizzle `0002_recordatorios.sql` (crea enum + tabla + índice único) en `src/db/migrations/` sin tocar tablas de 001
-- [ ] T006 [P] Definir el esquema Zod de argumentos del proceso (`--fecha` ISO 8601, `--clinica` uuid opcional) y de configuración de correo (remitente, `BASE_URL`) en `src/validation/recordatorios.ts`
-- [ ] T007 [P] Definir la fuente de datos de remitente/clínica para el `.eml`: la tabla `clinica` de 001 solo aporta `id`/`nombre`, por lo que **email remitente, teléfono y dirección de la clínica** deben resolverse desde configuración (`.env` + `.env.example`) mediante un módulo `src/services/correo/config-clinica.ts` (cubre FR-009 "teléfono de la clínica" y cabecera `From`/`Subject` de `contracts/correo-eml.md`)
-- [ ] T008 [P] Definir la interfaz `EmisorCorreo` (contrato de envío) en `src/services/correo/emisor.ts`
-- [ ] T009 [P] Definir la interfaz `ProveedorEnlaceAcceso` (stub de 005: dado `pacienteId` devuelve el enlace `/p/[token]`) en `src/services/correo/proveedor-enlace.ts`
-- [ ] T010 [P] Añadir a `src/domain/errores.ts` los códigos de negocio nuevos que necesite 002 (p. ej. `FECHA_INVALIDA`, `CONFIG_CORREO_INCOMPLETA`), reutilizando el catálogo de 001
+- [X] T004 Añadir el enum `resultado_recordatorio` (`enviado`, `simulado`, `omitido`) y la tabla `recordatorio` (con `cita_id` FK→`cita` on delete cascade e índice único `recordatorio_cita_unico` sobre `cita_id`) en `src/db/schema.ts`
+- [X] T005 Generar y añadir la migración Drizzle `0002_recordatorios.sql` (crea enum + tabla + índice único) en `src/db/migrations/` sin tocar tablas de 001
+- [X] T006 [P] Definir el esquema Zod de argumentos del proceso (`--fecha` ISO 8601, `--clinica` uuid opcional) y de configuración de correo (remitente, `BASE_URL`) en `src/validation/recordatorios.ts`
+- [X] T007 [P] Definir la fuente de datos de remitente/clínica para el `.eml`: la tabla `clinica` de 001 solo aporta `id`/`nombre`, por lo que **email remitente, teléfono y dirección de la clínica** deben resolverse desde configuración (`.env` + `.env.example`) mediante un módulo `src/services/correo/config-clinica.ts` (cubre FR-009 "teléfono de la clínica" y cabecera `From`/`Subject` de `contracts/correo-eml.md`)
+- [X] T008 [P] Definir la interfaz `EmisorCorreo` (contrato de envío) en `src/services/correo/emisor.ts`
+- [X] T009 [P] Definir la interfaz `ProveedorEnlaceAcceso` (stub de 005: dado `pacienteId` devuelve el enlace `/p/[token]`) en `src/services/correo/proveedor-enlace.ts`
+- [X] T010 [P] Añadir a `src/domain/errores.ts` los códigos de negocio nuevos que necesite 002 (p. ej. `FECHA_INVALIDA`, `CONFIG_CORREO_INCOMPLETA`), reutilizando el catálogo de 001
 
 **Checkpoint**: Fundamento listo — las historias de usuario pueden empezar.
 
@@ -58,17 +58,17 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 ### Tests for User Story 1 (escribir primero, deben FALLAR)
 
-- [ ] T011 [P] [US1] Test unitario de cálculo de ventana 24-48 h y elegibilidad por estado/inicio en `tests/unit/recordatorio-ventana.test.ts`
-- [ ] T012 [P] [US1] Test de integración de generación en ventana (V1) y exclusión por estado (V2/FR-002) en `tests/integration/recordatorios-generacion.test.ts`
-- [ ] T013 [P] [US1] Test de integración de idempotencia por cita (V3/FR-003): reejecución misma `--fecha` y día siguiente → 0 nuevos, en `tests/integration/recordatorios-idempotencia.test.ts`
-- [ ] T014 [P] [US1] Test de integración de concurrencia (V4/D2): dos ejecuciones simultáneas → un solo recordatorio por cita, en `tests/integration/recordatorios-concurrencia.test.ts`
+- [X] T011 [P] [US1] Test unitario de cálculo de ventana 24-48 h y elegibilidad por estado/inicio en `tests/unit/recordatorio-ventana.test.ts`
+- [X] T012 [P] [US1] Test de integración de generación en ventana (V1) y exclusión por estado (V2/FR-002) en `tests/integration/recordatorios-generacion.test.ts`
+- [X] T013 [P] [US1] Test de integración de idempotencia por cita (V3/FR-003): reejecución misma `--fecha` y día siguiente → 0 nuevos, en `tests/integration/recordatorios-idempotencia.test.ts`
+- [X] T014 [P] [US1] Test de integración de concurrencia (V4/D2): dos ejecuciones simultáneas → un solo recordatorio por cita, en `tests/integration/recordatorios-concurrencia.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Implementar lógica pura de elegibilidad y ventana 24-48 h (usando `src/domain/tiempo.ts`) en `src/domain/recordatorio.ts`
-- [ ] T016 [US1] Implementar el servicio del proceso diario: selección de citas `reservada` en ventana + inserción idempotente `INSERT ... ON CONFLICT (cita_id) DO NOTHING` en `src/services/generar-recordatorios.ts` (depende de T004, T006, T015)
-- [ ] T017 [US1] Implementar el punto de entrada CLI (`tsx`): parseo/validación de `--fecha`/`--clinica` con Zod, invocación del servicio, resumen en es-ES por stdout y códigos de salida (0 / ≠0) en `src/scripts/generar-recordatorios.ts` (depende de T006, T016)
-- [ ] T018 [US1] Añadir manejo de errores de configuración/infra (fecha inválida, DB inaccesible) usando `src/domain/errores.ts` en `src/scripts/generar-recordatorios.ts` (depende de T010, T017)
+- [X] T015 [P] [US1] Implementar lógica pura de elegibilidad y ventana 24-48 h (usando `src/domain/tiempo.ts`) en `src/domain/recordatorio.ts`
+- [X] T016 [US1] Implementar el servicio del proceso diario: selección de citas `reservada` en ventana + inserción idempotente `INSERT ... ON CONFLICT (cita_id) DO NOTHING` en `src/services/generar-recordatorios.ts` (depende de T004, T006, T015)
+- [X] T017 [US1] Implementar el punto de entrada CLI (`tsx`): parseo/validación de `--fecha`/`--clinica` con Zod, invocación del servicio, resumen en es-ES por stdout y códigos de salida (0 / ≠0) en `src/scripts/generar-recordatorios.ts` (depende de T006, T016)
+- [X] T018 [US1] Añadir manejo de errores de configuración/infra (fecha inválida, DB inaccesible) usando `src/domain/errores.ts` en `src/scripts/generar-recordatorios.ts` (depende de T010, T017)
 
 **Checkpoint**: El proceso diario genera recordatorios sin duplicados y es idempotente/concurrency-safe de forma independiente y verificable.
 
@@ -82,17 +82,17 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 ### Tests for User Story 2 (escribir primero, deben FALLAR)
 
-- [ ] T019 [P] [US2] Test unitario de composición del `.eml`: cabeceras (`From/To/Subject/Date/MIME-Version/Content-Type`), nombre de fichero `<yyyyMMdd-HHmm>-<cita_id>.eml` y cuerpo es-ES con enlace de 005 mockeado y datos de clínica de config, en `tests/unit/correo-eml.test.ts`
-- [ ] T020 [P] [US2] Test unitario de coherencia de política (SC-007/FR-008/FR-009): el cuerpo comunica 24 h y teléfono de la clínica, 0 textos con otro plazo, en `tests/unit/correo-politica.test.ts`
-- [ ] T021 [P] [US2] Test de integración de correspondencia 1:1 (V10/SC-005): nº de `.eml` == nº de filas con `resultado ∈ {simulado, enviado}` en `tests/integration/recordatorios-eml.test.ts`
-- [ ] T022 [P] [US2] Test de integración de paciente sin email (V5/FR-014): `resultado = omitido`, sin `.eml`, proceso continúa con código 0, en `tests/integration/recordatorios-omitidos.test.ts`
+- [X] T019 [P] [US2] Test unitario de composición del `.eml`: cabeceras (`From/To/Subject/Date/MIME-Version/Content-Type`), nombre de fichero `<yyyyMMdd-HHmm>-<cita_id>.eml` y cuerpo es-ES con enlace de 005 mockeado y datos de clínica de config, en `tests/unit/correo-eml.test.ts`
+- [X] T020 [P] [US2] Test unitario de coherencia de política (SC-007/FR-008/FR-009): el cuerpo comunica 24 h y teléfono de la clínica, 0 textos con otro plazo, en `tests/unit/correo-politica.test.ts`
+- [X] T021 [P] [US2] Test de integración de correspondencia 1:1 (V10/SC-005): nº de `.eml` == nº de filas con `resultado ∈ {simulado, enviado}` en `tests/integration/recordatorios-eml.test.ts`
+- [X] T022 [P] [US2] Test de integración de paciente sin email (V5/FR-014): `resultado = omitido`, sin `.eml`, proceso continúa con código 0, en `tests/integration/recordatorios-omitidos.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Implementar composición del mensaje MIME/`.eml` y textos es-ES (asunto, cuerpo, formato fecha vía `src/domain/tiempo.ts`, texto de política derivado de 005, datos de clínica desde `config-clinica.ts`) en `src/domain/correo.ts` (depende de T007)
-- [ ] T024 [P] [US2] Implementar el adaptador `EmisorCorreoEml` que escribe el `.eml` con nombre determinista `<yyyyMMdd-HHmm>-<cita_id>.eml` en `datos/salida-correo/` en `src/services/correo/emisor-eml.ts` (depende de T008, T023)
-- [ ] T025 [P] [US2] Implementar el stub del `ProveedorEnlaceAcceso` (enlace `/p/[token]` por `pacienteId`) para uso mientras 005 no esté integrada en `src/services/correo/proveedor-enlace-stub.ts` (depende de T009)
-- [ ] T026 [US2] Integrar composición + emisor + proveedor de enlace en el proceso diario: al crear fila con email válido (reutilizar el criterio de validación de email de 001 / `EMAIL_INVALIDO`, ver research D5) → `resultado = simulado` y escribir `.eml`; sin email válido → `resultado = omitido` sin `.eml`, en `src/services/generar-recordatorios.ts` (depende de T016, T023, T024, T025)
+- [X] T023 [P] [US2] Implementar composición del mensaje MIME/`.eml` y textos es-ES (asunto, cuerpo, formato fecha vía `src/domain/tiempo.ts`, texto de política derivado de 005, datos de clínica desde `config-clinica.ts`) en `src/domain/correo.ts` (depende de T007)
+- [X] T024 [P] [US2] Implementar el adaptador `EmisorCorreoEml` que escribe el `.eml` con nombre determinista `<yyyyMMdd-HHmm>-<cita_id>.eml` en `datos/salida-correo/` en `src/services/correo/emisor-eml.ts` (depende de T008, T023)
+- [X] T025 [P] [US2] Implementar el stub del `ProveedorEnlaceAcceso` (enlace `/p/[token]` por `pacienteId`) para uso mientras 005 no esté integrada en `src/services/correo/proveedor-enlace-stub.ts` (depende de T009)
+- [X] T026 [US2] Integrar composición + emisor + proveedor de enlace en el proceso diario: al crear fila con email válido (reutilizar el criterio de validación de email de 001 / `EMAIL_INVALIDO`, ver research D5) → `resultado = simulado` y escribir `.eml`; sin email válido → `resultado = omitido` sin `.eml`, en `src/services/generar-recordatorios.ts` (depende de T016, T023, T024, T025)
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente; los `.eml` cumplen su contrato de contenido y correspondencia 1:1.
 
@@ -106,13 +106,13 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 ### Tests for User Story 3 (escribir primero, deben FALLAR)
 
-- [ ] T027 [P] [US3] Test de integración: cita movida = nuevo recordatorio (V7/FR-011, **depende de FR-017a de 001**: mover = cancelar original + crear nueva) → la nueva recibe su propio y único recordatorio; la original cancelada no genera nada, en `tests/integration/recordatorios-cita-movida.test.ts`
-- [ ] T028 [P] [US3] Test de integración del consumo de cancelación (V8/FR-010/FR-010a) con doble del proveedor de enlace/servicio de 001: ≥24 h → cancelable (transición vía 001, libera hueco); <24 h → no ofrece cancelar y remite al teléfono; cita ya no `reservada` → mensaje "una sola cancelación efectiva", en `tests/integration/recordatorios-cancelacion.test.ts`
+- [X] T027 [P] [US3] Test de integración: cita movida = nuevo recordatorio (V7/FR-011, **depende de FR-017a de 001**: mover = cancelar original + crear nueva) → la nueva recibe su propio y único recordatorio; la original cancelada no genera nada, en `tests/integration/recordatorios-cita-movida.test.ts`
+- [X] T028 [P] [US3] Test de integración del consumo de cancelación (V8/FR-010/FR-010a) con doble del proveedor de enlace/servicio de 001: ≥24 h → cancelable (transición vía 001, libera hueco); <24 h → no ofrece cancelar y remite al teléfono; cita ya no `reservada` → mensaje "una sola cancelación efectiva", en `tests/integration/recordatorios-cancelacion.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Verificar que el cuerpo del `.eml` conduce a la vista de la cita del paciente en `/p/[token]` y que el texto deriva de 005 (sin umbral propio) — ajustar `src/domain/correo.ts` si procede (depende de T023)
-- [ ] T030 [US3] Anclar en código la **dependencia con 001 (FR-017a)** y el punto de invocación de la cancelación de 001 (servicio `cambiar-estado`) como dependencia consumida (sin reimplementar la transición): añadir el adaptador/consumo y un comentario de trazabilidad `FR-011 → FR-017a de 001` en `src/domain/recordatorio.ts` y `src/services/generar-recordatorios.ts` (depende de T025). **Si 001 cambiara la semántica "mover", 002 debe revisarse.**
+- [X] T029 [US3] Verificar que el cuerpo del `.eml` conduce a la vista de la cita del paciente en `/p/[token]` y que el texto deriva de 005 (sin umbral propio) — ajustar `src/domain/correo.ts` si procede (depende de T023)
+- [X] T030 [US3] Anclar en código la **dependencia con 001 (FR-017a)** y el punto de invocación de la cancelación de 001 (servicio `cambiar-estado`) como dependencia consumida (sin reimplementar la transición): añadir el adaptador/consumo y un comentario de trazabilidad `FR-011 → FR-017a de 001` en `src/domain/recordatorio.ts` y `src/services/generar-recordatorios.ts` (depende de T025). **Si 001 cambiara la semántica "mover", 002 debe revisarse.**
 
 **Checkpoint**: Las tres historias funcionan de forma independiente; 002 consume 005/001 por referencia sin reimplementarlos.
 
@@ -122,12 +122,12 @@ Extensión del proyecto Next.js de 001 (una sola app). Rutas relativas a la raí
 
 **Purpose**: Reproducibilidad, cobertura cruzada, métrica de eficacia y validación end-to-end.
 
-- [ ] T031 [P] Test de integración de reproducibilidad (V9/FR-015/SC-006): reset + re-seed + re-ejecución con la misma `--fecha` → conjunto idéntico de filas `recordatorio` y `.eml`, en `tests/integration/recordatorios-reproducibilidad.test.ts`
-- [ ] T032 [P] Test de "día sin citas elegibles": el proceso termina con código 0 y 0 recordatorios, en `tests/integration/recordatorios-sin-elegibles.test.ts`
-- [ ] T033 [P] [SC-008] Implementar la consulta de **eficacia del recordatorio** (métrica propia de 002, distinta de la tasa oficial de 004): % de citas recordadas (denominador = filas `recordatorio` con `resultado ∈ {simulado, enviado}`) que terminan en `no_asistida`, en `src/domain/recordatorio.ts` (función pura) + su test en `tests/unit/recordatorio-eficacia.test.ts`. Documentar en el resultado que la **tasa oficial de no asistencia remite a 004** (FR-006 de 004) y el efecto "la cancelación sustituye al no-show"
-- [ ] T034 Ejecutar la suite completa (`npm test` unit + `npm run test:integration` con Testcontainers) y dejarla en verde como puerta de merge (Principio 6)
-- [ ] T035 [P] Validación manual guiada por `specs/002-recordatorios-cita/quickstart.md` (V1–V10) e inspección de `datos/salida-correo/`
-- [ ] T036 [P] Actualizar `specs/MAPA.md` / trazabilidad si procede para reflejar la entrega de 002
+- [X] T031 [P] Test de integración de reproducibilidad (V9/FR-015/SC-006): reset + re-seed + re-ejecución con la misma `--fecha` → conjunto idéntico de filas `recordatorio` y `.eml`, en `tests/integration/recordatorios-reproducibilidad.test.ts`
+- [X] T032 [P] Test de "día sin citas elegibles": el proceso termina con código 0 y 0 recordatorios, en `tests/integration/recordatorios-sin-elegibles.test.ts`
+- [X] T033 [P] [SC-008] Implementar la consulta de **eficacia del recordatorio** (métrica propia de 002, distinta de la tasa oficial de 004): % de citas recordadas (denominador = filas `recordatorio` con `resultado ∈ {simulado, enviado}`) que terminan en `no_asistida`, en `src/domain/recordatorio.ts` (función pura) + su test en `tests/unit/recordatorio-eficacia.test.ts`. Documentar en el resultado que la **tasa oficial de no asistencia remite a 004** (FR-006 de 004) y el efecto "la cancelación sustituye al no-show"
+- [X] T034 Ejecutar la suite completa (`npm test` unit + `npm run test:integration` con Testcontainers) y dejarla en verde como puerta de merge (Principio 6)
+- [X] T035 [P] Validación manual guiada por `specs/002-recordatorios-cita/quickstart.md` (V1–V10) e inspección de `datos/salida-correo/`
+- [X] T036 [P] Actualizar `specs/MAPA.md` / trazabilidad si procede para reflejar la entrega de 002
 
 ---
 
@@ -209,3 +209,16 @@ Task: "Implementar elegibilidad/ventana en src/domain/recordatorio.ts"
 - **FR-011 depende de FR-017a de 001** (mover = cancelar + crear): anclado en código en T030.
 - Sin SMTP → salida simulada `.eml` en `datos/salida-correo/`; `resultado = simulado`.
 - Verificar que los tests fallan antes de implementar; commit tras cada tarea o grupo lógico.
+
+## Validación (T035) — mapeo quickstart ↔ tests automatizados
+
+Los escenarios V1–V10 del quickstart quedan cubiertos por la suite (unit + integración):
+- V1/V2 → `recordatorios-generacion.test.ts`; V3 → `recordatorios-idempotencia.test.ts`;
+  V4 → `recordatorios-concurrencia.test.ts`; V5 → `recordatorios-omitidos.test.ts`;
+  V6 → `correo-eml.test.ts` + `correo-politica.test.ts`; V7 → `recordatorios-cita-movida.test.ts`;
+  V8 → `recordatorios-cancelacion.test.ts` (consume 001; 005 pendiente de integrar);
+  V9 → `recordatorios-reproducibilidad.test.ts`; V10 → `recordatorios-eml.test.ts`.
+- Ejecución manual del proceso (`npm run recordatorios:generar -- --fecha=...`) contra la semilla
+  e inspección de `datos/salida-correo/` queda disponible para la demo operativa.
+
+Resultado de la suite: **unit 70/70** y **integración 124/124** en verde; lint y typecheck limpios.

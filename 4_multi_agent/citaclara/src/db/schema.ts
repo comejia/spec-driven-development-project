@@ -120,7 +120,52 @@ export const cita = pgTable(
   ],
 );
 
-export const schema = { clinica, profesional, servicio, paciente, cita, estadoCitaEnum };
+/**
+ * Recordatorio (propiedad de 002, ver specs/002-recordatorios-cita/data-model.md).
+ *
+ * Constancia de que se ha generado un aviso para una cita. La no duplicación (FR-003) se
+ * ancla en el índice único sobre `cita_id` + inserción condicional `ON CONFLICT DO NOTHING`
+ * (D2), replicando el enfoque de 001 de poner las garantías capitales en la capa de datos.
+ */
+export const resultadoRecordatorioEnum = pgEnum('resultado_recordatorio', [
+  'enviado',
+  'simulado',
+  'omitido',
+]);
+
+export const recordatorio = pgTable(
+  'recordatorio',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    citaId: uuid('cita_id')
+      .notNull()
+      .references(() => cita.id, { onDelete: 'cascade' }),
+    /** Instante de generación en UTC; se muestra en Europe/Madrid (FR-004). */
+    generadoEn: timestamp('generado_en', { withTimezone: true, mode: 'date' })
+      .notNull()
+      .defaultNow(),
+    /** `simulado` al escribir el .eml sin SMTP; `omitido` si el paciente no tiene email. */
+    resultado: resultadoRecordatorioEnum('resultado').notNull(),
+    /** Email al que se dirigió; `null` si `omitido` (FR-005/FR-014). */
+    destinoEmail: text('destino_email'),
+  },
+  // Ancla de la idempotencia (FR-003, D2): a lo sumo un recordatorio por cita en su vida.
+  (t) => [unique('recordatorio_cita_unico').on(t.citaId)],
+);
+
+export const schema = {
+  clinica,
+  profesional,
+  servicio,
+  paciente,
+  cita,
+  estadoCitaEnum,
+  recordatorio,
+  resultadoRecordatorioEnum,
+};
+
+export type Recordatorio = typeof recordatorio.$inferSelect;
+export type ResultadoRecordatorio = (typeof resultadoRecordatorioEnum.enumValues)[number];
 
 export type Clinica = typeof clinica.$inferSelect;
 export type Profesional = typeof profesional.$inferSelect;

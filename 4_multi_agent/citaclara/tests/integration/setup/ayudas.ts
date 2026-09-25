@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs';
 import { sql } from 'drizzle-orm';
 import { inject } from 'vitest';
 import { crearDb, type BaseDatos } from '@/src/db';
-import { clinica, paciente, profesional, servicio } from '@/src/db/schema';
+import { cita, clinica, paciente, profesional, servicio, type EstadoCita } from '@/src/db/schema';
 import { CLINICA_DEMO, PROFESIONALES_DEMO, SERVICIOS_DEMO } from '@/src/seed/datos';
-import { fechaEnMadrid, instanteEnMadrid } from '@/src/domain/tiempo';
+import { calcularFin, fechaEnMadrid, instanteEnMadrid } from '@/src/domain/tiempo';
 import { COOKIE_SESION, firmarSesion } from '@/src/services/session';
 
 /**
@@ -29,7 +29,7 @@ export async function cerrarConexion(): Promise<void> {
 /** Vacía todas las tablas conservando el esquema y sus invariantes. */
 export async function limpiarBase(cliente: BaseDatos = db): Promise<void> {
   await cliente.execute(
-    sql`TRUNCATE TABLE cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
+    sql`TRUNCATE TABLE recordatorio, cita, paciente, servicio, profesional, clinica RESTART IDENTITY CASCADE`,
   );
 }
 
@@ -128,4 +128,60 @@ export function fechaPasada(diasAtras = 30): string {
 /** Cabecera `Cookie` con una sesión de clínica válida (FR-018). */
 export function cabeceraSesion(clinicaId: string): Record<string, string> {
   return { cookie: `${COOKIE_SESION}=${encodeURIComponent(firmarSesion(clinicaId))}` };
+}
+
+// ---------------------------------------------------------------------------
+// Ayudas específicas de 002 (recordatorios)
+// ---------------------------------------------------------------------------
+
+/** Crea un paciente en la clínica; `email` puede ser null (paciente sin email, FR-014). */
+export async function crearPacienteCon(
+  clinicaId: string,
+  datos: { nombre: string; telefono: string; email: string | null },
+  cliente: BaseDatos = db,
+): Promise<string> {
+  const [fila] = await cliente
+    .insert(paciente)
+    .values({ clinicaId, nombre: datos.nombre, telefono: datos.telefono, email: datos.email })
+    .returning({ id: paciente.id });
+  return fila.id;
+}
+
+/**
+ * Inserta una cita directamente con un `inicio` y `estado` concretos, sin pasar por el
+ * servicio de 001 (que rechaza citas en pasado). Útil para fijar la ventana 24-48 h y estados
+ * finales en las pruebas de 002. El `fin` se deriva de la duración del servicio.
+ */
+export async function crearCitaDirecta(
+  params: {
+    clinicaId: string;
+    profesionalId: string;
+    servicioId: string;
+    pacienteId: string;
+    inicio: Date;
+    estado?: EstadoCita;
+    duracionMin?: number;
+  },
+  cliente: BaseDatos = db,
+): Promise<string> {
+  const [fila] = await cliente
+    .insert(cita)
+    .values({
+      clinicaId: params.clinicaId,
+      profesionalId: params.profesionalId,
+      servicioId: params.servicioId,
+      pacienteId: params.pacienteId,
+      inicio: params.inicio,
+      fin: calcularFin(params.inicio, params.duracionMin ?? 45),
+      estado: params.estado ?? 'reservada',
+    })
+    .returning({ id: cita.id });
+  return fila.id;
+}
+
+/** Instante en tramo válido de 5 min a `horas` de `referencia` (para poblar la ventana). */
+export function instanteAHoras(referencia: Date, horas: number): Date {
+  const bruto = referencia.getTime() + horas * 60 * 60 * 1000;
+  const paso = 5 * 60 * 1000;
+  return new Date(Math.round(bruto / paso) * paso);
 }
