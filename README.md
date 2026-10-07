@@ -71,7 +71,7 @@ El repositorio está organizado por temas. Cada carpeta contiene su propia docum
 | **1** | **Introducción** | Fundamentos de SDD: qué es, por qué usarlo y proyectos introductorios. | [`1_introduccion/`](1_introduccion/) |
 | **2** | **GitHub SpecKit** | Toolkit de GitHub con 6 etapas y una *constitución* como autoridad máxima del proyecto. | [`2_github_spec_kit/`](2_github_spec_kit/README.md) |
 | **3** | **OpenSpec** | Framework de Fission AI con 5 etapas y un ciclo de *propuesta → specs vivas*. | [`3_open_spec/`](3_open_spec/README.md) |
-| **4** | **Multi-Agente** | Exploración de flujos SDD con múltiples agentes de IA. | [`4_multi_agent/`](4_multi_agent/) |
+| **4** | **Multi-Spec** | Varias specs en paralelo sobre un mismo proyecto, cada una en su *git worktree* con su propia ejecución de SpecKit; al final se integra todo en `main` resolviendo conflictos. | [`4_multi_spec/`](4_multi_spec/README.md) |
 
 ---
 
