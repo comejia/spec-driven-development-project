@@ -1,0 +1,35 @@
+Análisis de solapamiento entre specs. Trabajas en el tronco (main) y NO vas a
+sacar ninguna rama ni entrar en ningún worktree: lees cada spec desde el commit
+de su rama con git.
+
+Primero resuelve dónde vive cada una:
+- Confirma que estás en el tronco: `git branch --show-current` debe dar main.
+- Lista lo que hay: `git worktree list` y `git branch --format='%(refname:short)'`.
+- El núcleo (001) está en main; las tres nuevas, cada una en su rama
+  (003-portal-paciente, 002-recordatorios-cita, 004-panel-analitica).
+
+Lee las CUATRO specs por su commit, sin checkout, con `git show REF:RUTA`. Si no
+sabes la ruta exacta dentro de una rama, localízala con
+`git ls-tree -r --name-only REF specs/ | grep spec.md`. Por ejemplo:
+  git show main:specs/001-nucleo-agenda/spec.md
+  git show 003-portal-paciente:specs/003-portal-paciente/spec.md
+  git show 002-recordatorios-cita:specs/002-recordatorios-cita/spec.md
+  git show 004-panel-analitica:specs/004-panel-analitica/spec.md
+Lees la versión de la PUNTA de cada rama. Si algún autor no ha commiteado su
+spec, no la verás por aquí: en ese caso PARA y avísame de qué rama falta el
+commit antes de analizar nada.
+
+Con las cuatro delante, detecta TODO punto donde dos o más specs pisen el mismo
+dominio. Busca específicamente:
+- Conceptos definidos en más de una spec (aunque usen palabras distintas):
+  identidades, accesos, estados, políticas, fórmulas.
+- Reglas que una spec fija y otra contradice, matiza o reinventa.
+- Escrituras sobre las mismas tablas o los mismos estados desde features distintas.
+- Definiciones de métricas que no coincidan con los estados del núcleo (001).
+
+Para cada solapamiento: qué specs implica, cita textual de cada una (indicando de
+qué rama la sacaste), por qué chocarán (en spec, en código o en producción), y una
+propuesta de resolución que asigne UN propietario a cada concepto.
+
+No modifiques NINGUNA spec ni saques ninguna rama. Escribe solo el informe en el
+árbol del tronco, en specs/000-revision-cruzada-jul2026.md.
