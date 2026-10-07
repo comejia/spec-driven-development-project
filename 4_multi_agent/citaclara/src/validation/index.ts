@@ -90,3 +90,12 @@ export const analiticaSchema = z.object({
   dia_referencia: fechaIsoSchema.optional(),
 });
 export type AnaliticaEntrada = z.infer<typeof analiticaSchema>;
+
+/**
+ * Entrada de POST /api/portal/[token]/cancelar (003, contracts/portal-cancelacion.md).
+ * Un `citaId` ausente o mal formado produce DATOS_INCOMPLETOS (400).
+ */
+export const cancelarPortalSchema = z.object({
+  citaId: uuidSchema,
+});
+export type CancelarPortalEntrada = z.infer<typeof cancelarPortalSchema>;
