@@ -1,0 +1,7 @@
+Estás en el master. Integra la rama de feature 004 que tiene su propio worktree:
+1) Haz merge de la rama de la feature con la rama master
+2) Si el merge da conflicto: Analiza el conflicto y la mejor manera de resolverlo
+proponme la solución completa para su implementación.
+3) Si el merge entra limpio, ejecuta los tests de la aplicación. Si los tests fallan, 
+analiza los fallos y propón la mejor manera de resolverlo.
+No borres worktrees ni ramas todavía

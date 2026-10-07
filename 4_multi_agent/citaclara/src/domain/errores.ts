@@ -38,6 +38,15 @@ export const CATALOGO_ERRORES = {
     estado: 404,
     mensaje: 'Esa cita no existe en la clínica.',
   },
+  ACCESO_DENEGADO: {
+    estado: 404,
+    mensaje: 'No hemos podido abrir este enlace. Solicita uno nuevo a tu clínica.',
+  },
+  FUERA_DE_PLAZO: {
+    estado: 409,
+    mensaje:
+      'Esta cita ya no se puede cancelar por internet porque faltan menos de 24 horas. Llama a la clínica para gestionarlo.',
+  },
   SOLAPE_PROFESIONAL: {
     estado: 409,
     mensaje: 'El profesional ya tiene otra cita a esa hora. Elige un hueco libre.',
@@ -49,11 +58,6 @@ export const CATALOGO_ERRORES = {
   TRANSICION_INVALIDA: {
     estado: 409,
     mensaje: 'Esta cita ya está cerrada, así que su estado no se puede volver a cambiar.',
-  },
-  FUERA_DE_PLAZO: {
-    estado: 403,
-    mensaje:
-      'Esta cita ya no se puede cancelar por internet porque faltan menos de 24 horas. Llama a la clínica para gestionarlo.',
   },
   TELEFONO_DUPLICADO: {
     estado: 409,
@@ -74,6 +78,11 @@ export const CATALOGO_ERRORES = {
   FECHA_INVALIDA: {
     estado: 422,
     mensaje: 'La fecha indicada no es válida.',
+  },
+  CONFIG_CORREO_INCOMPLETA: {
+    estado: 500,
+    mensaje:
+      'Falta configuración de correo de la clínica (remitente, teléfono, dirección o URL de acceso).',
   },
 } as const;
 

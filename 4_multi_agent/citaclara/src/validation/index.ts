@@ -78,3 +78,24 @@ export const cancelarPorPacienteSchema = z.object({
   citaId: uuidSchema,
 });
 export type CancelarPorPacienteEntrada = z.infer<typeof cancelarPorPacienteSchema>;
+
+/**
+ * Entrada de GET /api/analitica (004, contracts/analitica.md).
+ *
+ * `dia_referencia` es opcional: fija el "hoy" desde el que se cuentan las últimas 8
+ * semanas y la semana en curso. En producción por defecto es hoy; en pruebas se fija a
+ * 2026-09-16 para reproducir los números de la spec (FR-014).
+ */
+export const analiticaSchema = z.object({
+  dia_referencia: fechaIsoSchema.optional(),
+});
+export type AnaliticaEntrada = z.infer<typeof analiticaSchema>;
+
+/**
+ * Entrada de POST /api/portal/[token]/cancelar (003, contracts/portal-cancelacion.md).
+ * Un `citaId` ausente o mal formado produce DATOS_INCOMPLETOS (400).
+ */
+export const cancelarPortalSchema = z.object({
+  citaId: uuidSchema,
+});
+export type CancelarPortalEntrada = z.infer<typeof cancelarPortalSchema>;

@@ -23,7 +23,8 @@
     "test:all": "npm run test && npm run test:integration && npm run test:e2e",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
-    "db:seed": "tsx src/seed/run-seed.ts"
+    "db:seed": "tsx src/seed/run-seed.ts",
+    "recordatorios:generar": "tsx src/scripts/generar-recordatorios.ts"
   },
   "dependencies": {
     "@radix-ui/react-label": "2.1.8",
@@ -39,6 +40,7 @@
     "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "recharts": "2.15.0",
     "tailwind-merge": "3.3.1",
     "zod": "4.6.5"
   },
