@@ -1,5 +1,5 @@
 import { respuestaError, respuestaOk, manejarError } from '@/app/api/_lib/respuestas';
-import { accesoPortal } from '@/src/portal/acceso-desarrollo';
+import { accesoPortal } from '@/src/portal/acceso-real';
 import { consultarCitasPaciente } from '@/src/portal/consultar-citas-paciente';
 
 /**

@@ -3,10 +3,10 @@ import { and, eq } from 'drizzle-orm';
 import { POST } from '@/app/api/portal/[token]/cancelar/route';
 import { cita } from '@/src/db/schema';
 import { crearCita } from '@/src/services/crear-cita';
-import { tokenDeDesarrollo } from '@/src/portal/acceso-desarrollo';
 import { calcularFin } from '@/src/domain/tiempo';
 import {
   cerrarConexion,
+  crearTokenPaciente,
   crearEscenario,
   db,
   instanteFuturo,
@@ -57,7 +57,7 @@ function llamarPost(token: string, cuerpo: unknown) {
 describe('POST /api/portal/[token]/cancelar — contrato (T022, US2)', () => {
   it('200: cancela una cita reservada dentro de plazo y libera el hueco (SC-003)', async () => {
     const creada = await citaCancelable();
-    const respuesta = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), {
+    const respuesta = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), {
       citaId: creada.id,
     });
 
@@ -82,7 +82,7 @@ describe('POST /api/portal/[token]/cancelar — contrato (T022, US2)', () => {
 
   it('404 CITA_NO_EXISTE: la cita es de otro paciente', async () => {
     const ajena = await citaCancelable(escenario.pacientes.bruno);
-    const respuesta = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), {
+    const respuesta = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), {
       citaId: ajena.id,
     });
     expect(respuesta.status).toBe(404);
@@ -106,7 +106,7 @@ describe('POST /api/portal/[token]/cancelar — contrato (T022, US2)', () => {
       })
       .returning({ id: cita.id });
 
-    const respuesta = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), {
+    const respuesta = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), {
       citaId: fila.id,
     });
     expect(respuesta.status).toBe(409);
@@ -114,11 +114,11 @@ describe('POST /api/portal/[token]/cancelar — contrato (T022, US2)', () => {
   });
 
   it('400 DATOS_INCOMPLETOS: citaId ausente o inválido', async () => {
-    const sinCita = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), {});
+    const sinCita = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), {});
     expect(sinCita.status).toBe(400);
     expect((await sinCita.json()).error.codigo).toBe('DATOS_INCOMPLETOS');
 
-    const malFormado = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), {
+    const malFormado = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), {
       citaId: 'no-es-uuid',
     });
     expect(malFormado.status).toBe(400);

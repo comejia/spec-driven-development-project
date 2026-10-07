@@ -1,10 +1,10 @@
 import { and, eq } from 'drizzle-orm';
 import { obtenerDb, type BaseDatos } from '@/src/db';
-import { cita, paciente, profesional, servicio, type EstadoCita } from '@/src/db/schema';
+import { cita, clinica, paciente, profesional, servicio, type EstadoCita } from '@/src/db/schema';
 import { ErrorNegocio } from '@/src/domain/errores';
 import { ETIQUETAS_ESTADO } from '@/src/domain/cita';
 import { formatearFechaHora } from '@/src/domain/tiempo';
-import { politicaPortal } from './politica-desarrollo';
+import { PoliticaReal } from './politica-real';
 import type { PoliticaCancelacion } from './puertos';
 
 /**
@@ -47,7 +47,7 @@ export async function consultarCitasPaciente(
   pacienteId: string,
   ahora: Date = new Date(),
   db: BaseDatos = obtenerDb(),
-  politica: PoliticaCancelacion = politicaPortal,
+  politica?: PoliticaCancelacion,
 ): Promise<VistaPortal> {
   const [fichaPaciente] = await db
     .select({ nombre: paciente.nombre })
@@ -56,6 +56,11 @@ export async function consultarCitasPaciente(
     .limit(1);
 
   if (!fichaPaciente) throw new ErrorNegocio('PACIENTE_NO_EXISTE');
+
+  // Política de cancelación: por defecto la REAL de 005, con el teléfono real de la clínica
+  // (para el mensaje "llame a la clínica" dentro de ventana, FR-008). Los tests pueden
+  // inyectar otra implementación del puerto.
+  const politicaEfectiva = politica ?? (await construirPoliticaReal(clinicaId, db));
 
   const filas: FilaCita[] = await db
     .select({
@@ -74,7 +79,7 @@ export async function consultarCitasPaciente(
   const historial: CitaDelPortal[] = [];
 
   for (const fila of filas) {
-    const evaluacion = politica.evaluar({ estado: fila.estado, inicio: fila.inicio }, ahora);
+    const evaluacion = politicaEfectiva.evaluar({ estado: fila.estado, inicio: fila.inicio }, ahora);
     const vista: CitaDelPortal = {
       id: fila.id,
       inicioIso: fila.inicio.toISOString(),
@@ -100,4 +105,21 @@ export async function consultarCitasPaciente(
   historial.sort((a, b) => b.inicioIso.localeCompare(a.inicioIso));
 
   return { paciente: { nombre: fichaPaciente.nombre }, proximas, historial };
+}
+
+/**
+ * Construye la política REAL de 005 inyectándole el teléfono de la clínica indicada, para
+ * que el mensaje "llame a la clínica" dentro de ventana muestre el número correcto (FR-008).
+ */
+async function construirPoliticaReal(
+  clinicaId: string,
+  db: BaseDatos,
+): Promise<PoliticaCancelacion> {
+  const [ficha] = await db
+    .select({ telefono: clinica.telefono })
+    .from(clinica)
+    .where(eq(clinica.id, clinicaId))
+    .limit(1);
+
+  return new PoliticaReal({ telefonoClinica: ficha?.telefono ?? '' });
 }

@@ -2,9 +2,9 @@ import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { POST } from '@/app/api/portal/[token]/cancelar/route';
 import { crearCita } from '@/src/services/crear-cita';
 import { cambiarEstado } from '@/src/services/cambiar-estado';
-import { tokenDeDesarrollo } from '@/src/portal/acceso-desarrollo';
 import {
   cerrarConexion,
+  crearTokenPaciente,
   crearEscenario,
   db,
   instanteFuturo,
@@ -56,7 +56,7 @@ function llamarPost(token: string, citaId: string) {
 describe('POST /api/portal/[token]/cancelar — idempotencia/concurrencia (T023, US2)', () => {
   it('doble cancelación: la segunda devuelve 409 TRANSICION_INVALIDA', async () => {
     const creada = await citaCancelable();
-    const token = tokenDeDesarrollo(escenario.pacientes.ana);
+    const token = await crearTokenPaciente(escenario.pacientes.ana);
 
     const primera = await llamarPost(token, creada.id);
     expect(primera.status).toBe(200);
@@ -68,7 +68,7 @@ describe('POST /api/portal/[token]/cancelar — idempotencia/concurrencia (T023,
 
   it('cancelaciones simultáneas: exactamente una efectiva', async () => {
     const creada = await citaCancelable();
-    const token = tokenDeDesarrollo(escenario.pacientes.ana);
+    const token = await crearTokenPaciente(escenario.pacientes.ana);
 
     const [a, b] = await Promise.all([llamarPost(token, creada.id), llamarPost(token, creada.id)]);
     expect([a.status, b.status].sort()).toEqual([200, 409]);
@@ -79,7 +79,7 @@ describe('POST /api/portal/[token]/cancelar — idempotencia/concurrencia (T023,
     // Recepción (001) cancela primero.
     await cambiarEstado(escenario.clinicaId, creada.id, 'cancelada', db);
 
-    const respuesta = await llamarPost(tokenDeDesarrollo(escenario.pacientes.ana), creada.id);
+    const respuesta = await llamarPost(await crearTokenPaciente(escenario.pacientes.ana), creada.id);
     expect(respuesta.status).toBe(409);
     expect((await respuesta.json()).error.codigo).toBe('TRANSICION_INVALIDA');
   });

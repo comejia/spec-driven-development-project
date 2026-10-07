@@ -1,10 +1,10 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { GET } from '@/app/api/portal/[token]/route';
 import { cita } from '@/src/db/schema';
-import { tokenDeDesarrollo } from '@/src/portal/acceso-desarrollo';
 import { calcularFin } from '@/src/domain/tiempo';
 import {
   cerrarConexion,
+  crearTokenPaciente,
   crearEscenario,
   db,
   instanteFuturo,
@@ -72,7 +72,7 @@ describe('GET /api/portal/[token] — vista (T015, US1)', () => {
     const otraHora = instanteFuturo('12:00', 5);
     await insertarCita({ pacienteId: escenario.pacientes.bruno, inicio: otraHora, estado: 'reservada' });
 
-    const respuesta = await llamarGet(tokenDeDesarrollo(escenario.pacientes.ana));
+    const respuesta = await llamarGet(await crearTokenPaciente(escenario.pacientes.ana));
     expect(respuesta.status).toBe(200);
     const cuerpo = await respuesta.json();
 
@@ -84,7 +84,7 @@ describe('GET /api/portal/[token] — vista (T015, US1)', () => {
   });
 
   it('200: estados vacíos cuando el paciente no tiene citas (FR-008)', async () => {
-    const respuesta = await llamarGet(tokenDeDesarrollo(escenario.pacientes.carla));
+    const respuesta = await llamarGet(await crearTokenPaciente(escenario.pacientes.carla));
     expect(respuesta.status).toBe(200);
     const cuerpo = await respuesta.json();
     expect(cuerpo.proximas).toEqual([]);

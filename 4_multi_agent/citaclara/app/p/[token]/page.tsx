@@ -1,4 +1,4 @@
-import { accesoPortal } from '@/src/portal/acceso-desarrollo';
+import { accesoPortal } from '@/src/portal/acceso-real';
 import { consultarCitasPaciente } from '@/src/portal/consultar-citas-paciente';
 import { ListaCitas } from '@/components/portal/lista-citas';
 import { CancelarCita } from '@/components/portal/cancelar-cita';

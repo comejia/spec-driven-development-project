@@ -3,8 +3,8 @@ import { obtenerDb, type BaseDatos } from '@/src/db';
 import { cita } from '@/src/db/schema';
 import { ErrorNegocio } from '@/src/domain/errores';
 import { cambiarEstado } from '@/src/services/cambiar-estado';
-import { accesoPortal } from './acceso-desarrollo';
-import { politicaPortal } from './politica-desarrollo';
+import { AccesoReal } from './acceso-real';
+import { PoliticaReal } from './politica-real';
 import type { PoliticaCancelacion, PortalAccessGateway } from './puertos';
 
 /**
@@ -36,8 +36,9 @@ export async function cancelarDesdePortal(
   deps: DependenciasCancelacion = {},
 ): Promise<ResultadoCancelacion> {
   const db = deps.db ?? obtenerDb();
-  const acceso = deps.acceso ?? accesoPortal;
-  const politica = deps.politica ?? politicaPortal;
+  const acceso = deps.acceso ?? new AccesoReal(db);
+  // La cancelación no muestra el teléfono (solo lanza FUERA_DE_PLAZO); el umbral lo decide 005.
+  const politica = deps.politica ?? new PoliticaReal({ telefonoClinica: '' });
   const ahora = deps.ahora ?? new Date();
 
   // 1. Acceso (005).
