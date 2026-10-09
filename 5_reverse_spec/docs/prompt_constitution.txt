@@ -1,0 +1,23 @@
+/speckit-constitution
+
+Redacta la constitución de este proyecto, que es un
+sistema HEREDADO de facturación en producción (GesFact, de Suministros
+Hidalgo S.L.). El objetivo de esta fase es documentarlo y protegerlo, no
+mejorarlo. Principios innegociables:
+
+1. El comportamiento actual es sagrado. Ningún cambio de comportamiento
+   observable sin decisión explícita y por escrito del negocio, aunque el
+   comportamiento parezca un error. Este sistema factura dinero real y
+   terceros (la gestoría) dependen de sus resultados exactos, céntimo a
+   céntimo.
+2. Evidencia obligatoria. Toda afirmación sobre lo que el sistema hace debe
+   ir acompañada de su evidencia: fichero y líneas de código, dato real de
+   la base de datos, o testimonio del negocio (con nombre y fecha). Las
+   suposiciones se marcan como SUPOSICIÓN y se convierten en preguntas.
+3. Los hallazgos no se corrigen, se registran. Bugs, riesgos y rarezas van
+   al registro de anomalías con su clasificación; corregirlos es una
+   decisión del módulo siguiente, no de este.
+4. Cero dependencias nuevas y cero refactors. No se añade ningún paquete ni
+   se reorganiza código en esta fase; los tests de caracterización usarán
+   exclusivamente el runner nativo de Node (node:test).
+5. Todo en español de España, como el resto del proyecto y de sus usuarios.

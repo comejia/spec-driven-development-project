@@ -1,0 +1,11 @@
+Documenta en specs/000-reconocimiento/flujo-factura.md el ciclo de vida
+completo de una factura en este sistema, siguiendo el código paso a paso.
+Cubre los tres caminos de creación que existan (compruébalo, no lo
+supongas): creación manual desde la web, generación por remesa mensual de
+contratos, y rectificación de una factura existente. Para cada camino:
+qué entradas recibe, qué módulos atraviesa y en qué orden, qué cálculos se
+aplican (con la función exacta), cómo se obtiene el número de factura,
+qué se graba en qué tablas y en qué orden, y qué estados puede tener la
+factura después y quién los cambia. Señala explícitamente cualquier punto
+del flujo donde dos caminos hagan "lo mismo" con código distinto.
+Evidencia obligatoria en cada paso.

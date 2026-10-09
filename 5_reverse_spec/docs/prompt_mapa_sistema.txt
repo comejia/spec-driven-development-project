@@ -1,0 +1,12 @@
+Explora todo el proyecto y genera specs/000-reconocimiento/mapa-sistema.md
+con el mapa del sistema. Para cada módulo o fichero relevante: (1) su
+responsabilidad en una frase de negocio, no técnica ("calcula los importes
+de las facturas", no "exporta funciones de cálculo"); (2) de qué otros
+módulos depende y quién depende de él; (3) una estimación de su criticidad
+para el negocio (alta/media/baja) con justificación. Añade al final:
+(a) un diagrama en texto de las dependencias; (b) la lista de tecnologías
+y versiones reales que usa el proyecto (deducidas del código y de
+package.json, no del LEEME.txt, que está desactualizado); (c) un apartado
+"Zonas oscuras" con todo lo que exista en el proyecto y no encaje en el
+mapa: código muerto, ficheros huérfanos, funcionalidades a medias.
+Constitución aplicable: toda afirmación con su evidencia (fichero y líneas).

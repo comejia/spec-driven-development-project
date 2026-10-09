@@ -1,0 +1,12 @@
+Genera specs/000-reconocimiento/registro-riesgos.md con la deuda técnica y
+los riesgos VISIBLES del proyecto, sin corregir nada. Busca específicamente:
+secretos o credenciales en el código; operaciones de base de datos de varios
+pasos sin transacción (y qué pasaría si fallan a medias); condiciones de
+carrera (lecturas-modificaciones-escrituras concurrentes, contadores);
+validaciones incompletas o desactivadas; manejo de fechas casero y sus casos
+límite; dependencias muertas, obsoletas o con avisos de seguridad; y
+cualquier discrepancia entre lo que los comentarios prometen y lo que el
+código hace. Formato: tabla con ID (R1, R2...), descripción, evidencia,
+impacto de negocio en una frase, y probabilidad estimada de que muerda
+(alta/media/baja). Ordena por impacto × probabilidad. No propongas
+soluciones todavía: solo el registro.
