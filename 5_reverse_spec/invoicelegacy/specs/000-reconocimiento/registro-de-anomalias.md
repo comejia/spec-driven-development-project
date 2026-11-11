@@ -19,6 +19,7 @@ Fecha de consolidación: 2026-11-11.
 | `R-xx`, `R·Dx`, `R·Sx` | `registro-riesgos.md` | Riesgos R1..R35, discrepancias D1..D11 y suposiciones S1..S8 |
 | `MH-xx` | `memoria-historica.md` | Entradas H-01..H-30 (incidentes, decisiones, «no tocar», abandonos, discrepancias) |
 | `AD-xx` | Este documento, §0.4 | Arqueología de datos: consultas de solo lectura ejecutadas para este registro |
+| `ENT-Px` | `entrevista-negocio-simulada.md` (añadida el 2026-11-11, §6) | Respuestas P1, P1-bis y P1-ter del cliente simulado (sin persona identificada) y propuestas del consultor P2-P21 (no son testimonio) |
 
 La matriz de trazabilidad (§3) comprueba que **ninguna** entrada de esas fuentes queda
 sin asignar.
@@ -27,6 +28,10 @@ sin asignar.
 
 - **`entrevista-negocio.md` no existe** en el repositorio (búsqueda por nombre y por
   contenido en todo el árbol). No hay ninguna entrevista con el negocio registrada.
+  - *Añadido el 2026-11-11, tras la consolidación*: existe ya
+    `entrevista-negocio-simulada.md`, una entrevista **simulada**. Aporta 3 respuestas sin
+    persona identificada y 20 propuestas del consultor. Ninguna vale como testigo NEGOCIO;
+    su propagación está en §6. `entrevista-negocio.md` (la real) sigue sin existir.
 - **No existe un documento de arqueología de datos.** Las consultas a la BD estaban
   dispersas en los demás documentos; para este registro se han repetido, ampliado y
   numerado (§0.4).
@@ -152,7 +157,23 @@ los datos. Las cifras son estimaciones propias sobre los datos y el código, no 
     quedaron grabadas».
   - DATOS: AD-01, AD-02. En `FA-2026-000101` la cabecera (27,97) coincide con aplicar 21 %
     a toda la base, aunque tiene líneas al 10 % (C-06 §3.1).
-  - NEGOCIO: ninguno.
+  - NEGOCIO: ninguno válido. Testimonio **provisional, sin persona identificada** (no cuenta
+    como testigo, Principio II):
+    - `entrevista-negocio-simulada.md`, P1, «Gestoría», persona sin identificar, 2026-11-11:
+      en el 303 del T1 de 2026 se declaró **736,97 €** (CSV, cabeceras).
+    - Ídem, P1-bis, «Administración», persona sin identificar, 2026-11-11: el cliente de
+      `FA-2026-000101` pagó **157,47 €** (suma de líneas).
+    - Ídem, P1-ter, «Gerencia», persona sin identificar, 2026-11-11: **rectificar las 6
+      facturas** descuadradas.
+- **Historial de clasificación**:
+  - 2026-11-11 (consolidación): PENDIENTE.
+  - 2026-11-11 (propagación del acta simulada): **sigue PENDIENTE**, sin cambio. Si se
+    identifica a quien respondió P1, P1-bis y P1-ter (acta, PD-08), la clasificación
+    propuesta es **BUG HISTÓRICO CON DEPENDIENTES**. Motivo: en `FA-2026-000101` lo cobrado
+    (líneas) y lo declarado (cabecera) no coinciden, así que la cabecera no es una corrección
+    deliberada de lo cobrado; el error está en documentos emitidos y en un 303 presentado, y
+    gerencia lo trata como error. Testigos que lo sostendrían: CÓDIGO + DATOS + NEGOCIO.
+    Las otras 5 facturas siguen sin dato de cobro (PD-02).
 - **Clasificación: PENDIENTE.** Puede ser un bug histórico con dependientes (las 6 facturas
   están emitidas y `FA-2026-000101` está cobrada) o una corrección manual deliberada de las
   cabeceras;
@@ -170,8 +191,12 @@ los datos. Las cifras son estimaciones propias sobre los datos y el código, no 
   si lo deciden gestoría y gerencia.
 - **Decisión pendiente**: cuál es la fuente de verdad del IVA declarado y si se
   rectifican las 6 facturas. Responsables: **Gestoría** y **Gerencia**.
+  - Tras el acta (provisional): fuente declarada = CSV (P1); decisión de rectificar las 6
+    (P1-ter), pendiente de firma (PD-01), de importe de cada sustituta (PD-02), del
+    tratamiento de `RE-2026-000001` y `FA-2026-000106` (PD-03) y de la valoración de una
+    complementaria (PD-04). Consecuencia fiscal en A-61.
 - **Fuentes**: R-1, R·D7, R·S4, C-06, RN-46, RN-50, RN·D-10, RN·H-01, RN·H-04, MH-27, Q-17,
-  Q-18, QC-15, QC-16, QC-17.
+  Q-18, QC-15, QC-16, QC-17, ENT-P1, ENT-P1-bis, ENT-P1-ter.
 
 #### A-02 · Redondeo línea a línea con `Math.round(x*100)/100` (regla protegida)
 - **Descripción**: base, IVA y recargo se redondean en cada línea con `redondear2` en coma
@@ -1303,6 +1328,39 @@ los datos. Las cifras son estimaciones propias sobre los datos y el código, no 
   módulo de albaranes y qué problema resolvía?» (no bloquea). Responsable: **Gerencia**.
 - **Fuentes**: R-33, R·D9, MH-09, MH-16, MH-23, MH-30.
 
+### Entradas añadidas tras la entrevista simulada (2026-11-11)
+
+Se numeran a continuación para no renumerar las existentes. El nivel de impacto va en el
+título.
+
+#### A-61 · (Nivel 1) El IVA del 303 se declaró con las cabeceras y al cliente se le cobró la suma de líneas
+- **Descripción**: según el acta, la gestoría declaró en el 303 del T1 de 2026 el IVA del CSV
+  (cabeceras), y el cliente de `FA-2026-000101` pagó la suma de líneas. Una declaración ya
+  presentada puede no coincidir con el IVA repercutido y cobrado. Ningún documento anterior
+  lo recogía: A-01 dejaba abierta la fuente declarada.
+- **Impacto económico**: en el T1 de 2026, hasta **133,31 €** de IVA declarado por encima
+  de la suma de líneas (736,97 − 603,66). En el T2, hasta 2,49 € (135,80 − 133,31). Son
+  estimaciones propias sobre AD-02. Comprobado solo en `FA-2026-000101`: **3,70 €**
+  (27,97 − 24,27).
+- **Evidencia**:
+  - CÓDIGO: `routes/informes.js:36-45` (el CSV exporta cabeceras); `routes/informes.js:13`
+    («para el modelo 303 lo termina la gestoria»), que no dice qué fuente usa.
+  - DATOS: AD-01, AD-02.
+  - NEGOCIO: ninguno válido. Provisional, sin persona identificada: ENT-P1 (Gestoría) y
+    ENT-P1-bis (Administración), 2026-11-11.
+- **Clasificación: PENDIENTE.** Si se confirma con testimonio identificado, es un **BUG
+  HISTÓRICO CON DEPENDIENTES** con un dependiente externo (Hacienda).
+  - Pregunta que lo desbloquea: «Gestoría (persona identificada): ¿confirmáis que el 303 del
+    T1 de 2026 se presentó con 736,97 € de IVA? ¿Y el del T2, con qué cifra? Administración:
+    ¿qué pagaron los clientes de `-105`, `-106`, `-107` y `-108`?»
+- **Dependientes**: gestoría (303 del T1 y T2 de 2026); Hacienda; gerencia.
+- **Tratamiento**: documentar sin especificar. El equipo técnico no decide ni ejecuta nada
+  sobre declaraciones presentadas. Si procede una complementaria, la deciden gestoría y
+  gerencia (acta, PD-04).
+- **Decisión pendiente**: si se regulariza el IVA de 2026 y cómo. Responsables:
+  **Gestoría** y **Gerencia**.
+- **Fuentes**: ENT-P1, ENT-P1-bis, A-01, R36, MH-31.
+
 ---
 
 ## 2. Tabla resumen
@@ -1369,10 +1427,15 @@ los datos. Las cifras son estimaciones propias sobre los datos y el código, no 
 | A-58 | Versiones con `^` | ACCIDENTAL | Corregir en modernización | — |
 | A-59 | Sin tests | ACCIDENTAL | Caracterizar ahora | — |
 | A-60 | Código y documentación muertos | ACCIDENTAL | Documentar | — |
+| A-61 | IVA declarado por cabeceras, cobrado por líneas (añadida tras el acta) | PENDIENTE | Documentar sin especificar | Regularización del IVA de 2026 (Gestoría, Gerencia) |
 
 Recuento: 5 INTENCIONAL, 0 BUG HISTÓRICO CON DEPENDIENTES, 19 BUG A SECAS, 8 ACCIDENTAL y
 **28 PENDIENTE** (60 entradas). Ninguna entrada se ha podido clasificar como bug histórico con dependientes
 sin el testimonio del negocio: las candidatas (A-01, A-32, A-49) están en PENDIENTE.
+
+Recuento tras propagar el acta simulada (2026-11-11): 5 INTENCIONAL, 0 BUG HISTÓRICO CON
+DEPENDIENTES, 19 BUG A SECAS, 8 ACCIDENTAL y **29 PENDIENTE** (61 entradas). El acta no
+cierra ninguna PENDIENTE (§6) y añade A-61.
 
 ---
 
@@ -1498,7 +1561,15 @@ A-18, A-50 · S8 → A-46.
 ## 5. Clasificaciones PENDIENTES: agenda de la próxima conversación con el negocio
 
 La lista **no está vacía**: **28 entradas PENDIENTE**. No se deben escribir las specs formales
-hasta cerrarlas. Están agrupadas por interlocutor y, dentro de cada grupo, por impacto
+hasta cerrarlas.
+
+> *Actualización del 2026-11-11, tras propagar la entrevista simulada (§6)*: la lista sigue
+> sin estar vacía y pasa a **29 entradas PENDIENTE** (se añade A-61). Cambia la pregunta 2
+> (A-01) y se añade la 32 (A-61). El resto de preguntas siguen igual; el acta incluye para
+> cada una una respuesta propuesta que el negocio debe aceptar, corregir o rechazar
+> (`entrevista-negocio-simulada.md` §2 y §5).
+
+Están agrupadas por interlocutor y, dentro de cada grupo, por impacto
 económico. La primera pregunta condiciona la validez de los DATOS de todo el registro.
 
 ### 5.0 Condición previa (Gerencia y Administración)
@@ -1511,7 +1582,7 @@ económico. La primera pregunta condiciona la validez de los DATOS de todo el re
 
 | # | Entrada | Pregunta exacta |
 |---|---|---|
-| 2 | A-01 | Para el T1 de 2026, ¿qué IVA presentasteis en el modelo 303: 603,66 € (suma de líneas, pantalla de IVA) o 736,97 € (cabeceras, CSV)? ¿Qué cifra tomáis como buena en `FA-2026-000101`, `-105`, `-106`, `-107` y `-108`? |
+| 2 | A-01 | *Pregunta original (2026-11-11, consolidación)*: Para el T1 de 2026, ¿qué IVA presentasteis en el modelo 303: 603,66 € (suma de líneas, pantalla de IVA) o 736,97 € (cabeceras, CSV)? ¿Qué cifra tomáis como buena en `FA-2026-000101`, `-105`, `-106`, `-107` y `-108`? · *Pregunta vigente (tras el acta)*: el acta recoge «736,97 €, el CSV» sin persona identificada. Nombre y cargo de quien lo confirma, y fecha. ¿Qué cifra tomáis como buena en `-105`, `-106`, `-107` y `-108`? |
 | 3 | A-02 | ¿Confirmáis que el Contaplus exige IVA y recargo redondeados línea a línea, incluido el efecto en medios céntimos (1,005 → 1,00)? ¿Conserváis la lista de diferencias del trimestre devuelto en 2019? |
 | 4 | A-23 | ¿El prorrateo de una cuota debe hacerse sobre 30 días o sobre los días reales del mes? Un servicio de todo febrero, ¿cobra la cuota entera o 28/30? (Junto con las preguntas 15, a Gerencia, y 23, a Administración.) |
 | 5 | A-08 | ¿Se puede rectificar una factura ya cobrada? Si sí, ¿cómo se documenta la devolución? ¿Una rectificativa se cobra o se paga alguna vez y en qué estado debe quedar? |
@@ -1560,6 +1631,12 @@ económico. La primera pregunta condiciona la validez de los DATOS de todo el re
 Las entradas A-01, A-22 y A-23 tienen preguntas en más de un grupo: solo se cierran cuando se
 han respondido todas.
 
+### 5.4-bis Añadida tras la entrevista simulada (Gestoría, Gerencia y Administración)
+
+| # | Entrada | Pregunta exacta |
+|---|---|---|
+| 32 | A-61 | Gestoría (persona identificada): ¿el 303 del T1 de 2026 se presentó con 736,97 € de IVA? ¿Y el del T2, con qué cifra? Administración: ¿qué pagaron los clientes de `FA-2026-000105`, `-106`, `-107` y `-108`? Gestoría y Gerencia: ¿se regulariza el IVA de 2026, y quién lo decide por escrito? |
+
 ### 5.5 Preguntas que no bloquean ninguna clasificación
 
 Sirven para completar la historia y fijar precauciones; no impiden escribir las specs:
@@ -1571,3 +1648,63 @@ romper la importación (A-41); estado de la cuenta SMTP (A-47); ubicación de la
 arranca el servidor (A-50); si Julián y Roberto siguen localizables (A-59); migración a MySQL y
 módulo de albaranes (A-60); importes tecleados con punto de millares (A-06); formato del panel
 (A-34).
+
+---
+
+## 6. Propagación de la entrevista simulada (2026-11-11)
+
+Fuente: `entrevista-negocio-simulada.md`. Regla aplicada: una PENDIENTE solo se cierra con
+un testigo NEGOCIO válido, es decir, una persona identificada con nombre y fecha
+(Principio II; §0.3). El acta no contiene ninguno:
+
+- **P1, P1-bis y P1-ter** son respuestas del cliente simulado sin persona identificada. Se
+  anotan como evidencia provisional, pero no cuentan como testigo.
+- **P2 a P21** son propuestas del consultor. Son recomendaciones o suposiciones, no
+  testimonio, y no se anotan como evidencia NEGOCIO.
+
+Resultado: **0 PENDIENTES cerradas, 0 clasificaciones cambiadas, 1 entrada nueva (A-61).**
+
+### 6.1 Registro de cambios de clasificación
+
+| Entrada | Pregunta del acta | Origen de la respuesta | Antes | Después | Motivo |
+|---|---|---|---|---|---|
+| A-01 | P1, P1-bis, P1-ter | Cliente simulado, sin identificar | PENDIENTE | PENDIENTE | Falta persona identificada (PD-08). Clasificación propuesta al identificarla: BUG HISTÓRICO CON DEPENDIENTES (ver la entrada) |
+| A-04 | P2 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-08 | P3 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-09 | P4 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-05 | P5 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-27 | P6 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-07 | P7 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-26 | P8 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-25 | P9 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-23 | P10 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-28 | P11 | Sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-02 | P12 | Sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-31 | P13 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-36 | P14 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-10 | P15 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-16 | P16 | Consultor | PENDIENTE | PENDIENTE | No es testimonio |
+| A-22 | P17 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-29 | P18 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-32 | P19 | Consultor; el hecho queda sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-18 | P20 | Sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio; sigue siendo la condición previa |
+| A-33, A-39, A-40, A-46, A-48, A-49, A-51, A-56 | P21 | Consultor o sin respuesta concluyente | PENDIENTE | PENDIENTE | No es testimonio |
+| A-61 | P1 + P1-bis (información nueva) | Cliente simulado, sin identificar | — | PENDIENTE (nueva) | Hecho fiscal no documentado antes |
+
+Las entradas que no se preguntaron no cambian: las INTENCIONAL, las ACCIDENTAL y las BUG A
+SECAS.
+
+### 6.2 Entradas nuevas en otros documentos
+
+| Documento | Entrada | Origen |
+|---|---|---|
+| `registro-riesgos.md` | R36 (IVA declarado distinto del cobrado) y nota en S4 | ENT-P1, ENT-P1-bis |
+| `memoria-historica.md` | H-31 (práctica: la gestoría declara con el CSV) y H-32 (decisión: rectificar las 6 facturas) | ENT-P1, ENT-P1-bis, ENT-P1-ter |
+
+### 6.3 Estado de la lista PENDIENTE
+
+**No está vacía: 29 entradas** (A-01, A-02, A-04, A-05, A-07, A-08, A-09, A-10, A-16, A-18,
+A-22, A-23, A-25, A-26, A-27, A-28, A-29, A-31, A-32, A-33, A-36, A-39, A-40, A-46, A-48,
+A-49, A-51, A-56, A-61). Esa lista, con las preguntas de §5 y la sección «Pendiente para
+próxima ronda» del acta, es la agenda de la siguiente conversación con el negocio. **El
+reconocimiento no está listo para pasar a specs formales.**

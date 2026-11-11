@@ -318,6 +318,32 @@ documentada en un comentario).
 - **Pregunta**: ¿Quién ha ido editando el fichero tras 2019 sin actualizar la fecha?
   ¿Sigue Julián vinculado al sistema? ¿Hay otro mantenedor?
 
+### Entradas añadidas tras la entrevista simulada (2026-11-11)
+
+Fuente: `entrevista-negocio-simulada.md`. Son respuestas **sin persona identificada**: no
+valen como testimonio (Principio II) hasta que alguien con nombre y fecha las confirme.
+
+### H-31 · T1 2026 (respondido el 2026-11-11) · PRÁCTICA · La gestoría declara el IVA con el CSV, no con la pantalla de IVA
+- **Qué**: el 303 del T1 de 2026 se presentó con **736,97 €** de IVA, la cifra del CSV
+  (cabeceras), y no con los 603,66 € de la pantalla de IVA (suma de líneas). Además, el
+  cliente de `FA-2026-000101` pagó **157,47 €** (suma de líneas). Responde en parte a la
+  pregunta de H-27, y contradice el comentario de que la gestoría revisa el informe de IVA
+  antes del 303 (`routes/informes.js:13`; `views/informe_iva.ejs:16`).
+- **Quién**: «Gestoría» y «Administración», personas sin identificar.
+- **Dónde**: `entrevista-negocio-simulada.md` P1 y P1-bis.
+- **Pregunta**: ¿Quién lo confirma, con nombre y fecha? ¿Desde cuándo se usa el CSV para el
+  303? ¿Y en el T2 de 2026? ¿Alguien usa la pantalla de IVA?
+
+### H-32 · 2026-11-11 · DECISIÓN (pendiente de firma) · Gerencia decide rectificar las 6 facturas descuadradas
+- **Qué**: gerencia decide corregir con rectificativa `FA-2026-000101`, `-105`, `-106`,
+  `-107`, `-108` y `RE-2026-000001`, cuyo pie no coincide con la suma de líneas. No se
+  ejecuta en esta fase (Principio III). Faltan: escrito firmado, importe de cada factura
+  sustituta, tratamiento de la RE y de la ya rectificada, y valoración de una
+  complementaria del 303.
+- **Quién**: «Gerencia», persona sin identificar.
+- **Dónde**: `entrevista-negocio-simulada.md` P1-ter y PD-01 a PD-05.
+- **Pregunta**: ¿Quién firma la decisión? ¿Se ha comunicado a la gestoría?
+
 ---
 
 ## 2. Índices por tipo
