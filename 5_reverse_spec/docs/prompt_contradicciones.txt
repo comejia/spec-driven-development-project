@@ -1,0 +1,25 @@
+Busca en todo el proyecto conceptos de negocio implementados MÁS DE UNA
+VEZ: el mismo cálculo, validación, formato o transformación escrito en dos
+o más sitios. Pistas para encontrarlos: los puntos que flujo-*.md señala
+como "dos caminos hacen lo mismo con código distinto"; funciones de nombre
+parecido en módulos distintos; lógica inline en scripts o jobs que
+reimplementa funciones que ya existen en la aplicación; y validaciones que
+se repiten con criterios diferentes.
+
+Para cada duplicidad, documenta en
+specs/000-reconocimiento/contradiccion-NN-<nombre>.md:
+(1) las implementaciones implicadas, con evidencia (fichero, función,
+    líneas) y qué camino del sistema usa cada una;
+(2) ¿usan la misma convención o algoritmo? Compáralas paso a paso;
+(3) si difieren, construye ejemplos concretos donde produzcan resultados
+    DISTINTOS para la misma entrada —con datos reales de producción si es
+    posible— y cuantifica la divergencia;
+(4) en qué circunstancias se manifiesta la divergencia y en cuáles ambas
+    coinciden (esto suele explicar por qué nadie la ha detectado);
+(5) la historia probable de cómo se llegó aquí, reconstruida desde los
+    comentarios, el estilo del código y la cronología del proyecto.
+
+NO decidas cuál de las implementaciones es "la correcta": esa es una
+pregunta de negocio, no técnica. No corrijas nada. Cada contradicción
+encontrada terminará como entrada del registro de anomalías y como
+pregunta del guion de entrevista al negocio.

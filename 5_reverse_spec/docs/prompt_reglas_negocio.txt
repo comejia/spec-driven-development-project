@@ -1,0 +1,28 @@
+Toma specs/000-reconocimiento/mapa-sistema.md y selecciona los módulos de lógica de negocio central (obligatorios criticidad ALTA) junto con las utilidades de las que dependan. 
+Extrae en specs/000-reconocimiento/reglas-de-negocio.md
+TODAS las reglas de negocio que implementan, escritas como reglas de
+negocio (qué se cobra, qué se permite, qué se calcula, cuándo y cuánto),
+no como descripción del código. Para cada regla:
+- identificador (RN-01, RN-02...);
+- enunciado en lenguaje de negocio;
+- un ejemplo con valores concretos, calculado ejecutando mentalmente el
+  código (si hay datos de producción, usa valores reales de ahí);
+- evidencia: función, fichero y líneas;
+- clasificación provisional: INTENCIONAL (señales de decisión deliberada:
+  comentarios, coherencia interna, testimonio), ACCIDENTAL (efecto
+  colateral de la implementación) o DUDOSA (indecidible desde el código).
+
+Presta atención especial a los sospechosos habituales del legacy:
+- redondeos y truncamientos, y el ORDEN en que se aplican;
+- fronteras exactas de todo umbral, tramo o límite (¿> o >=? ¿el valor
+  justo entra o no entra?);
+- manejo de fechas: fin de mes, fin de año, cambios de hora;
+- valores especiales: cero, negativos, vacíos y duplicados;
+- constantes mágicas y tablas hardcodeadas (¿de qué época son y por qué
+  siguen ahí?);
+- toda discrepancia entre lo que dicen los comentarios y lo que hace el
+  código: cada discrepancia es un hallazgo, nunca un descuido a ignorar.
+
+No corrijas nada. Constitución aplicable: toda afirmación con su
+evidencia; las suposiciones se marcan como SUPOSICIÓN y se convierten
+en preguntas.

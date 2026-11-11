@@ -1,0 +1,36 @@
+Consolida todos los hallazgos del reconocimiento y la ingeniería inversa
+en specs/000-reconocimiento/registro-de-anomalias.md. Fuentes de entrada,
+recórrelas TODAS y no dejes ninguna huérfana:
+- las reglas clasificadas como DUDOSAS o ACCIDENTALES en
+  reglas-de-negocio.md (las INTENCIONALES con historia de incidente
+  también entran: son anomalías positivas, reglas protegidas);
+- todas las contradicciones documentadas en contradiccion-*.md;
+- las entradas del registro-riesgos.md;
+- las discrepancias comentario-vs-código y los "no tocar" de
+  memoria-historica.md;
+- las respuestas de entrevista-negocio.md y los resultados de la
+  arqueología de datos, que son las que permiten cerrar clasificaciones.
+
+Una entrada por anomalía (A-01, A-02...), cada una con:
+- descripción en una frase;
+- evidencia, citando qué testigos la respaldan: CÓDIGO (fichero y
+  líneas), DATOS (consulta y resultado) y/o NEGOCIO (quién lo dijo y
+  cuándo);
+- clasificación final: INTENCIONAL / ACCIDENTAL / BUG HISTÓRICO CON
+  DEPENDIENTES / BUG A SECAS. Regla innegociable: nada se clasifica
+  como INTENCIONAL sin al menos dos de los tres testigos a favor. Si
+  falta el testimonio del negocio o el veredicto de los datos, la
+  clasificación queda como PENDIENTE con la pregunta exacta que la
+  desbloquearía;
+- quién o qué depende del comportamiento actual (personas, procesos
+  externos, documentos ya emitidos), o "nadie identificado";
+- tratamiento acordado: especificar tal cual / documentar sin
+  especificar / corregir en fase de modernización, con qué precauciones
+  y si la corrección puede o no ser retroactiva;
+- decisión de negocio pendiente, si la hay, con su responsable.
+
+Ordena por impacto económico. Cierra con una tabla resumen
+(ID / clasificación / tratamiento / decisión pendiente) y con la lista
+de clasificaciones PENDIENTES: esa lista debe quedar VACÍA antes de
+escribir las specs formales; si no lo está, es la agenda de la próxima
+conversación con el negocio.
