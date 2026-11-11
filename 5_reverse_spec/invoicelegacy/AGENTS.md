@@ -7,7 +7,7 @@ externa cuadra sus importes céntimo a céntimo.
 > **Antes de nada**: lee `.specify/memory/constitution.md`. Esta fase es para
 > **documentar y proteger**, no mejorar. No cambies comportamiento observable, no
 > añadas dependencias, no refactorices, registra los hallazgos en vez de
-> corregirlos, y escribe todo en español de España.
+> corregirlos, y escribe todo en español.
 
 ## Tabla de contenidos
 
