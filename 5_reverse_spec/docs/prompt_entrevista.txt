@@ -1,0 +1,17 @@
+A partir del acta: 
+
+1. Propaga el acta al registro de anomalías: cierra las PENDIENTES
+   que el acta resuelva, añadiendo a su evidencia el testigo NEGOCIO
+   como referencia (acta, pregunta, persona, fecha). Registra el
+   cambio de clasificación, no lo sobrescribas en silencio.
+2. Lo que el negocio revele y no estuviera documentado (procesos
+   manuales, dependencias externas, incidentes no registrados) genera
+   entradas NUEVAS en el registro de anomalías, el registro de
+   riesgos o la memoria histórica, según corresponda, citando el acta.
+3. Las preguntas sin respuesta concluyente, y las preguntas nuevas
+   que hayan surgido, van a la sección "Pendiente para próxima ronda"
+   del acta.
+4. Termina con el estado de la lista PENDIENTE del registro: si no
+   queda vacía, esa lista es la agenda de la siguiente conversación
+   con el negocio; si queda vacía, el reconocimiento está listo para
+   pasar a specs formales.

@@ -1,0 +1,8 @@
+Recorre todos los comentarios del proyecto y extrae en
+specs/000-reconocimiento/memoria-historica.md una cronología de eventos y
+decisiones del sistema: incidentes mencionados (con fecha si consta),
+decisiones de negocio atribuidas a personas (Paco, Marga, Puri, Julián,
+Roberto...), advertencias del tipo "no tocar" con su motivo, y trabajos
+abandonados. Presenta cada entrada como: fecha aproximada, qué pasó o qué
+se decidió, quién aparece implicado, dónde está el comentario (fichero y
+línea), y qué pregunta deberíamos hacerle al negocio al respecto.

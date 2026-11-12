@@ -1,0 +1,49 @@
+Crea la red de characterization tests del proyecto: tests que congelan
+el comportamiento ACTUAL del sistema, tal cual es, para detectar
+cualquier cambio futuro. Restricciones de la constitución: cero
+dependencias nuevas y cero cambios en el código de producción; usa el
+runner de tests nativo del stack (o el que ya exista en el proyecto).
+
+REGLAS DE ORO, innegociables:
+- El valor esperado de cada test es EL QUE EL CÓDIGO ACTUAL PRODUCE.
+  Ejecuta cada caso y transcribe el resultado real, aunque contradiga
+  la norma, la lógica o la documentación.
+- Si un test falla, corrige el TEST (transcribiste mal la realidad),
+  jamás el código.
+- Si al ejecutar descubres un comportamiento no documentado en el
+  reconocimiento, no lo "arregles": añádelo como entrada nueva al
+  registro de anomalías y congélalo.
+
+QUÉ CUBRIR (derívalo de los artefactos, no lo inventes):
+1. Alcance: los módulos de criticidad ALTA de mapa-sistema.md,
+   empezando por las funciones puras (cálculo y validación sin IO),
+   que son las congelables sin infraestructura.
+2. Una batería por cada regla de reglas-de-negocio.md, usando su
+   ejemplo numérico como caso de contraste: si tu transcripción no
+   coincide con el ejemplo del documento, PARA e investiga cuál de
+   los dos está mal antes de continuar.
+3. Un test por cada anomalía ejecutable del registro, con nombre
+   prefijado "CONGELA comportamiento actual:" y comentario que remite
+   a su ID. Para las contradicciones (conceptos implementados más de
+   una vez), congela CADA implementación por separado, cada una con
+   su resultado divergente.
+4. Para todo umbral, tramo o frontera: los tres puntos por los dos
+   lados (justo debajo / el valor exacto / justo encima).
+5. Los sospechosos habituales: redondeos con casos de coma flotante,
+   fechas en fin de mes, fin de año y febrero bisiesto, cero,
+   negativos, vacíos y valores inexistentes.
+
+GOLDEN MASTER del flujo central de negocio (identifícalo en los
+flujo-*.md): diseña un juego FIJO de 8-12 casos de entrada que entre
+todos ejerciten las reglas y anomalías principales; genera la salida
+completa, con todos los decimales, a un fichero master de formato
+estable y claves ordenadas; y crea el test que regenera y compara en
+profundidad, con mensajes de fallo que señalen el caso y el campo
+exactos. Añade junto al master un LEEME: qué es, cuándo DEBE
+regenerarse (solo con decisión de negocio documentada) y cómo.
+
+Al terminar: ejecuta la suite completa, itera hasta el verde total y
+añade el script de test al manifiesto del proyecto. Entrega un resumen
+final: tests creados, anomalías congeladas, y qué partes del sistema
+quedan FUERA de la red y por qué (rutas, jobs, IO), como registro de
+cobertura pendiente para la siguiente fase.
