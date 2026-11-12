@@ -72,6 +72,7 @@ El repositorio está organizado por temas. Cada carpeta contiene su propia docum
 | **2** | **GitHub SpecKit** | Toolkit de GitHub con 6 etapas y una *constitución* como autoridad máxima del proyecto. | [`2_github_spec_kit/`](2_github_spec_kit/README.md) |
 | **3** | **OpenSpec** | Framework de Fission AI con 5 etapas y un ciclo de *propuesta → specs vivas*. | [`3_open_spec/`](3_open_spec/README.md) |
 | **4** | **Multi-Spec** | Varias specs en paralelo sobre un mismo proyecto, cada una en su *git worktree* con su propia ejecución de SpecKit; al final se integra todo en `main` resolviendo conflictos. | [`4_multi_spec/`](4_multi_spec/README.md) |
+| **5** | **Reverse Spec** | SDD inverso: a partir de un sistema heredado sin documentación (GesFact), se extraen sus reglas de negocio y se redactan las specs de lo que el código ya hace. Antes de tocar nada se documenta, se valida con el negocio y se protege con tests. | [`5_reverse_spec/`](5_reverse_spec/README.md) |
 
 ---
 

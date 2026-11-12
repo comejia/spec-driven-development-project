@@ -1,0 +1,50 @@
+Vamos a decidir la partición del sistema en specs formales. Precondición:
+la lista PENDIENTE del registro de anomalías debe estar vacía; si no lo
+está, para y dime qué falta por cerrar. Lee todos los artefactos de
+specs/000-reconocimiento/ y genera specs/000-reconocimiento/propuesta-particion-specs.md.
+
+PARTE 1 — La partición. Reglas:
+- Las specs se dividen por DOMINIO DE NEGOCIO, nunca por fichero ni por
+  capa técnica. Un dominio = un conjunto de reglas que el negocio decide
+  junto y que puede evolucionar sin arrastrar a los demás.
+- Para cada spec propuesta: nombre y número; alcance en 2-3 frases;
+  módulos de código que la evidencian; reglas RN-* que le pertenecen;
+  anomalías A-* que le pertenecen, con su clasificación y tratamiento;
+  characterization tests que la respaldan (y si el golden master la
+  cubre); y su dueño natural del negocio: quién respondió sobre estas
+  cuestiones en las actas.
+- Reparto de contradicciones: la convención declarada vigente va a la
+  spec del dominio que posee la regla; la implementación divergente se
+  referencia como anomalía en la spec del camino que la usa.
+- Criterio de tamaño: cada spec debe poder revisarla el negocio en una
+  sentada (~30 min). Si excede, divídela; si dos specs se citarían
+  mutuamente en más de la mitad de sus requisitos, fusiónalas.
+- Completitud: ninguna regla RN-* ni anomalía A-* puede quedar sin spec
+  asignada; lo que excluyas (p. ej. riesgos puramente técnicos sin
+  comportamiento de negocio), justifícalo.
+- Señala los casos frontera —conceptos que podrían caer en dos specs—
+  con tu recomendación y el criterio aplicado.
+
+PARTE 2 — Para cada spec propuesta, su descripción LISTA para lanzar
+con /speckit-specify, siguiendo la plantilla de spec inversa:
+- Encuadre: "Spec de ingeniería inversa: documenta el comportamiento
+  EXISTENTE de [dominio]. No es una feature nueva: es la especificación
+  formal de lo que el sistema YA hace, para que sirva de contrato en la
+  modernización."
+- Reglas de la spec: cada requisito y criterio describe el
+  comportamiento ACTUAL con su evidencia (fichero y función, o dato
+  real); las anomalías NO se corrigen ni se omiten: se especifican tal
+  cual funcionan hoy, referenciadas por su ID del registro; los
+  criterios de aceptación deben ser verificables contra la suite de
+  tests/, citando el test cuando exista; toda decisión de negocio se
+  cita por su acta (documento, pregunta, persona, fecha).
+- Alcance: enumera las reglas del dominio CON SUS VALORES CONCRETOS
+  (umbrales exactos, convenciones, el ejemplo numérico canónico de cada
+  regla tomado de reglas-de-negocio.md) y sus anomalías con el
+  tratamiento acordado.
+- Fuera de alcance: qué queda deliberadamente para otras specs,
+  nombrándolas por número.
+
+Cierra con la tabla resumen (spec → reglas → anomalías → dueño → tests)
+y NO ejecutes ningún /speckit-specify: la propuesta se revisa y se
+aprueba antes de invertir.
