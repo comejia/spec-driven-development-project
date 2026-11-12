@@ -1,0 +1,19 @@
+Ensambla el spec pack de GesFact en specs/SPEC-PACK.md como documento de
+entrada única al paquete. Estructura:
+(1) Resumen ejecutivo PARA EL GERENTE, una página, sin tecnicismos: qué
+    se ha hecho, qué se ha descubierto (las 3-4 anomalías con impacto
+    económico, en lenguaje de negocio y con ejemplos en euros), qué
+    protección se ha instalado (los tests, explicados como "alarma que
+    salta si la facturación cambia un céntimo") y qué decisiones tiene
+    pendientes el negocio, con recomendación.
+(2) Inventario de riesgos priorizado (desde registro-riesgos.md y el
+    registro de anomalías), cada uno con impacto en una frase y
+    recomendación para la fase de modernización.
+(3) Índice comentado del paquete: mapa del sistema, glosario, las
+    specs con su trazabilidad, el registro de anomalías, la memoria
+    histórica, la entrevista de negocio y la suite de tests con
+    instrucciones de ejecución (npm test).
+(4) Estado de la red de seguridad: qué está congelado y qué no (rutas
+    HTTP y remesa end-to-end quedan explícitamente señaladas como
+    primera tarea de la siguiente fase).
+Tono: profesional, español de España, cero autobombo.
