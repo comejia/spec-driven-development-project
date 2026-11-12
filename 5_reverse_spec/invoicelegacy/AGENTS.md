@@ -25,7 +25,7 @@ externa cuadra sus importes céntimo a céntimo.
 Monolito web Node.js + Express con vistas EJS renderizadas en servidor y
 persistencia en un fichero SQLite (`datos/gesfact.db`). Estilo ES5 (`var`,
 callbacks de `sqlite3`, sin promesas). Dependencias: `express`, `body-parser`,
-`ejs`, `sqlite3`. Sin build, sin linter, sin tests.
+`ejs`, `sqlite3`. Sin build ni linter; tests de caracterización con `npm test`.
 
 Arranque: `node server.js` → http://localhost:3000 (`server.js`). Puerto y config en
 `config.js`.
@@ -127,3 +127,9 @@ Gobernanza: `.specify/memory/constitution.md`.
 <!-- This section is for human and agent-maintained operational knowledge.
      Add repo-specific conventions, gotchas, and workflow rules here.
      This section is preserved exactly as-is when re-running codebase-summary. -->
+
+- **Tests de caracterización**: `npm test` (runner nativo `node:test`, sin dependencias). Congelan el
+  comportamiento ACTUAL, correcto o no: si un test falla, se corrige el test o se explica el cambio,
+  nunca se «arregla» el código. Las pruebas con BD, rutas o remesa corren en procesos hijo con una BD
+  temporal (`test/ayudas/sandbox.js`); `datos/gesfact.db` no se abre nunca. Golden master del flujo de
+  facturación y reglas para regenerarlo: `test/golden/LEEME.md`.

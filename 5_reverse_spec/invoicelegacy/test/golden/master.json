@@ -1,0 +1,925 @@
+{
+  "casos": {
+    "G01": {
+      "camino": "A: alta manual",
+      "descripcion": "Factura simple de hostelería: una línea, IVA 21 %, cliente sin plazo (vence a +30 días, cruzando fin de mes)",
+      "entrada": {
+        "cant": [
+          "3"
+        ],
+        "cliente_id": "1",
+        "desc": [
+          "Vaso caña 20cl (caja 72)"
+        ],
+        "fecha": "2026-01-31",
+        "iva": [
+          "21"
+        ],
+        "precio": [
+          "21,60"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 64.8,
+          "cliente_id": 1,
+          "estado": "emitida",
+          "fecha": "2026-01-31",
+          "iva": 13.61,
+          "numero": "FA-2026-000109",
+          "observaciones": "",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 78.41,
+          "vencimiento": "2026-03-02"
+        },
+        "http": {
+          "location": "/facturas/10",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 64.8,
+            "cantidad": 3,
+            "cuota_iva": 13.61,
+            "cuota_recargo": 0,
+            "descripcion": "Vaso caña 20cl (caja 72)",
+            "precio": 21.6,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G02": {
+      "camino": "A: alta manual",
+      "descripcion": "Redondeo línea a línea con coma flotante: 3 × 0,12 al 21 %, 0,01 × 14,50 y 0,03 × 7,50 (coma decimal tecleada)",
+      "entrada": {
+        "cant": [
+          "1",
+          "1",
+          "1",
+          "0,01",
+          "0,03"
+        ],
+        "cliente_id": "1",
+        "desc": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ],
+        "fecha": "2026-05-06",
+        "iva": [
+          "21",
+          "21",
+          "21",
+          "21",
+          "21"
+        ],
+        "precio": [
+          "0,12",
+          "0,12",
+          "0,12",
+          "14,50",
+          "7,50"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 0.72,
+          "cliente_id": 1,
+          "estado": "emitida",
+          "fecha": "2026-05-06",
+          "iva": 0.17,
+          "numero": "FA-2026-000110",
+          "observaciones": "",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 0.89,
+          "vencimiento": "2026-06-05"
+        },
+        "http": {
+          "location": "/facturas/11",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 0.12,
+            "cantidad": 1,
+            "cuota_iva": 0.03,
+            "cuota_recargo": 0,
+            "descripcion": "a",
+            "precio": 0.12,
+            "tipo_iva": 21
+          },
+          {
+            "base": 0.12,
+            "cantidad": 1,
+            "cuota_iva": 0.03,
+            "cuota_recargo": 0,
+            "descripcion": "b",
+            "precio": 0.12,
+            "tipo_iva": 21
+          },
+          {
+            "base": 0.12,
+            "cantidad": 1,
+            "cuota_iva": 0.03,
+            "cuota_recargo": 0,
+            "descripcion": "c",
+            "precio": 0.12,
+            "tipo_iva": 21
+          },
+          {
+            "base": 0.14,
+            "cantidad": 0.01,
+            "cuota_iva": 0.03,
+            "cuota_recargo": 0,
+            "descripcion": "d",
+            "precio": 14.5,
+            "tipo_iva": 21
+          },
+          {
+            "base": 0.22,
+            "cantidad": 0.03,
+            "cuota_iva": 0.05,
+            "cuota_recargo": 0,
+            "descripcion": "e",
+            "precio": 7.5,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G03": {
+      "camino": "A: alta manual",
+      "descripcion": "Cliente con recargo de equivalencia y tres tipos de IVA (21/10/4) con cantidades fraccionarias",
+      "entrada": {
+        "cant": [
+          "4",
+          "0,97",
+          "1,41",
+          "0,32"
+        ],
+        "cliente_id": "2",
+        "desc": [
+          "Desengrasante",
+          "Café",
+          "Aceite",
+          "Portes"
+        ],
+        "fecha": "2026-02-06",
+        "iva": [
+          "21",
+          "10",
+          "4",
+          "21"
+        ],
+        "precio": [
+          "18,50",
+          "11,95",
+          "27,45",
+          "6"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 126.21,
+          "cliente_id": 2,
+          "estado": "emitida",
+          "fecha": "2026-02-06",
+          "iva": 18.65,
+          "numero": "FA-2026-000111",
+          "observaciones": "",
+          "recargo": 4.3,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 149.16,
+          "vencimiento": "2026-03-08"
+        },
+        "http": {
+          "location": "/facturas/12",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 38.7,
+            "cantidad": 1.41,
+            "cuota_iva": 1.55,
+            "cuota_recargo": 0.19,
+            "descripcion": "Aceite",
+            "precio": 27.45,
+            "tipo_iva": 4
+          },
+          {
+            "base": 11.59,
+            "cantidad": 0.97,
+            "cuota_iva": 1.16,
+            "cuota_recargo": 0.16,
+            "descripcion": "Café",
+            "precio": 11.95,
+            "tipo_iva": 10
+          },
+          {
+            "base": 74,
+            "cantidad": 4,
+            "cuota_iva": 15.54,
+            "cuota_recargo": 3.85,
+            "descripcion": "Desengrasante",
+            "precio": 18.5,
+            "tipo_iva": 21
+          },
+          {
+            "base": 1.92,
+            "cantidad": 0.32,
+            "cuota_iva": 0.4,
+            "cuota_recargo": 0.1,
+            "descripcion": "Portes",
+            "precio": 6,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G04": {
+      "camino": "A: alta manual",
+      "descripcion": "Frontera del descuento: base de 1.000,00 € exactos (no descuenta) con cliente a 60 días",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "3",
+        "desc": [
+          "Pedido apertura"
+        ],
+        "fecha": "2026-02-20",
+        "iva": [
+          "21"
+        ],
+        "obs": "Pedido apertura temporada",
+        "precio": [
+          "1000"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 1000,
+          "cliente_id": 3,
+          "estado": "emitida",
+          "fecha": "2026-02-20",
+          "iva": 210,
+          "numero": "FA-2026-000112",
+          "observaciones": "Pedido apertura temporada",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 1210,
+          "vencimiento": "2026-04-21"
+        },
+        "http": {
+          "location": "/facturas/13",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 1000,
+            "cantidad": 1,
+            "cuota_iva": 210,
+            "cuota_recargo": 0,
+            "descripcion": "Pedido apertura",
+            "precio": 1000,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G05": {
+      "camino": "A: alta manual",
+      "descripcion": "Frontera del descuento: 1.000,01 € (2 %), con y sin observaciones propias",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "1",
+        "desc": [
+          "Pedido"
+        ],
+        "fecha": "2026-03-02",
+        "iva": [
+          "21"
+        ],
+        "obs": "Pedido grande",
+        "precio": [
+          "1000,01"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 980.01,
+          "cliente_id": 1,
+          "estado": "emitida",
+          "fecha": "2026-03-02",
+          "iva": 205.8,
+          "numero": "FA-2026-000113",
+          "observaciones": "Pedido grande Descuento volumen 2% aplicado",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 1185.81,
+          "vencimiento": "2026-04-01"
+        },
+        "http": {
+          "location": "/facturas/14",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 980.01,
+            "cantidad": 1,
+            "cuota_iva": 205.8,
+            "cuota_recargo": 0,
+            "descripcion": "Pedido",
+            "precio": 980.01,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G06": {
+      "camino": "A: alta manual",
+      "descripcion": "Frontera del segundo tramo: 5.000,00 € exactos (siguen en el 2 %)",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "1",
+        "desc": [
+          "Pedido"
+        ],
+        "fecha": "2026-03-03",
+        "iva": [
+          "21"
+        ],
+        "precio": [
+          "5000"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 4900,
+          "cliente_id": 1,
+          "estado": "emitida",
+          "fecha": "2026-03-03",
+          "iva": 1029,
+          "numero": "FA-2026-000114",
+          "observaciones": " Descuento volumen 2% aplicado",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 5929,
+          "vencimiento": "2026-04-02"
+        },
+        "http": {
+          "location": "/facturas/15",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 4900,
+            "cantidad": 1,
+            "cuota_iva": 1029,
+            "cuota_recargo": 0,
+            "descripcion": "Pedido",
+            "precio": 4900,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G07": {
+      "camino": "A: alta manual",
+      "descripcion": "Frontera del segundo tramo: 5.000,01 € (5 %), con cliente con recargo",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "4",
+        "desc": [
+          "Pedido"
+        ],
+        "fecha": "2026-03-04",
+        "iva": [
+          "21"
+        ],
+        "precio": [
+          "5000,01"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 4750.01,
+          "cliente_id": 4,
+          "estado": "emitida",
+          "fecha": "2026-03-04",
+          "iva": 997.5,
+          "numero": "FA-2026-000115",
+          "observaciones": " Descuento volumen 5% aplicado",
+          "recargo": 247,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 5994.51,
+          "vencimiento": "2026-04-03"
+        },
+        "http": {
+          "location": "/facturas/16",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 4750.01,
+            "cantidad": 1,
+            "cuota_iva": 997.5,
+            "cuota_recargo": 247,
+            "descripcion": "Pedido",
+            "precio": 4750.01,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G08": {
+      "camino": "A: alta manual",
+      "descripcion": "El tramo se decide con la base bruta: 1.020,41 € → 2 % → base final 1.000,00 €, cliente con recargo",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "2",
+        "desc": [
+          "Pedido"
+        ],
+        "fecha": "2026-03-05",
+        "iva": [
+          "21"
+        ],
+        "precio": [
+          "1020,41"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 1000,
+          "cliente_id": 2,
+          "estado": "emitida",
+          "fecha": "2026-03-05",
+          "iva": 210,
+          "numero": "FA-2026-000116",
+          "observaciones": " Descuento volumen 2% aplicado",
+          "recargo": 52,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 1262,
+          "vencimiento": "2026-04-04"
+        },
+        "http": {
+          "location": "/facturas/17",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 1000,
+            "cantidad": 1,
+            "cuota_iva": 210,
+            "cuota_recargo": 52,
+            "descripcion": "Pedido",
+            "precio": 1000,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G09": {
+      "camino": "A: alta manual",
+      "descripcion": "Tecleo con rarezas: miles «1.234,50» (se lee 1,234), fila sin descripción descartada, cantidad negativa e IVA 5 % con recargo",
+      "entrada": {
+        "cant": [
+          "1",
+          "2",
+          "-2"
+        ],
+        "cliente_id": "4",
+        "desc": [
+          "con miles",
+          "",
+          "devolución"
+        ],
+        "fecha": "2026-03-06",
+        "iva": [
+          "21",
+          "21",
+          "5"
+        ],
+        "precio": [
+          "1.234,50",
+          "50",
+          "10,005"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": -18.78,
+          "cliente_id": 4,
+          "estado": "emitida",
+          "fecha": "2026-03-06",
+          "iva": -0.74,
+          "numero": "FA-2026-000117",
+          "observaciones": "",
+          "recargo": 0.06,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": -19.46,
+          "vencimiento": "2026-04-05"
+        },
+        "http": {
+          "location": "/facturas/18",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 1.23,
+            "cantidad": 1,
+            "cuota_iva": 0.26,
+            "cuota_recargo": 0.06,
+            "descripcion": "con miles",
+            "precio": 1.234,
+            "tipo_iva": 21
+          },
+          {
+            "base": -20.01,
+            "cantidad": -2,
+            "cuota_iva": -1,
+            "cuota_recargo": 0,
+            "descripcion": "devolución",
+            "precio": 10.005,
+            "tipo_iva": 5
+          }
+        ]
+      }
+    },
+    "G10": {
+      "camino": "A: alta manual",
+      "descripcion": "Fecha de otro año grabada hoy (2025-12-31 en 2026): el número es del año del reloj; cliente a 60 días",
+      "entrada": {
+        "cant": [
+          "1"
+        ],
+        "cliente_id": "5",
+        "desc": [
+          "Servicio"
+        ],
+        "fecha": "2025-12-31",
+        "iva": [
+          "21"
+        ],
+        "precio": [
+          "100"
+        ]
+      },
+      "salida": {
+        "factura": {
+          "base": 100,
+          "cliente_id": 5,
+          "estado": "emitida",
+          "fecha": "2025-12-31",
+          "iva": 21,
+          "numero": "FA-2026-000118",
+          "observaciones": "",
+          "recargo": 0,
+          "rectifica_a": null,
+          "serie": "FA",
+          "total": 121,
+          "vencimiento": "2026-03-01"
+        },
+        "http": {
+          "location": "/facturas/19",
+          "status": 302
+        },
+        "lineas": [
+          {
+            "base": 100,
+            "cantidad": 1,
+            "cuota_iva": 21,
+            "cuota_recargo": 0,
+            "descripcion": "Servicio",
+            "precio": 100,
+            "tipo_iva": 21
+          }
+        ]
+      }
+    },
+    "G11": {
+      "camino": "B: remesa mensual",
+      "descripcion": "Remesa de febrero de 2026 con los contratos de la semilla (alta a mitad de mes: días reales sobre 28)",
+      "entrada": {
+        "contratos": "los de la semilla",
+        "fechaSistema": "2026-11-11T10:00:00",
+        "mes": "2026-02"
+      },
+      "salida": {
+        "codigoSalida": 0,
+        "consola": "  FA-2026-000109  Cafetería La Parada, S.C.  108.90 eur\n  FA-2026-000110  Restaurante Casa Ubaldo, S.L.  175.45 eur\n  FA-2026-000111  Bar Nuevo Siglo  54.45 eur\nRemesa 2026-02 terminada: 3 facturas.\n",
+        "contadores": [
+          {
+            "anyo": 2026,
+            "serie": "FA",
+            "ultimo": 111
+          },
+          {
+            "anyo": 2026,
+            "serie": "RE",
+            "ultimo": 1
+          }
+        ],
+        "facturas": [
+          {
+            "factura": {
+              "base": 90,
+              "cliente_id": 1,
+              "estado": "emitida",
+              "fecha": "2026-02-28",
+              "iva": 18.9,
+              "numero": "FA-2026-000109",
+              "observaciones": "Remesa febrero 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 108.9,
+              "vencimiento": "2026-03-30"
+            },
+            "lineas": [
+              {
+                "base": 90,
+                "cantidad": 1,
+                "cuota_iva": 18.9,
+                "cuota_recargo": 0,
+                "descripcion": "Alquiler máquina de café Futurmat F3 (febrero 2026)",
+                "precio": 90,
+                "tipo_iva": 21
+              }
+            ]
+          },
+          {
+            "factura": {
+              "base": 145,
+              "cliente_id": 3,
+              "estado": "emitida",
+              "fecha": "2026-02-28",
+              "iva": 30.45,
+              "numero": "FA-2026-000110",
+              "observaciones": "Remesa febrero 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 175.45,
+              "vencimiento": "2026-04-29"
+            },
+            "lineas": [
+              {
+                "base": 145,
+                "cantidad": 1,
+                "cuota_iva": 30.45,
+                "cuota_recargo": 0,
+                "descripcion": "Mantenimiento cámaras frigoríficas (febrero 2026)",
+                "precio": 145,
+                "tipo_iva": 21
+              }
+            ]
+          },
+          {
+            "factura": {
+              "base": 45,
+              "cliente_id": 6,
+              "estado": "emitida",
+              "fecha": "2026-02-28",
+              "iva": 9.45,
+              "numero": "FA-2026-000111",
+              "observaciones": "Remesa febrero 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 54.45,
+              "vencimiento": "2026-03-30"
+            },
+            "lineas": [
+              {
+                "base": 45,
+                "cantidad": 1,
+                "cuota_iva": 9.45,
+                "cuota_recargo": 0,
+                "descripcion": "Alquiler máquina de café Futurmat F3 (14 dias)",
+                "precio": 45,
+                "tipo_iva": 21
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "G12": {
+      "camino": "B: remesa mensual",
+      "descripcion": "Remesa de diciembre de 2026 lanzada el 1-ene-2027: año del número, baja a mitad de mes, cuota grande con recargo y alta a mitad de mes con IVA 10 %",
+      "entrada": {
+        "contratos": [
+          [
+            1,
+            "Alquiler completo",
+            90,
+            21,
+            "2024-03-01",
+            null
+          ],
+          [
+            2,
+            "Cuota grande con recargo",
+            1500,
+            21,
+            "2020-01-01",
+            null
+          ],
+          [
+            3,
+            "Baja a mitad de mes",
+            145,
+            21,
+            "2023-01-15",
+            "2026-12-15"
+          ],
+          [
+            6,
+            "Alta a mitad de mes",
+            90,
+            10,
+            "2026-12-16",
+            null
+          ]
+        ],
+        "fechaSistema": "2027-01-01T09:00:00",
+        "mes": "2026-12"
+      },
+      "salida": {
+        "codigoSalida": 0,
+        "consola": "  FA-2027-000001  Cafetería La Parada, S.C.  108.90 eur\n  FA-2027-000002  Ferretería El Tornillo  1855.14 eur\n  FA-2027-000003  Restaurante Casa Ubaldo, S.L.  84.89 eur\n  FA-2027-000004  Bar Nuevo Siglo  51.09 eur\nRemesa 2026-12 terminada: 4 facturas.\n",
+        "contadores": [
+          {
+            "anyo": 2026,
+            "serie": "FA",
+            "ultimo": 108
+          },
+          {
+            "anyo": 2027,
+            "serie": "FA",
+            "ultimo": 4
+          },
+          {
+            "anyo": 2026,
+            "serie": "RE",
+            "ultimo": 1
+          }
+        ],
+        "facturas": [
+          {
+            "factura": {
+              "base": 90,
+              "cliente_id": 1,
+              "estado": "emitida",
+              "fecha": "2026-12-31",
+              "iva": 18.9,
+              "numero": "FA-2027-000001",
+              "observaciones": "Remesa diciembre 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 108.9,
+              "vencimiento": "2027-01-30"
+            },
+            "lineas": [
+              {
+                "base": 90,
+                "cantidad": 1,
+                "cuota_iva": 18.9,
+                "cuota_recargo": 0,
+                "descripcion": "Alquiler completo (diciembre 2026)",
+                "precio": 90,
+                "tipo_iva": 21
+              }
+            ]
+          },
+          {
+            "factura": {
+              "base": 1470,
+              "cliente_id": 2,
+              "estado": "emitida",
+              "fecha": "2026-12-31",
+              "iva": 308.7,
+              "numero": "FA-2027-000002",
+              "observaciones": "Remesa diciembre 2026",
+              "recargo": 76.44,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 1855.14,
+              "vencimiento": "2027-01-30"
+            },
+            "lineas": [
+              {
+                "base": 1470,
+                "cantidad": 1,
+                "cuota_iva": 308.7,
+                "cuota_recargo": 76.44,
+                "descripcion": "Cuota grande con recargo (diciembre 2026)",
+                "precio": 1470,
+                "tipo_iva": 21
+              }
+            ]
+          },
+          {
+            "factura": {
+              "base": 70.16,
+              "cliente_id": 3,
+              "estado": "emitida",
+              "fecha": "2026-12-31",
+              "iva": 14.73,
+              "numero": "FA-2027-000003",
+              "observaciones": "Remesa diciembre 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 84.89,
+              "vencimiento": "2027-03-01"
+            },
+            "lineas": [
+              {
+                "base": 70.16,
+                "cantidad": 1,
+                "cuota_iva": 14.73,
+                "cuota_recargo": 0,
+                "descripcion": "Baja a mitad de mes (15 dias)",
+                "precio": 70.16,
+                "tipo_iva": 21
+              }
+            ]
+          },
+          {
+            "factura": {
+              "base": 46.45,
+              "cliente_id": 6,
+              "estado": "emitida",
+              "fecha": "2026-12-31",
+              "iva": 4.64,
+              "numero": "FA-2027-000004",
+              "observaciones": "Remesa diciembre 2026",
+              "recargo": 0,
+              "rectifica_a": null,
+              "serie": "FA",
+              "total": 51.09,
+              "vencimiento": "2027-01-30"
+            },
+            "lineas": [
+              {
+                "base": 46.45,
+                "cantidad": 1,
+                "cuota_iva": 4.64,
+                "cuota_recargo": 0,
+                "descripcion": "Alta a mitad de mes (16 dias)",
+                "precio": 46.45,
+                "tipo_iva": 10
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "contadoresTrasLasAltas": [
+      {
+        "anyo": 2026,
+        "serie": "FA",
+        "ultimo": 118
+      },
+      {
+        "anyo": 2026,
+        "serie": "RE",
+        "ultimo": 1
+      }
+    ],
+    "entorno": {
+      "fechaSistema": "2026-11-11T10:00:00",
+      "tz": "Europe/Madrid"
+    },
+    "formato": 1,
+    "nota": "Golden master del flujo central de emision de facturas. No editar a mano: ver test/golden/LEEME.md"
+  }
+}

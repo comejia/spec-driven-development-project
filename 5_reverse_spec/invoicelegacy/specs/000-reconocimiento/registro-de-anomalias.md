@@ -1361,6 +1361,116 @@ título.
   **Gestoría** y **Gerencia**.
 - **Fuentes**: ENT-P1, ENT-P1-bis, A-01, R36, MH-31.
 
+### Entradas añadidas al escribir la red de tests de caracterización (2026-11-11)
+
+Al ejecutar cada caso de `test/` contra el código real aparecieron comportamientos que ningún
+documento de reconocimiento recogía. Se registran aquí **sin corregir** (Principio III) y cada
+uno queda **congelado** por un test cuyo nombre empieza por «CONGELA comportamiento actual:» y
+cita su ID. No se renumeran ni recuentan las secciones 2, 3 y 5: estas entradas son adicionales.
+Todas las clasificaciones son **provisionales**: no hay testigo NEGOCIO (Principio II) y las
+evidencias son CÓDIGO y ejecución (**Entorno**). Ninguna autoriza a cambiar nada.
+
+Nota sobre A-59 («Sin tests»): desde esta fecha existe la red de tests (`npm test`); la entrada
+sigue describiendo el estado en el que se hizo el reconocimiento.
+
+#### A-62 · `redondear2` devuelve `-0` para los negativos entre -0,005 y 0 y el cero negativo se propaga
+- **Descripción**: `Math.round(-0.004 * 100) / 100` es `-0`. En una línea con precio negativo
+  de medio céntimo, `base`, `cuotaIva` y `cuotaRecargo` quedan en `-0` (la cabecera suma a `0`).
+- **Impacto económico**: ninguno aparente; `-0` se muestra como `0` y SQLite lo guarda como 0.
+  Riesgo de comparaciones con `Object.is` o de serializaciones que conserven el signo.
+- **Evidencia**: CÓDIGO `lib/util.js:5-7`, `services/calculo.js:27-31`. Entorno: tests
+  «A-62» en `test/util.test.js` y `test/calculo.test.js`.
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-63 · `formatearImporte` escribe «Infinity,undefined» con infinitos o importes ≥ 1e21
+- **Descripción**: `toFixed(2)` de `Infinity` devuelve `"Infinity"` (sin punto) y `partes[1]` es
+  `undefined`; `1e21` da `"1e+21,undefined"`. `NaN` sí se protege (`0,00`).
+- **Impacto económico**: ninguno con importes reales (se necesitaría un importe infinito).
+- **Evidencia**: CÓDIGO `lib/util.js:51-58`. Entorno: test «A-63» en `test/util.test.js`.
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-64 · `fechaBonita` con un texto que no es `AAAA-MM-DD` escribe «undefined» en el resultado
+- **Descripción**: `fechaBonita('abc')` devuelve `undefined/undefined/abc`; `'2026-5'` devuelve
+  `undefined/5/2026`. Solo se protege el valor vacío.
+- **Impacto económico**: una fecha mal grabada (A-44) saldría así en listados, factura impresa y CSV.
+- **Evidencia**: CÓDIGO `lib/util.js:29-33`. Entorno: test «A-64».
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-65 · `diasDelMes` con un mes 14 devuelve 28 y con un texto que no es fecha devuelve `NaN`
+- **Descripción**: añade a lo documentado en RN-54/A-42 (mes 13 y 00 → 31): el mes 14 equivale a
+  febrero del año siguiente (28 días); `diasDelMes('abc')` y `''` devuelven `NaN`.
+- **Evidencia**: CÓDIGO `lib/util.js:36-39`. Entorno: test «A-65» en `test/util.test.js`.
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-66 · `sumarDias` con fecha nula da 1970-01-02 y una fecha inexistente se desborda al mes siguiente
+- **Descripción**: `sumarDias(null, 1)` = `1970-01-02` (`new Date(null)` es el origen de época);
+  `sumarDias('2026-02-30', 0)` = `2026-03-02`. Complementa A-44 (texto ilegible → `NaN-NaN-NaN`).
+- **Impacto económico**: un vencimiento plausible pero erróneo, sin ningún aviso, si llegara una
+  fecha inexistente al alta (el formulario usa `type="date"`, el servidor no valida).
+- **Evidencia**: CÓDIGO `lib/util.js:20-26`; `routes/facturas.js:44,69`. Entorno: test «A-66».
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-67 · Una línea no numérica anula también el descuento por volumen del resto de la factura
+- **Descripción**: con una línea cuyo importe es `NaN`, la base bruta pasa a `NaN`,
+  `porcentajeDescuento(NaN)` es 0 y las demás líneas (p. ej. 2.000 €) no reciben el 2 %. El total sale
+  `NaN`; en el alta manual el `INSERT` falla (A-45) y el número queda consumido (A-12).
+- **Evidencia**: CÓDIGO `services/calculo.js:53-61`. Entorno: test «A-67» en `test/calculo.test.js`.
+- **Clasificación (provisional): ACCIDENTAL** (la factura no llega a grabarse).
+  **Tratamiento**: especificar tal cual.
+
+#### A-68 · `calcularProrrateo` lanza `TypeError` con una fecha nula y devuelve `NaN` con un texto que no es fecha
+- **Descripción**: `calcularProrrateo(90, null, '2026-07-10')` lanza; `('x','y')`, `('2026-07','2026-07')`
+  y `NaN` en la cuota devuelven `NaN`. Complementa A-30 (no valida las fechas).
+- **Evidencia**: CÓDIGO `services/calculo.js:95-102`. Entorno: tests «A-30» y «A-68».
+- **Clasificación (provisional): ACCIDENTAL** (la ruta de baja siempre pasa textos con fecha).
+  **Tratamiento**: especificar tal cual.
+
+#### A-69 · La factura de referencia «1.000 justo sin descuento» (`FA-2026-000103`) no es reproducible con el código actual
+- **Descripción**: `db.js:138` la cita como el caso comentado con la gestoría (base 1.000,00 €, sin
+  descuento) y A-24 la usa como caso frontera de los DATOS. Pero con **sus propias líneas** el código
+  da 1.000,02 € brutos (la línea «Portes» 0,92 × 6,00 es 5,52, grabada 5,50, H-02): descuento del 2 %,
+  base 980,01 € y total 1.185,82 €. La cabecera grabada (1.000,00 / 1.210,00) no sale del cálculo.
+- **Impacto económico**: el único caso real que respaldaba el `>` estricto en 1.000 € (INTENCIONAL en
+  A-24) no sirve como caso frontera: no lo ejercita el código tal como está.
+- **Evidencia**: CÓDIGO `services/calculo.js:36-43, 48-88`; DATOS `FA-2026-000103` (AD-03); Entorno: test «A-69».
+- **Clasificación (provisional): PENDIENTE** (afecta a la solidez de A-24 y a A-32). Pregunta que lo
+  desbloquea: «¿Cómo se emitió `FA-2026-000103`: con una línea de Portes de 5,50 tecleada a mano? ¿Es
+  de verdad el caso hablado con la gestoría?».
+- **Tratamiento**: documentar sin especificar la factura; especificar tal cual la regla del `>`.
+
+#### A-70 · Una remesa con mes inexistente escribe «undefined» y un vencimiento `NaN-NaN-NaN`
+- **Descripción**: ampliación de A-42. Con `2026-13`, `nombreMes` devuelve `undefined 2026`
+  (observaciones «Remesa undefined 2026», líneas «… (undefined 2026)»), la fecha es `2026-13-31` y el
+  vencimiento `NaN-NaN-NaN`. Las facturas se numeran y graban igualmente (exit 0). Con `2026-00` el
+  mes también se acepta (fecha `2026-00-31`).
+- **Evidencia**: CÓDIGO `scripts/remesa_mensual.js:14-18, 21, 59-62, 80-84`. Entorno: tests «A-42 / A-70».
+- **Clasificación (provisional): BUG A SECAS** (documentos legales numerados con datos imposibles, sin
+  dependientes identificados). **Tratamiento**: especificar tal cual; corregir en modernización.
+
+#### A-71 · Un argumento incorrecto de la remesa deja un fichero `datos/gesfact.db` vacío en el directorio de ejecución
+- **Descripción**: `scripts/remesa_mensual.js` carga `../db` (que crea la carpeta `datos/` y abre el
+  fichero SQLite) antes de validar el argumento; con uso incorrecto escribe el mensaje de uso, sale con
+  código 1 y deja un fichero de 0 bytes. Si se lanzara desde otra carpeta, la siguiente ejecución
+  sembraría esa BD paralela (A-17).
+- **Evidencia**: CÓDIGO `scripts/remesa_mensual.js:9, 14-18`; `db.js:11-15`. Entorno: test «A-71».
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
+#### A-72 · `siguienteNumero` acepta cualquier serie y no vigila un reloj retrasado
+- **Descripción**: cualquier cadena (incluida la vacía) abre su propio contador (`XX-2026-000001`,
+  `-2026-000001`); RN-40 dice que hay dos series, pero no está en el código. Con el reloj en 2025, se abre
+  `FA/2025` desde 0 aunque `FA/2026` ya vaya por 108. `formatear` tampoco valida el número
+  (`FA-2026-0001.5`, `FA-2026-0000-5`, `FA-2026-00null`).
+- **Evidencia**: CÓDIGO `lib/numeracion.js:14-42`. Entorno: tests «A-72» y «A-10» en `test/numeracion.test.js`.
+- **Clasificación (provisional): ACCIDENTAL** (las series las escribe el código de las rutas).
+  **Tratamiento**: especificar tal cual.
+
+#### A-73 · La marca de recargo (`== 1`) también se activa con `'1.0'` y con `[1]`
+- **Descripción**: precisión de RN-03/A-29: `recargo_equivalencia == 1` es verdadero con `1`, `'1'`,
+  `true`, `'1.0'` y `[1]`; falso con `0`, `2`, `null`, `'a'`. La columna es `INTEGER`, así que solo
+  entran 0 y 1 desde la BD.
+- **Evidencia**: CÓDIGO `services/calculo.js:49`. Entorno: tests de `calcularFactura` en `test/calculo.test.js`.
+- **Clasificación (provisional): ACCIDENTAL.** **Tratamiento**: especificar tal cual.
+
 ---
 
 ## 2. Tabla resumen
